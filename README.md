@@ -1,2 +1,2 @@
-# blockhero
+# cryptohero
 console crypto trading terminal.
