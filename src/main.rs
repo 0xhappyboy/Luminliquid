@@ -6,7 +6,7 @@ pub mod pages;
 pub mod task;
 pub mod types;
 
-use std::{io, sync::atomic::Ordering, thread};
+use std::{io, sync::atomic::Ordering};
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
