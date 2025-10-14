@@ -1,8 +1,8 @@
-use std::sync::Arc;
+use std::sync::{Arc, atomic::Ordering};
 
 use tokio::sync::mpsc;
 
-use crate::types::BackgroundThreadData;
+use crate::{global::APPLICETION_CLOSE_FLAG, types::BackgroundThreadData};
 
 pub enum TaskType {
     Ethereum,
@@ -38,5 +38,7 @@ impl TaskController {
         return (tx, rx);
     }
     /// clear all task
-    async fn clear_all_task(&mut self) {}
+    pub fn clear_all_task() {
+        APPLICETION_CLOSE_FLAG.store(true, Ordering::SeqCst);
+    }
 }

@@ -1,18 +1,18 @@
 use crossterm::event::{self, Event, KeyCode};
-use ratatui::{Terminal, backend::CrosstermBackend, widgets::Dataset};
+use ratatui::{Terminal, backend::CrosstermBackend};
 use std::{
     io,
-    sync::atomic::Ordering,
     time::{Duration, Instant},
 };
 use tokio::sync::mpsc;
 
 use crate::{
     app::{App, AreaFocusEnum},
-    global::APPLICETION_CLOSE_FLAG,
     index::ui,
     pages::ethereum::EthereumPageTabEnum,
+    task::TaskController,
     types::{BackgroundThreadData, NetworkEnum},
+    widgets::menu::MenuFocusArea,
 };
 
 /// event poll
@@ -52,7 +52,19 @@ pub fn event_poll(
                         // quit app
                         KeyCode::Char('q') => app.quit = true,
                         KeyCode::Esc => {
-                            app.focus = AreaFocusEnum::LeftMenu;
+                            // app.focus = AreaFocusEnum::LeftMenu;
+                            match app.focus {
+                                AreaFocusEnum::LeftMenu => match app.menu.focus {
+                                    MenuFocusArea::SubMenu(_) => {
+                                        app.collapse_menu();
+                                    }
+                                    MenuFocusArea::MainMenu => {}
+                                },
+                                AreaFocusEnum::ContentArea(area_index) => {
+                                    app.focus = AreaFocusEnum::LeftMenu;
+                                }
+                                _ => {}
+                            }
                         }
                         KeyCode::Char('/') => {
                             app.search_mode = true;
@@ -65,8 +77,7 @@ pub fn event_poll(
                                 app.current_content_tab = 0;
                                 match app.current_menu_item {
                                     NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab =
-                                            EthereumPageTabEnum::Status
+                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Status
                                     }
                                     NetworkEnum::Solana => app.solana_page_current_tab_index = 0,
                                     NetworkEnum::Bsc => app.bsc_page_current_tab_index = 0,
@@ -173,7 +184,16 @@ pub fn event_poll(
                         // ============ Switch the right content area subframe end ============
                         KeyCode::Down => match app.focus {
                             AreaFocusEnum::LeftMenu => {
-                                app.next_menu();
+                                // app.next_menu();
+
+                                match app.menu.focus {
+                                    MenuFocusArea::MainMenu => {
+                                        app.next_main_menu();
+                                    }
+                                    MenuFocusArea::SubMenu(_) => {
+                                        app.next_sub_menu();
+                                    }
+                                }
                             }
                             AreaFocusEnum::ContentArea(area_index) => {
                                 app.next_content_item(area_index);
@@ -182,7 +202,16 @@ pub fn event_poll(
                         },
                         KeyCode::Up => match app.focus {
                             AreaFocusEnum::LeftMenu => {
-                                app.previous_menu();
+                                // app.previous_menu();
+
+                                match app.menu.focus {
+                                    MenuFocusArea::MainMenu => {
+                                        app.previous_main_menu();
+                                    }
+                                    MenuFocusArea::SubMenu(_) => {
+                                        app.previous_sub_menu();
+                                    }
+                                }
                             }
                             AreaFocusEnum::ContentArea(area_index) => {
                                 app.previous_content_item(area_index);
@@ -190,27 +219,42 @@ pub fn event_poll(
                             _ => {}
                         },
                         KeyCode::Right => match app.focus {
-                            AreaFocusEnum::LeftMenu => {
-                                app.previous_menu();
-                            }
+                            AreaFocusEnum::LeftMenu => match app.menu.focus {
+                                MenuFocusArea::MainMenu => {
+                                    app.expand_menu();
+                                }
+                                MenuFocusArea::SubMenu(_) => {
+                                    app.handle_sub_menu_selection();
+                                }
+                            },
                             AreaFocusEnum::ContentArea(area_index) => {
                                 app.previous_content_item(area_index);
                             }
                             _ => {}
                         },
                         KeyCode::Left => match app.focus {
-                            AreaFocusEnum::LeftMenu => {
-                                app.previous_menu();
-                            }
+                            AreaFocusEnum::LeftMenu => match app.menu.focus {
+                                MenuFocusArea::SubMenu(_) => {
+                                    app.collapse_menu();
+                                }
+                                MenuFocusArea::MainMenu => {
+                                    app.previous_main_menu();
+                                }
+                            },
                             AreaFocusEnum::ContentArea(area_index) => {
                                 app.previous_content_item(area_index);
                             }
                             _ => {}
                         },
                         KeyCode::Enter => match app.focus {
-                            AreaFocusEnum::LeftMenu => {
-                                app.focus = AreaFocusEnum::ContentArea(0);
-                            }
+                            AreaFocusEnum::LeftMenu => match app.menu.focus {
+                                MenuFocusArea::MainMenu => {
+                                    app.expand_menu();
+                                }
+                                MenuFocusArea::SubMenu(_) => {
+                                    app.handle_sub_menu_selection();
+                                }
+                            },
                             AreaFocusEnum::ContentArea(area_index) => {
                                 app.handle_content_enter(area_index);
                             }
@@ -227,7 +271,7 @@ pub fn event_poll(
         // close application
         if app.quit {
             // clear all theard
-            APPLICETION_CLOSE_FLAG.store(true, Ordering::SeqCst);
+            TaskController::clear_all_task();
             return Ok(());
         }
     }

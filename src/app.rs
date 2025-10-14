@@ -5,7 +5,10 @@ use crate::{
     i18n::I18N,
     pages::ethereum::{EthereumPageData, EthereumPageTabEnum},
     types::NetworkEnum,
-    widgets::market_table::TokenData,
+    widgets::{
+        market_table::TokenData,
+        menu::{Menu, MenuFocusArea},
+    },
 };
 
 // focus area enum
@@ -19,8 +22,8 @@ pub enum AreaFocusEnum {
 }
 
 pub struct App {
-    pub left_menu_items: Vec<NetworkEnum>,
-    pub left_menu_state: ListState,
+    // left menu
+    pub menu: Menu,
     pub current_menu_item: NetworkEnum,
     pub current_content_tab: usize,
     // ethereum page parameters
@@ -53,7 +56,6 @@ pub struct App {
 
 impl App {
     pub fn new() -> Self {
-        let menu_items = NetworkEnum::all_vec();
         let mut left_menu_state = ListState::default();
         left_menu_state.select(Some(0));
         let mut block_list_state = ListState::default();
@@ -83,9 +85,8 @@ impl App {
         table_state.select(Some(0));
 
         Self {
-            left_menu_items: menu_items.clone(),
-            left_menu_state,
-            current_menu_item: menu_items[0].clone(),
+            menu: Menu::new(),
+            current_menu_item: NetworkEnum::all_vec()[0].clone(),
             current_content_tab: 0,
             focus: AreaFocusEnum::LeftMenu,
             quit: false,
@@ -107,10 +108,15 @@ impl App {
             i18n: I18N::EN,
         }
     }
-    pub fn next_menu(&mut self) {
-        let i = match self.left_menu_state.selected() {
+    // get current main menu index
+    fn get_current_main_menu_index(&self) -> Option<usize> {
+        self.menu.main_menu_selection.selected()
+    }
+    // next main menu
+    pub fn next_main_menu(&mut self) {
+        let i = match self.menu.main_menu_selection.selected() {
             Some(i) => {
-                if i >= self.left_menu_items.len() - 1 {
+                if i >= self.menu.menu_items.len() - 1 {
                     0
                 } else {
                     i + 1
@@ -118,22 +124,72 @@ impl App {
             }
             None => 0,
         };
-        self.left_menu_state.select(Some(i));
-        self.current_menu_item = self.left_menu_items[i].clone();
+        self.menu.main_menu_selection.select(Some(i));
+
+        if let Some(menu) = self.menu.menu_items.get(i) {
+            self.menu.current_main_menu = menu.main.clone();
+        }
     }
-    pub fn previous_menu(&mut self) {
-        let i = match self.left_menu_state.selected() {
+    // previous main menu
+    pub fn previous_main_menu(&mut self) {
+        let i = match self.menu.main_menu_selection.selected() {
             Some(i) => {
                 if i == 0 {
-                    self.left_menu_items.len() - 1
+                    self.menu.menu_items.len() - 1
                 } else {
                     i - 1
                 }
             }
             None => 0,
         };
-        self.left_menu_state.select(Some(i));
-        self.current_menu_item = self.left_menu_items[i].clone();
+        self.menu.main_menu_selection.select(Some(i));
+        if let Some(menu) = self.menu.menu_items.get(i) {
+            self.menu.current_main_menu = menu.main.clone();
+        }
+    }
+    // next sub menu
+    pub fn next_sub_menu(&mut self) {
+        if let MenuFocusArea::SubMenu(main_index) = self.menu.focus {
+            if let Some(menu) = self.menu.menu_items.get_mut(main_index) {
+                menu.next_sub_menu();
+            }
+        }
+    }
+    // previous sub menu
+    pub fn previous_sub_menu(&mut self) {
+        if let MenuFocusArea::SubMenu(main_index) = self.menu.focus {
+            if let Some(menu) = self.menu.menu_items.get_mut(main_index) {
+                menu.previous_sub_menu();
+            }
+        }
+    }
+    // expand menu
+    pub fn expand_menu(&mut self) {
+        if let Some(main_index) = self.get_current_main_menu_index() {
+            if let Some(menu) = self.menu.menu_items.get_mut(main_index) {
+                menu.expanded = true;
+                self.menu.focus = MenuFocusArea::SubMenu(main_index);
+            }
+        }
+    }
+    // collapse menu
+    pub fn collapse_menu(&mut self) {
+        if let MenuFocusArea::SubMenu(main_index) = self.menu.focus {
+            if let Some(menu) = self.menu.menu_items.get_mut(main_index) {
+                menu.expanded = false;
+                self.menu.focus = MenuFocusArea::MainMenu;
+            }
+        } else if let MenuFocusArea::MainMenu = self.menu.focus {
+            self.previous_main_menu();
+        }
+    }
+    // handle sub menu selection
+    pub fn handle_sub_menu_selection(&mut self) {
+        if let MenuFocusArea::SubMenu(main_index) = self.menu.focus {
+            self.focus = AreaFocusEnum::ContentArea(0);
+        } else if let MenuFocusArea::MainMenu = self.menu.focus {
+            self.expand_menu();
+        }
     }
     pub fn next_content_item(&mut self, area_index: usize) {}
     pub fn previous_content_item(&mut self, area_index: usize) {}

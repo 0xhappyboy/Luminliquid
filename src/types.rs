@@ -3,10 +3,8 @@ pub struct Network<'a> {
 }
 
 /// background thread data structure, interact with the UI thread through this data structure.
-#[derive(Debug)]
-pub struct BackgroundThreadData {
-    pub a: u64,
-}
+#[derive(Debug, Clone, Copy)]
+pub struct BackgroundThreadData {}
 
 /// network enum
 #[derive(Debug, Clone, PartialEq)]
