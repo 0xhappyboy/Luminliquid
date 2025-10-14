@@ -5,16 +5,15 @@ use ratatui::{
 };
 
 use crate::app::{App, AreaFocusEnum};
-pub struct Solana;
+pub struct SolanaPageUI;
 
-impl Solana {
-    pub fn read(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
+impl SolanaPageUI {
+    pub fn ui(frame: &mut ratatui::Frame, app: &mut App, area: Rect) {
         let right_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(10)].as_ref())
             .split(area);
-
-        f.render_widget(
+        frame.render_widget(
             Block::default()
                 .borders(Borders::ALL)
                 .title(" Solana Block 1 ")
@@ -25,7 +24,7 @@ impl Solana {
                 }),
             right_chunks[0],
         );
-        f.render_widget(
+        frame.render_widget(
             Block::default()
                 .borders(Borders::ALL)
                 .title(" Solana Block 2 ")

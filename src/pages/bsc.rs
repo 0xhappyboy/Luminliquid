@@ -5,10 +5,10 @@ use ratatui::{
 };
 
 use crate::app::{App, AreaFocusEnum};
-pub struct Bsc;
+pub struct BscPageUI;
 
-impl Bsc {
-    pub fn read(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
+impl BscPageUI {
+    pub fn ui(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
         let right_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(10)].as_ref())

@@ -1,19 +1,23 @@
 use crossterm::event::{self, Event, KeyCode};
-use ratatui::{Terminal, backend::CrosstermBackend};
+use ratatui::{Terminal, backend::CrosstermBackend, widgets::Dataset};
 use std::{
     io,
+    sync::atomic::Ordering,
     time::{Duration, Instant},
 };
+use tokio::sync::mpsc;
 
 use crate::{
     app::{App, AreaFocusEnum},
+    global::APPLICETION_CLOSE_FLAG,
     index::ui,
-    global::NetworkEnum,
+    types::{BackgroundThreadData, NetworkEnum},
 };
 
 /// event poll
 /// program main loop
 pub fn event_poll(
+    mut rx: mpsc::UnboundedReceiver<BackgroundThreadData>,
     terminal: &mut Terminal<CrosstermBackend<std::io::Stdout>>,
     mut app: App,
 ) -> io::Result<()> {
@@ -21,6 +25,8 @@ pub fn event_poll(
     let mut last_key_time = Instant::now();
     let key_debounce = Duration::from_millis(150);
     loop {
+        // backgroun thread data
+        while let Ok(data) = rx.try_recv() {}
         terminal.draw(|f| ui(f, &mut app))?;
         let timeout = tick_rate
             .checked_sub(app.last_update.elapsed())
@@ -56,21 +62,73 @@ pub fn event_poll(
                         KeyCode::Char('1') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 0;
+                                match app.current_menu_item {
+                                    NetworkEnum::Ethereum => {
+                                        app.ethereum_page_current_tab_index = 0
+                                    }
+                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 0,
+                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 0,
+                                    NetworkEnum::Base => app.base_page_current_tab_index = 0,
+                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 0,
+                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 0,
+                                    NetworkEnum::HyperEvm => {
+                                        app.hyperevm_page_current_tab_index = 0
+                                    }
+                                }
                             }
                         }
                         KeyCode::Char('2') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 1;
+                                match app.current_menu_item {
+                                    NetworkEnum::Ethereum => {
+                                        app.ethereum_page_current_tab_index = 1
+                                    }
+                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 1,
+                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 1,
+                                    NetworkEnum::Base => app.base_page_current_tab_index = 1,
+                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 1,
+                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 1,
+                                    NetworkEnum::HyperEvm => {
+                                        app.hyperevm_page_current_tab_index = 1
+                                    }
+                                }
                             }
                         }
                         KeyCode::Char('3') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 2;
+                                match app.current_menu_item {
+                                    NetworkEnum::Ethereum => {
+                                        app.ethereum_page_current_tab_index = 2
+                                    }
+                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 2,
+                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 2,
+                                    NetworkEnum::Base => app.base_page_current_tab_index = 2,
+                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 2,
+                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 2,
+                                    NetworkEnum::HyperEvm => {
+                                        app.hyperevm_page_current_tab_index = 2
+                                    }
+                                }
                             }
                         }
                         KeyCode::Char('4') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 3;
+                                match app.current_menu_item {
+                                    NetworkEnum::Ethereum => {
+                                        app.ethereum_page_current_tab_index = 3
+                                    }
+                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 3,
+                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 3,
+                                    NetworkEnum::Base => app.base_page_current_tab_index = 3,
+                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 3,
+                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 3,
+                                    NetworkEnum::HyperEvm => {
+                                        app.hyperevm_page_current_tab_index = 3
+                                    }
+                                }
                             }
                         }
                         // ================== Number keys switch tab pages end ==================
@@ -148,7 +206,10 @@ pub fn event_poll(
         if app.last_update.elapsed() >= tick_rate {
             app.last_update = Instant::now();
         }
+        // close application
         if app.quit {
+            // clear all theard
+            APPLICETION_CLOSE_FLAG.store(true, Ordering::SeqCst);
             return Ok(());
         }
     }

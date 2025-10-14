@@ -1,7 +1,7 @@
 use ratatui::widgets::ListState;
 use std::time::Instant;
 
-use crate::global::NetworkEnum;
+use crate::{pages::ethereum::EthereumPageData, types::NetworkEnum};
 
 // focus area enum
 #[derive(Debug, Clone, PartialEq)]
@@ -18,6 +18,21 @@ pub struct App {
     pub left_menu_state: ListState,
     pub current_menu_item: NetworkEnum,
     pub current_content_tab: usize,
+    // ethereum page tab index
+    pub ethereum_page_current_tab_index: usize,
+    pub ethereum_page_data: EthereumPageData,
+    // solana page tab index
+    pub solana_page_current_tab_index: usize,
+    // bsc page tab index
+    pub bsc_page_current_tab_index: usize,
+    // base page tab index
+    pub base_page_current_tab_index: usize,
+    // aptos page tab index
+    pub aptos_page_current_tab_index: usize,
+    // sui page tab index
+    pub sui_page_current_tab_index: usize,
+    // hyperevm page tab index
+    pub hyperevm_page_current_tab_index: usize,
     pub focus: AreaFocusEnum,
     pub quit: bool,
     pub last_update: Instant,
@@ -52,6 +67,14 @@ impl App {
             last_update: Instant::now(),
             search_mode: false,
             content_selection,
+            ethereum_page_current_tab_index: 0,
+            ethereum_page_data: EthereumPageData::default(),
+            solana_page_current_tab_index: 0,
+            bsc_page_current_tab_index: 0,
+            base_page_current_tab_index: 0,
+            aptos_page_current_tab_index: 0,
+            sui_page_current_tab_index: 0,
+            hyperevm_page_current_tab_index: 0,
         }
     }
     pub fn next_menu(&mut self) {

@@ -7,9 +7,10 @@ use ratatui::{
 use crate::{
     app::{App, AreaFocusEnum},
     pages::{
-        aptos::Aptos, base::Base, bsc::Bsc, ethereum::Ethereum, hyperevm::HyperEvm, solana::Solana,
-        sui::Sui,
+        aptos::AptosPageUI, base::BasePageUI, bsc::BscPageUI, ethereum::EthereumPageUI,
+        hyperevm::HyperEvmPageUI, solana::SolanaPageUI, sui::SuiPageUI,
     },
+    types::NetworkEnum,
 };
 
 // main app ui
@@ -23,13 +24,13 @@ pub fn ui(f: &mut ratatui::Frame, app: &mut App) {
     render_left_menu_area(f, app, main_layout[0]);
     // right content area
     match app.current_menu_item {
-        crate::global::NetworkEnum::Ethereum => Ethereum::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::Solana => Solana::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::Bsc => Bsc::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::Base => Base::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::Aptos => Aptos::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::Sui => Sui::read(f, app, main_layout[1]),
-        crate::global::NetworkEnum::HyperEvm => HyperEvm::read(f, app, main_layout[1]),
+        NetworkEnum::Ethereum => EthereumPageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::Solana => SolanaPageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::Bsc => BscPageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::Base => BasePageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::Aptos => AptosPageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::Sui => SuiPageUI::ui(f, app, main_layout[1]),
+        NetworkEnum::HyperEvm => HyperEvmPageUI::ui(f, app, main_layout[1]),
     }
     if app.search_mode {}
 }

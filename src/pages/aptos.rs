@@ -6,10 +6,10 @@ use ratatui::{
 
 use crate::app::{App, AreaFocusEnum};
 
-pub struct Aptos;
+pub struct AptosPageUI;
 
-impl Aptos {
-    pub fn read(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
+impl AptosPageUI {
+    pub fn ui(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
         let right_chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Length(3), Constraint::Min(10)].as_ref())
