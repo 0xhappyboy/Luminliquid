@@ -16,7 +16,7 @@ pub enum AreaFocusEnum {
 pub struct App {
     pub left_menu_items: Vec<NetworkEnum>,
     pub left_menu_state: ListState,
-    pub current_menu: NetworkEnum,
+    pub current_menu_item: NetworkEnum,
     pub current_content_tab: usize,
     pub focus: AreaFocusEnum,
     pub quit: bool,
@@ -45,7 +45,7 @@ impl App {
         Self {
             left_menu_items: menu_items.clone(),
             left_menu_state,
-            current_menu: menu_items[0].clone(),
+            current_menu_item: menu_items[0].clone(),
             current_content_tab: 0,
             focus: AreaFocusEnum::LeftMenu,
             quit: false,
@@ -66,7 +66,7 @@ impl App {
             None => 0,
         };
         self.left_menu_state.select(Some(i));
-        self.current_menu = self.left_menu_items[i].clone();
+        self.current_menu_item = self.left_menu_items[i].clone();
     }
     pub fn previous_menu(&mut self) {
         let i = match self.left_menu_state.selected() {
@@ -80,7 +80,7 @@ impl App {
             None => 0,
         };
         self.left_menu_state.select(Some(i));
-        self.current_menu = self.left_menu_items[i].clone();
+        self.current_menu_item = self.left_menu_items[i].clone();
     }
     pub fn next_content_item(&mut self, area_index: usize) {}
     pub fn previous_content_item(&mut self, area_index: usize) {}

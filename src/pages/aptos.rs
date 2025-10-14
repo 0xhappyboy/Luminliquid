@@ -5,9 +5,10 @@ use ratatui::{
 };
 
 use crate::app::{App, AreaFocusEnum};
-pub struct Base;
 
-impl Base {
+pub struct Aptos;
+
+impl Aptos {
     pub fn read(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
         let right_chunks = Layout::default()
             .direction(Direction::Vertical)
@@ -17,7 +18,7 @@ impl Base {
         f.render_widget(
             Block::default()
                 .borders(Borders::ALL)
-                .title(" Base 1 ")
+                .title(" Aptos 1 ")
                 .border_style(if app.focus == AreaFocusEnum::ContentArea(0) {
                     Style::default().fg(Color::Yellow)
                 } else {
@@ -28,7 +29,7 @@ impl Base {
         f.render_widget(
             Block::default()
                 .borders(Borders::ALL)
-                .title(" Base 2 ")
+                .title(" Aptos 2 ")
                 .border_style(if app.focus == AreaFocusEnum::ContentArea(0) {
                     Style::default().fg(Color::Yellow)
                 } else {

@@ -4,7 +4,13 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem},
 };
 
-use crate::app::{App, AreaFocusEnum};
+use crate::{
+    app::{App, AreaFocusEnum},
+    pages::{
+        aptos::Aptos, base::Base, bsc::Bsc, ethereum::Ethereum, hyperevm::HyperEvm, solana::Solana,
+        sui::Sui,
+    },
+};
 
 // main app ui
 pub fn ui(f: &mut ratatui::Frame, app: &mut App) {
@@ -15,8 +21,16 @@ pub fn ui(f: &mut ratatui::Frame, app: &mut App) {
         .split(size);
     // left menu area
     render_left_menu_area(f, app, main_layout[0]);
-    // right area
-    render_right_area(f, app, main_layout[1]);
+    // right content area
+    match app.current_menu_item {
+        crate::global::NetworkEnum::Ethereum => Ethereum::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::Solana => Solana::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::Bsc => Bsc::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::Base => Base::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::Aptos => Aptos::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::Sui => Sui::read(f, app, main_layout[1]),
+        crate::global::NetworkEnum::HyperEvm => HyperEvm::read(f, app, main_layout[1]),
+    }
     if app.search_mode {}
 }
 
@@ -37,7 +51,7 @@ fn render_left_menu_area(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
                 Style::default()
                     .fg(Color::Yellow)
                     .add_modifier(Modifier::BOLD)
-            } else if app.current_menu == *item {
+            } else if app.current_menu_item == *item {
                 Style::default().fg(Color::Green)
             } else {
                 Style::default().fg(Color::White)
@@ -66,34 +80,4 @@ fn render_left_menu_area(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
         .highlight_symbol("▶ ");
 
     f.render_stateful_widget(menu, area, &mut app.left_menu_state);
-}
-/// reader right area
-fn render_right_area(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
-    let right_chunks = Layout::default()
-        .direction(Direction::Vertical)
-        .constraints([Constraint::Length(3), Constraint::Min(10)].as_ref())
-        .split(area);
-
-    f.render_widget(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(" Block 1 ")
-            .border_style(if app.focus == AreaFocusEnum::ContentArea(0) {
-                Style::default().fg(Color::Yellow)
-            } else {
-                Style::default().fg(Color::Gray)
-            }),
-        right_chunks[0],
-    );
-    f.render_widget(
-        Block::default()
-            .borders(Borders::ALL)
-            .title(" Block 2 ")
-            .border_style(if app.focus == AreaFocusEnum::ContentArea(0) {
-                Style::default().fg(Color::Yellow)
-            } else {
-                Style::default().fg(Color::Gray)
-            }),
-        right_chunks[1],
-    );
 }

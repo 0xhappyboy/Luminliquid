@@ -7,7 +7,7 @@ use std::{
 
 use crate::{
     app::{App, AreaFocusEnum},
-    appui::ui,
+    index::ui,
     global::NetworkEnum,
 };
 
@@ -78,7 +78,7 @@ pub fn event_poll(
                         KeyCode::Tab => match app.focus {
                             AreaFocusEnum::LeftMenu => {}
                             AreaFocusEnum::ContentArea(area_index) => {
-                                let max_area = match app.current_menu {
+                                let max_area = match app.current_menu_item {
                                     NetworkEnum::Ethereum => 3,
                                     NetworkEnum::Solana => 5,
                                     NetworkEnum::Bsc => 4,

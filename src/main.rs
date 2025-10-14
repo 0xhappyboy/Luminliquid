@@ -1,8 +1,9 @@
 pub mod app;
-pub mod apprun;
-pub mod appui;
+pub mod events;
+pub mod index;
 pub mod global;
 pub mod types;
+pub mod pages;
 
 use crossterm::{
     event::{DisableMouseCapture, EnableMouseCapture},
@@ -12,7 +13,7 @@ use crossterm::{
 use ratatui::{Terminal, backend::CrosstermBackend};
 use std::io;
 
-use crate::{app::App, apprun::event_poll};
+use crate::{app::App, events::event_poll};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     enable_raw_mode()?;
