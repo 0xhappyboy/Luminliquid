@@ -4,30 +4,56 @@ use crate::global::{SUPPORT_CEX_LIST, SUPPORT_DEX_LIST, SUPPORT_NETWORK_LIST};
 
 // main menu
 #[derive(Debug, Clone, PartialEq)]
-pub enum MainMenuItem {
+pub enum MainMenuItemTypeEnum {
     Network,
     Dex,
     Cex,
     Wallets,
 }
 
-impl MainMenuItem {
+impl MainMenuItemTypeEnum {
     pub fn as_str(&self) -> &'static str {
         match self {
-            MainMenuItem::Dex => "📊 Dex",
-            MainMenuItem::Cex => "📦 Cex",
-            MainMenuItem::Network => "🌐 Network",
-            MainMenuItem::Wallets => "👛 Wallets",
+            MainMenuItemTypeEnum::Dex => "📊 Dex",
+            MainMenuItemTypeEnum::Cex => "📦 Cex",
+            MainMenuItemTypeEnum::Network => "🌐 Network",
+            MainMenuItemTypeEnum::Wallets => "👛 Wallets",
         }
     }
-    pub fn all() -> Vec<MainMenuItem> {
+    pub fn all() -> Vec<MainMenuItemTypeEnum> {
         vec![
-            MainMenuItem::Network,
-            MainMenuItem::Dex,
-            MainMenuItem::Cex,
-            MainMenuItem::Wallets,
+            MainMenuItemTypeEnum::Network,
+            MainMenuItemTypeEnum::Dex,
+            MainMenuItemTypeEnum::Cex,
+            MainMenuItemTypeEnum::Wallets,
         ]
     }
+}
+
+/// sub menu type enum
+#[derive(Debug, Clone, PartialEq)]
+pub enum SubMenuTypeEnum {
+    // network
+    Ethereum,
+    Solana,
+    Bsc,
+    Base,
+    Aptos,
+    Sui,
+    HyperEvm,
+    // dex
+    Uniswap,
+    Pancakeswap,
+    Raydium,
+    Orca,
+    // cex
+    Binance,
+    Coinbase,
+    Bybit,
+    Bitget,
+    Kraken,
+    Okx,
+    // wallet
 }
 
 // sub menu
@@ -54,14 +80,14 @@ pub enum MenuFocusArea {
 // menu item
 #[derive(Debug, Clone)]
 pub struct MenuItem {
-    pub main: MainMenuItem,
+    pub main: MainMenuItemTypeEnum,
     pub sub_items: Vec<SubMenuItem>,
     pub expanded: bool,
     pub sub_menu_state: ListState, // sub menu state
 }
 
 impl MenuItem {
-    pub fn new(main: MainMenuItem, sub_items: Vec<SubMenuItem>) -> Self {
+    pub fn new(main: MainMenuItemTypeEnum, sub_items: Vec<SubMenuItem>) -> Self {
         let mut sub_menu_state = ListState::default();
         sub_menu_state.select(Some(0));
         Self {
@@ -117,38 +143,40 @@ impl MenuItem {
 pub struct Menu {
     // menu item list
     pub menu_items: Vec<MenuItem>,
-    pub current_main_menu: MainMenuItem,
+    pub current_main_menu: MainMenuItemTypeEnum,
     // main menu selection status
     pub main_menu_selection: ListState,
     pub focus: MenuFocusArea,
+    // current_menu_item
+    pub current_menu_item: SubMenuTypeEnum,
 }
 
 impl Menu {
     pub fn new() -> Self {
         let menu_items = vec![
             MenuItem::new(
-                MainMenuItem::Network,
+                MainMenuItemTypeEnum::Network,
                 SUPPORT_NETWORK_LIST
                     .iter()
                     .map(|net| SubMenuItem::new(net.name))
                     .collect(),
             ),
             MenuItem::new(
-                MainMenuItem::Dex,
+                MainMenuItemTypeEnum::Dex,
                 SUPPORT_DEX_LIST
                     .iter()
                     .map(|dex| SubMenuItem::new(dex))
                     .collect(),
             ),
             MenuItem::new(
-                MainMenuItem::Cex,
+                MainMenuItemTypeEnum::Cex,
                 SUPPORT_CEX_LIST
                     .iter()
                     .map(|cex| SubMenuItem::new(cex))
                     .collect(),
             ),
             MenuItem::new(
-                MainMenuItem::Wallets,
+                MainMenuItemTypeEnum::Wallets,
                 vec![
                     SubMenuItem::new("Info"),
                     SubMenuItem::new("Analysis"),
@@ -160,9 +188,10 @@ impl Menu {
         main_menu_selection.select(Some(0));
         Self {
             menu_items,
-            current_main_menu: MainMenuItem::Network,
+            current_main_menu: MainMenuItemTypeEnum::Network,
             main_menu_selection,
             focus: MenuFocusArea::MainMenu,
+            current_menu_item: SubMenuTypeEnum::Ethereum,
         }
     }
 }

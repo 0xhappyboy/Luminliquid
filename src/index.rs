@@ -5,51 +5,12 @@ use ratatui::{
 };
 
 use crate::{
-    app::{App},
+    app::App,
     pages::{
-        aptos::AptosPageUI, base::BasePageUI, bsc::BscPageUI, ethereum::EthereumPageUI,
-        hyperevm::HyperEvmPageUI, solana::SolanaPageUI, sui::SuiPageUI,
+        aptos::AptosPageUI, base::BasePageUI, binance::BinancePageUI, bitget::BitgetPageUI, bsc::BscPageUI, bybit::BybitPageUI, coinbase::CoinbasePageUI, ethereum::EthereumPageUI, hyperevm::HyperEvmPageUI, kraken::KrakenPageUI, okx::OkxPageUI, solana::SolanaPageUI, sui::SuiPageUI
     },
-    types::NetworkEnum,
-    widgets::menu::MenuFocusArea,
+    widgets::menu::{MenuFocusArea, SubMenuTypeEnum, },
 };
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum MainMenuItem {
-    Dashboard,
-    Blocks,
-    Transactions,
-    Network,
-    Wallets,
-    Analytics,
-    Settings,
-}
-
-impl MainMenuItem {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            MainMenuItem::Dashboard => "📊 Dashboard",
-            MainMenuItem::Blocks => "📦 Blocks",
-            MainMenuItem::Transactions => "💸 Transactions",
-            MainMenuItem::Network => "🌐 Network",
-            MainMenuItem::Wallets => "👛 Wallets",
-            MainMenuItem::Analytics => "📈 Analytics",
-            MainMenuItem::Settings => "⚙️ Settings",
-        }
-    }
-
-    pub fn all() -> Vec<MainMenuItem> {
-        vec![
-            MainMenuItem::Dashboard,
-            MainMenuItem::Blocks,
-            MainMenuItem::Transactions,
-            MainMenuItem::Network,
-            MainMenuItem::Wallets,
-            MainMenuItem::Analytics,
-            MainMenuItem::Settings,
-        ]
-    }
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SubMenuItem {
@@ -76,14 +37,28 @@ pub fn ui(f: &mut ratatui::Frame, app: &mut App) {
     // show left menu area
     show_menu(f, app, main_layout[0]);
     // right content area
-    match app.current_menu_item {
-        NetworkEnum::Ethereum => EthereumPageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::Solana => SolanaPageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::Bsc => BscPageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::Base => BasePageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::Aptos => AptosPageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::Sui => SuiPageUI::ui(f, app, main_layout[1]),
-        NetworkEnum::HyperEvm => HyperEvmPageUI::ui(f, app, main_layout[1]),
+    match app.menu.current_menu_item {
+        // ========================== network ==========================
+        SubMenuTypeEnum::Ethereum => EthereumPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Solana  => SolanaPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Bsc  => BscPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Base  => BasePageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Aptos  => AptosPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Sui  => SuiPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::HyperEvm => HyperEvmPageUI::ui(f, app, main_layout[1]),
+        // ========================== dex ==========================
+        SubMenuTypeEnum::Uniswap  => BasePageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Pancakeswap  => AptosPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Raydium  => SuiPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Orca => HyperEvmPageUI::ui(f, app, main_layout[1]),
+        // ========================== cex ==========================
+        SubMenuTypeEnum::Binance=> BinancePageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Coinbase=> CoinbasePageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Bybit=> BybitPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Bitget=> BitgetPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Kraken=> KrakenPageUI::ui(f, app, main_layout[1]),
+        SubMenuTypeEnum::Okx=> OkxPageUI::ui(f, app, main_layout[1]),
+        _=>{}
     }
     if app.search_mode {}
 }
@@ -150,7 +125,7 @@ fn show_menu(f: &mut ratatui::Frame, app: &mut App, area: Rect) {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title("")
+                .title(format!(""))
                 .border_style(menu_border_style),
         )
         .highlight_style(

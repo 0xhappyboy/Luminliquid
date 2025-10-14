@@ -1,12 +1,9 @@
-use std::rc::Rc;
-
 use ratatui::{
-    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     symbols,
     text::{Line, Span, Text},
-    widgets::{Block, Borders, Cell, List, ListItem, Paragraph, Row, Tabs},
+    widgets::{Block, Borders, List, ListItem, Paragraph, Tabs},
 };
 
 use crate::{

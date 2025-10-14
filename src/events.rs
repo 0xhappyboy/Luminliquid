@@ -11,8 +11,8 @@ use crate::{
     index::ui,
     pages::ethereum::EthereumPageTabEnum,
     task::TaskController,
-    types::{BackgroundThreadData, NetworkEnum},
-    widgets::menu::MenuFocusArea,
+    types::BackgroundThreadData,
+    widgets::menu::{MenuFocusArea, SubMenuTypeEnum},
 };
 
 /// event poll
@@ -27,7 +27,7 @@ pub fn event_poll(
     let key_debounce = Duration::from_millis(150);
     loop {
         // backgroun thread data
-        while let Ok(data) = rx.try_recv() {}
+        while let Ok(_data) = rx.try_recv() {}
         terminal.draw(|f| ui(f, &mut app))?;
         let timeout = tick_rate
             .checked_sub(app.last_update.elapsed())
@@ -42,7 +42,7 @@ pub fn event_poll(
                     match key.code {
                         KeyCode::Enter => {}
                         KeyCode::Esc => {}
-                        KeyCode::Char(c) => {}
+                        KeyCode::Char(_c) => {}
                         KeyCode::Backspace => {}
                         KeyCode::Delete => {}
                         _ => {}
@@ -60,7 +60,7 @@ pub fn event_poll(
                                     }
                                     MenuFocusArea::MainMenu => {}
                                 },
-                                AreaFocusEnum::ContentArea(area_index) => {
+                                AreaFocusEnum::ContentArea(_area_index) => {
                                     app.focus = AreaFocusEnum::LeftMenu;
                                 }
                                 _ => {}
@@ -75,108 +75,43 @@ pub fn event_poll(
                         KeyCode::Char('1') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 0;
-                                match app.current_menu_item {
-                                    NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Status
-                                    }
-                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 0,
-                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 0,
-                                    NetworkEnum::Base => app.base_page_current_tab_index = 0,
-                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 0,
-                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 0,
-                                    NetworkEnum::HyperEvm => {
-                                        app.hyperevm_page_current_tab_index = 0
-                                    }
-                                }
+                                // set current menu item
+                                set_current_menu_item(&mut app, 1);
                             }
                         }
                         KeyCode::Char('2') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 1;
-                                match app.current_menu_item {
-                                    NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Market
-                                    }
-                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 1,
-                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 1,
-                                    NetworkEnum::Base => app.base_page_current_tab_index = 1,
-                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 1,
-                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 1,
-                                    NetworkEnum::HyperEvm => {
-                                        app.hyperevm_page_current_tab_index = 1
-                                    }
-                                }
+                                // set current menu item
+                                set_current_menu_item(&mut app, 2);
                             }
                         }
                         KeyCode::Char('3') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 2;
-                                match app.current_menu_item {
-                                    NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Scan
-                                    }
-                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 2,
-                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 2,
-                                    NetworkEnum::Base => app.base_page_current_tab_index = 2,
-                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 2,
-                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 2,
-                                    NetworkEnum::HyperEvm => {
-                                        app.hyperevm_page_current_tab_index = 2
-                                    }
-                                }
+                                // set current menu item
+                                set_current_menu_item(&mut app, 3);
                             }
                         }
                         KeyCode::Char('4') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
                                 app.current_content_tab = 3;
-                                match app.current_menu_item {
-                                    NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Charts
-                                    }
-                                    NetworkEnum::Solana => app.solana_page_current_tab_index = 3,
-                                    NetworkEnum::Bsc => app.bsc_page_current_tab_index = 3,
-                                    NetworkEnum::Base => app.base_page_current_tab_index = 3,
-                                    NetworkEnum::Aptos => app.aptos_page_current_tab_index = 3,
-                                    NetworkEnum::Sui => app.sui_page_current_tab_index = 3,
-                                    NetworkEnum::HyperEvm => {
-                                        app.hyperevm_page_current_tab_index = 3
-                                    }
-                                }
+                                // set current menu item
+                                set_current_menu_item(&mut app, 4);
                             }
                         }
                         KeyCode::Char('5') => {
                             if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
-                                app.current_content_tab = 3;
-                                match app.current_menu_item {
-                                    NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Tools
-                                    }
-                                    NetworkEnum::Solana => {}
-                                    NetworkEnum::Bsc => {}
-                                    NetworkEnum::Base => {}
-                                    NetworkEnum::Aptos => {}
-                                    NetworkEnum::Sui => {}
-                                    NetworkEnum::HyperEvm => {}
-                                }
+                                app.current_content_tab = 4;
+                                // set current menu item
+                                set_current_menu_item(&mut app, 5);
                             }
                         }
                         // ================== Number keys switch tab pages end ==================
                         // ============ Switch the right content area subframe start ============
                         KeyCode::Tab => match app.focus {
                             AreaFocusEnum::LeftMenu => {}
-                            AreaFocusEnum::ContentArea(area_index) => {
-                                let max_area = match app.current_menu_item {
-                                    NetworkEnum::Ethereum => 3,
-                                    NetworkEnum::Solana => 5,
-                                    NetworkEnum::Bsc => 4,
-                                    _ => 2,
-                                };
-                                if area_index < max_area {
-                                    app.focus = AreaFocusEnum::ContentArea(area_index + 1);
-                                } else {
-                                    app.focus = AreaFocusEnum::ContentArea(0);
-                                }
-                            }
+                            AreaFocusEnum::ContentArea(_area_index) => {}
                             _ => {
                                 app.focus = AreaFocusEnum::ContentArea(0);
                             }
@@ -274,5 +209,35 @@ pub fn event_poll(
             TaskController::clear_all_task();
             return Ok(());
         }
+    }
+}
+
+/// set current menu item
+fn set_current_menu_item(app: &mut App, keycode: usize) {
+    match app.menu.current_menu_item {
+        SubMenuTypeEnum::Ethereum => match keycode {
+            1 => app.ethereum_page_current_tab = EthereumPageTabEnum::Status,
+            2 => app.ethereum_page_current_tab = EthereumPageTabEnum::Market,
+            3 => app.ethereum_page_current_tab = EthereumPageTabEnum::Scan,
+            4 => app.ethereum_page_current_tab = EthereumPageTabEnum::Charts,
+            5 => app.ethereum_page_current_tab = EthereumPageTabEnum::Tools,
+            _ => {}
+        },
+        SubMenuTypeEnum::Solana => app.solana_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::Bsc => app.bsc_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::Base => app.base_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::Aptos => app.aptos_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::Sui => app.sui_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::HyperEvm => app.hyperevm_page_current_tab_index = keycode - 1,
+        SubMenuTypeEnum::Uniswap => todo!(),
+        SubMenuTypeEnum::Pancakeswap => todo!(),
+        SubMenuTypeEnum::Raydium => todo!(),
+        SubMenuTypeEnum::Orca => todo!(),
+        SubMenuTypeEnum::Binance => todo!(),
+        SubMenuTypeEnum::Coinbase => todo!(),
+        SubMenuTypeEnum::Bybit => todo!(),
+        SubMenuTypeEnum::Bitget => todo!(),
+        SubMenuTypeEnum::Kraken => todo!(),
+        SubMenuTypeEnum::Okx => todo!(),
     }
 }

@@ -4,10 +4,9 @@ use std::time::Instant;
 use crate::{
     i18n::I18N,
     pages::ethereum::{EthereumPageData, EthereumPageTabEnum},
-    types::NetworkEnum,
     widgets::{
         market_table::TokenData,
-        menu::{Menu, MenuFocusArea},
+        menu::{MainMenuItemTypeEnum, Menu, MenuFocusArea, SubMenuTypeEnum},
     },
 };
 
@@ -15,7 +14,6 @@ use crate::{
 #[derive(Debug, Clone, PartialEq)]
 pub enum AreaFocusEnum {
     LeftMenu,
-    ContentTabs,
     ContentArea(usize),
     Search,
     None,
@@ -24,7 +22,6 @@ pub enum AreaFocusEnum {
 pub struct App {
     // left menu
     pub menu: Menu,
-    pub current_menu_item: NetworkEnum,
     pub current_content_tab: usize,
     // ethereum page parameters
     pub ethereum_page_current_tab: EthereumPageTabEnum,
@@ -86,7 +83,6 @@ impl App {
 
         Self {
             menu: Menu::new(),
-            current_menu_item: NetworkEnum::all_vec()[0].clone(),
             current_content_tab: 0,
             focus: AreaFocusEnum::LeftMenu,
             quit: false,
@@ -185,16 +181,81 @@ impl App {
     }
     // handle sub menu selection
     pub fn handle_sub_menu_selection(&mut self) {
-        if let MenuFocusArea::SubMenu(main_index) = self.menu.focus {
+        if let MenuFocusArea::SubMenu(index) = self.menu.focus {
             self.focus = AreaFocusEnum::ContentArea(0);
+            if let Some(menu) = self.menu.menu_items.get(index) {
+                if let Some(sub_index) = menu.sub_menu_state.selected() {
+                    if let Some(sub_item) = menu.sub_items.get(sub_index) {
+                        let _main_menu_name = menu.main.as_str();
+                        let _sub_menu_name = &sub_item.name;
+                        match (&menu.main, sub_index) {
+                            // =================== network ===================
+                            (MainMenuItemTypeEnum::Network, 0) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Ethereum;
+                            }
+                            (MainMenuItemTypeEnum::Network, 1) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Solana;
+                            }
+                            (MainMenuItemTypeEnum::Network, 2) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Bsc;
+                            }
+                            (MainMenuItemTypeEnum::Network, 3) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Base;
+                            }
+                            (MainMenuItemTypeEnum::Network, 4) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Aptos;
+                            }
+                            (MainMenuItemTypeEnum::Network, 5) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Sui;
+                            }
+                            (MainMenuItemTypeEnum::Network, 6) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::HyperEvm;
+                            }
+                            // =================== Dex ===================
+                            (MainMenuItemTypeEnum::Dex, 0) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Uniswap;
+                            }
+                            (MainMenuItemTypeEnum::Dex, 1) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Pancakeswap;
+                            }
+                            (MainMenuItemTypeEnum::Dex, 2) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Raydium;
+                            }
+                            (MainMenuItemTypeEnum::Dex, 3) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Orca;
+                            }
+                            // =================== Cex ===================
+                            (MainMenuItemTypeEnum::Cex, 0) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Binance;
+                            }
+                            (MainMenuItemTypeEnum::Cex, 1) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Coinbase;
+                            }
+                            (MainMenuItemTypeEnum::Cex, 2) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Bybit;
+                            }
+                            (MainMenuItemTypeEnum::Cex, 3) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Bitget;
+                            }
+                            (MainMenuItemTypeEnum::Cex, 4) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Kraken;
+                            }
+                            (MainMenuItemTypeEnum::Cex, 5) => {
+                                self.menu.current_menu_item = SubMenuTypeEnum::Okx;
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
         } else if let MenuFocusArea::MainMenu = self.menu.focus {
             self.expand_menu();
         }
     }
-    pub fn next_content_item(&mut self, area_index: usize) {}
-    pub fn previous_content_item(&mut self, area_index: usize) {}
-    pub fn get_content_item_count(&self, area_index: usize) -> usize {
+    pub fn next_content_item(&mut self, _area_index: usize) {}
+    pub fn previous_content_item(&mut self, _area_index: usize) {}
+    pub fn get_content_item_count(&self, _area_index: usize) -> usize {
         0
     }
-    pub fn handle_content_enter(&mut self, area_index: usize) {}
+    pub fn handle_content_enter(&mut self, _area_index: usize) {}
 }
