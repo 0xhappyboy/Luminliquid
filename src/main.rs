@@ -5,6 +5,8 @@ pub mod index;
 pub mod pages;
 pub mod task;
 pub mod types;
+pub mod widgets;
+pub mod i18n;
 
 use std::{io, sync::atomic::Ordering};
 

@@ -1,7 +1,12 @@
-use ratatui::widgets::ListState;
+use ratatui::widgets::{ListState, TableState};
 use std::time::Instant;
 
-use crate::{pages::ethereum::EthereumPageData, types::NetworkEnum};
+use crate::{
+    i18n::I18N,
+    pages::ethereum::{EthereumPageData, EthereumPageTabEnum},
+    types::NetworkEnum,
+    widgets::market_table::TokenData,
+};
 
 // focus area enum
 #[derive(Debug, Clone, PartialEq)]
@@ -18,9 +23,13 @@ pub struct App {
     pub left_menu_state: ListState,
     pub current_menu_item: NetworkEnum,
     pub current_content_tab: usize,
-    // ethereum page tab index
-    pub ethereum_page_current_tab_index: usize,
+    // ethereum page parameters
+    pub ethereum_page_current_tab: EthereumPageTabEnum,
     pub ethereum_page_data: EthereumPageData,
+    pub ethereum_page_tokens: Vec<TokenData>,
+    pub ethereum_page_table_state: TableState,
+    pub ethereum_page_selected_token: Option<TokenData>,
+    pub ethereum_page_market_table_show_detail: bool,
     // solana page tab index
     pub solana_page_current_tab_index: usize,
     // bsc page tab index
@@ -38,6 +47,8 @@ pub struct App {
     pub last_update: Instant,
     pub search_mode: bool,
     pub content_selection: Vec<ListState>,
+    // system setting
+    pub i18n: I18N,
 }
 
 impl App {
@@ -57,6 +68,20 @@ impl App {
             ListState::default(),
             ListState::default(),
         ];
+        // tokens
+        let tokens = vec![
+            TokenData::new("Bitcoin", "BTC", 45000.0),
+            TokenData::new("Ethereum", "ETH", 3000.0),
+            TokenData::new("Binance Coin", "BNB", 350.0),
+            TokenData::new("Cardano", "ADA", 1.2),
+            TokenData::new("Solana", "SOL", 120.0),
+            TokenData::new("Polkadot", "DOT", 25.0),
+            TokenData::new("Dogecoin", "DOGE", 0.15),
+            TokenData::new("Avalanche", "AVAX", 40.0),
+        ];
+        let mut table_state = TableState::default();
+        table_state.select(Some(0));
+
         Self {
             left_menu_items: menu_items.clone(),
             left_menu_state,
@@ -67,14 +92,19 @@ impl App {
             last_update: Instant::now(),
             search_mode: false,
             content_selection,
-            ethereum_page_current_tab_index: 0,
+            ethereum_page_current_tab: EthereumPageTabEnum::Status,
             ethereum_page_data: EthereumPageData::default(),
+            ethereum_page_tokens: tokens,
+            ethereum_page_table_state: table_state,
+            ethereum_page_selected_token: None,
+            ethereum_page_market_table_show_detail: false,
             solana_page_current_tab_index: 0,
             bsc_page_current_tab_index: 0,
             base_page_current_tab_index: 0,
             aptos_page_current_tab_index: 0,
             sui_page_current_tab_index: 0,
             hyperevm_page_current_tab_index: 0,
+            i18n: I18N::EN,
         }
     }
     pub fn next_menu(&mut self) {

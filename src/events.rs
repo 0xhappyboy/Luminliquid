@@ -11,6 +11,7 @@ use crate::{
     app::{App, AreaFocusEnum},
     global::APPLICETION_CLOSE_FLAG,
     index::ui,
+    pages::ethereum::EthereumPageTabEnum,
     types::{BackgroundThreadData, NetworkEnum},
 };
 
@@ -64,7 +65,8 @@ pub fn event_poll(
                                 app.current_content_tab = 0;
                                 match app.current_menu_item {
                                     NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab_index = 0
+                                        app.ethereum_page_current_tab =
+                                            EthereumPageTabEnum::Status
                                     }
                                     NetworkEnum::Solana => app.solana_page_current_tab_index = 0,
                                     NetworkEnum::Bsc => app.bsc_page_current_tab_index = 0,
@@ -82,7 +84,7 @@ pub fn event_poll(
                                 app.current_content_tab = 1;
                                 match app.current_menu_item {
                                     NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab_index = 1
+                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Market
                                     }
                                     NetworkEnum::Solana => app.solana_page_current_tab_index = 1,
                                     NetworkEnum::Bsc => app.bsc_page_current_tab_index = 1,
@@ -100,7 +102,7 @@ pub fn event_poll(
                                 app.current_content_tab = 2;
                                 match app.current_menu_item {
                                     NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab_index = 2
+                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Scan
                                     }
                                     NetworkEnum::Solana => app.solana_page_current_tab_index = 2,
                                     NetworkEnum::Bsc => app.bsc_page_current_tab_index = 2,
@@ -118,7 +120,7 @@ pub fn event_poll(
                                 app.current_content_tab = 3;
                                 match app.current_menu_item {
                                     NetworkEnum::Ethereum => {
-                                        app.ethereum_page_current_tab_index = 3
+                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Charts
                                     }
                                     NetworkEnum::Solana => app.solana_page_current_tab_index = 3,
                                     NetworkEnum::Bsc => app.bsc_page_current_tab_index = 3,
@@ -128,6 +130,22 @@ pub fn event_poll(
                                     NetworkEnum::HyperEvm => {
                                         app.hyperevm_page_current_tab_index = 3
                                     }
+                                }
+                            }
+                        }
+                        KeyCode::Char('5') => {
+                            if !matches!(app.focus, AreaFocusEnum::LeftMenu) {
+                                app.current_content_tab = 3;
+                                match app.current_menu_item {
+                                    NetworkEnum::Ethereum => {
+                                        app.ethereum_page_current_tab = EthereumPageTabEnum::Tools
+                                    }
+                                    NetworkEnum::Solana => {}
+                                    NetworkEnum::Bsc => {}
+                                    NetworkEnum::Base => {}
+                                    NetworkEnum::Aptos => {}
+                                    NetworkEnum::Sui => {}
+                                    NetworkEnum::HyperEvm => {}
                                 }
                             }
                         }
