@@ -1,8 +1,8 @@
 <h1 align="center">
-  ✨ Luminliquid
+  ✨ Luminliquid Terminal
 </h1>
 <h4 align="center">
-一款金融终端.
+一款运行在控制台的金融终端.
 </h4>
 <p align="center">
   <a href="https://github.com/0xhappyboy/Luminliquid/LICENSE"><img src="https://img.shields.io/badge/License-GPL3.0-d1d1f6.svg?style=flat&labelColor=1C2C2E&color=BEC5C9&logo=googledocs&label=license&logoColor=BEC5C9" alt="License"></a>
