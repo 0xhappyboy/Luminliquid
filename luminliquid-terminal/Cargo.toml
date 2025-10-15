@@ -1,13 +1,13 @@
 [package]
-name = "cryptohero"
+name = "luminliquid-terminal"
 version = "0.1.0"
 edition = "2024"
 authors = ["happyboy <superhappyboy1995@gmail.com>"]
 description = "crypto trading terminal."
-keywords = ["trade", "crypto", "finance","financial-terminal"]
+keywords = ["trade", "crypto", "finance", "financial-terminal"]
 license = "GPL-3.0"
 readme = "README.md"
-repository = "https://github.com/0xhappyboy/cryptohero"
+repository = "https://github.com/0xhappyboy/Luminliquid"
 
 [dependencies]
 ratatui = "0.26"
