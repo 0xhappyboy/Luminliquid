@@ -18,10 +18,7 @@ class App extends React.Component {
   render() {
     return (
       <>
-        {/* top area */}
-        <TopArea />
-        {/* bottom area */}
-        <BottomArea />
+        <MainLayout />
       </>
     );
   }
