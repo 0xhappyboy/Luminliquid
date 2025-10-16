@@ -1,26 +1,30 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import MainLayout from './layout/MainLayout';
+import TopArea from './components/top/TopArea';
+import BottomArea from './components/bottom/BottomArea';
+import { themeManager } from './globals/theme/ThemeManager';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+require('normalize.css');
+require('@blueprintjs/core/lib/css/blueprint.css');
+require('@blueprintjs/icons/lib/css/blueprint-icons.css');
+
+class App extends React.Component {
+  componentDidMount() {
+    themeManager.getTheme();
+  }
+
+  render() {
+    return (
+      <>
+        {/* top area */}
+        <TopArea />
+        {/* bottom area */}
+        <BottomArea />
+      </>
+    );
+  }
 }
 
 export default App;

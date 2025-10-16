@@ -15,8 +15,11 @@
         "title": "luminliquid",
         "width": 800,
         "height": 600,
+        "minWidth": 650,
+        "minHeight": 400,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "decorations": false
       }
     ],
     "security": {
