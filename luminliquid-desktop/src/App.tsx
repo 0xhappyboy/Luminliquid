@@ -2,8 +2,6 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import MainLayout from './layout/MainLayout';
-import TopArea from './components/top/TopArea';
-import BottomArea from './components/bottom/BottomArea';
 import { themeManager } from './globals/theme/ThemeManager';
 // blueprintjs
 require('normalize.css');
