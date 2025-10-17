@@ -3,7 +3,7 @@ import { HTMLTable } from '@blueprintjs/core';
 import '../styles/TradePage.css';
 import { overflowManager } from '../globals/theme/OverflowTypeManager';
 
-interface TradingLayoutState {
+interface TradePageState {
     visibleModules: number;
     windowWidth: number;
     theme: 'dark' | 'light';
@@ -103,7 +103,7 @@ const TEST_DATA = {
     ]
 };
 
-class TradingLayout extends React.Component<{}, TradingLayoutState> {
+class TradePage extends React.Component<{}, TradePageState> {
     private modules: ModuleConfig[];
     private resizeTimeout: NodeJS.Timeout | null = null;
     private readonly CONTAINER_PADDING = 16;
@@ -1066,4 +1066,4 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
     }
 }
 
-export default TradingLayout;
+export default TradePage;
