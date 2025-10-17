@@ -1,6 +1,7 @@
 import React from 'react';
 import { HTMLTable } from '@blueprintjs/core';
 import '../styles/TradePage.css';
+import { overflowManager } from '../globals/theme/OverflowTypeManager';
 
 interface TradingLayoutState {
     visibleModules: number;
@@ -9,6 +10,11 @@ interface TradingLayoutState {
     activeTradeTab: string;
     activeTradingInfoTab: string;
     showSymbolPopup: boolean;
+    showTokenPopup: boolean;
+    tokenPopupPosition: { top: number; left: number };
+    tokenPopupActiveTab: 'all' | 'perps' | 'spot' | 'trending';
+    tokenPopupSearchQuery: string;
+    tokenPopupButtonGroup: 'all' | 'favorites';
 }
 
 interface ModuleConfig {
@@ -102,18 +108,26 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
     private resizeTimeout: NodeJS.Timeout | null = null;
     private readonly CONTAINER_PADDING = 16;
     private readonly GAP_WIDTH = 1;
+    private tokenPopupRef: React.RefObject<HTMLDivElement>;
 
     constructor(props: {}) {
         super(props);
-
         this.state = {
             visibleModules: 3,
             windowWidth: window.innerWidth,
             theme: this.getCurrentTheme(),
             activeTradeTab: 'limit',
             activeTradingInfoTab: 'balance',
-            showSymbolPopup: false
+            showSymbolPopup: false,
+            showTokenPopup: false,
+            tokenPopupPosition: { top: 0, left: 0 },
+            tokenPopupActiveTab: 'all',
+            tokenPopupSearchQuery: '',
+            tokenPopupButtonGroup: 'all'
         };
+
+        this.applyTheme(this.getCurrentTheme());
+        this.tokenPopupRef = React.createRef();
 
         this.modules = [
             {
@@ -141,16 +155,24 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
         ];
     }
 
+
+    handleTokenPopupButtonGroupChange = (buttonId: 'all' | 'favorites') => {
+        this.setState({ tokenPopupButtonGroup: buttonId });
+    };
+
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
         document.addEventListener('click', this.handleClickOutside);
+        document.addEventListener('keydown', this.handleKeyDown);
         this.calculateVisibleModules();
         this.applyTheme(this.state.theme);
+        overflowManager.setOverflow('auto');
     }
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.handleResize);
         document.removeEventListener('click', this.handleClickOutside);
+        document.removeEventListener('keydown', this.handleKeyDown);
         if (this.resizeTimeout) {
             clearTimeout(this.resizeTimeout);
         }
@@ -159,6 +181,17 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
     handleClickOutside = (event: MouseEvent) => {
         if (this.state.showSymbolPopup) {
             this.setState({ showSymbolPopup: false });
+        }
+        if (this.state.showTokenPopup &&
+            this.tokenPopupRef.current &&
+            !this.tokenPopupRef.current.contains(event.target as Node)) {
+            this.setState({ showTokenPopup: false });
+        }
+    };
+
+    handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape' && this.state.showTokenPopup) {
+            this.setState({ showTokenPopup: false });
         }
     };
 
@@ -234,14 +267,228 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
 
     handleSymbolClick = (event: React.MouseEvent) => {
         event.stopPropagation();
-        this.setState(prevState => ({ showSymbolPopup: !prevState.showSymbolPopup }));
+        const rect = event.currentTarget.getBoundingClientRect();
+        this.setState({
+            showTokenPopup: true,
+            tokenPopupPosition: {
+                top: rect.bottom + window.scrollY,
+                left: rect.left + window.scrollX
+            }
+        });
+    };
+
+    handleTokenPriceClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+
+    };
+
+    handleTokenPopupTabChange = (tabId: 'all' | 'perps' | 'spot' | 'trending') => {
+        this.setState({ tokenPopupActiveTab: tabId });
+    };
+
+    handleTokenPopupSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ tokenPopupSearchQuery: event.target.value });
     };
 
     handleMaxClick = (field: 'price' | 'amount') => {
-        if (field === 'price') {
-        } else {
-        }
+
     };
+
+
+    getTokenData = () => [
+        { symbol: 'RUB/USDC', type: 'SPOT', lastPrice: 6244547, change24h: -1811351, changePercent24h: -22.48, volume24h: 69478 },
+        { symbol: 'BTC/USDC', type: 'SPOT', lastPrice: 104984, change24h: -5876, changePercent24h: -5.30, volume24h: 168473556 },
+        { symbol: 'BTC-USD', type: 'PERP', lastPrice: 104956, change24h: -5825, changePercent24h: -5.26, fundingRate: 0.0001, volume24h: 5808776941, openInterest: 2571340910, leverage: 40 },
+        { symbol: 'PAXG-USD', type: 'PERP', lastPrice: 4397.2, change24h: 148.7, changePercent24h: 3.50, fundingRate: -0.000155, volume24h: 104945861, openInterest: 71606297, leverage: 10 },
+        { symbol: 'ETH-USD', type: 'PERP', lastPrice: 3709.7, change24h: -282.8, changePercent24h: -7.08, fundingRate: 0.0001, volume24h: 3876211252, openInterest: 1489743254, leverage: 25 },
+        { symbol: 'KAS-USD', type: 'PERP', lastPrice: 0.048707, change24h: -0.008886, changePercent24h: -15.43, fundingRate: 0.000013, volume24h: 742079.08, openInterest: 843933.87, leverage: 10 },
+        { symbol: 'SOL-USD', type: 'PERP', lastPrice: 102.34, change24h: 5.67, changePercent24h: 5.86, fundingRate: 0.0002, volume24h: 2456789123, openInterest: 1234567890, leverage: 20 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+        { symbol: 'ADA-USD', type: 'PERP', lastPrice: 0.478, change24h: 0.022, changePercent24h: 4.82, fundingRate: 0.00015, volume24h: 456789123, openInterest: 234567890, leverage: 10 },
+
+    ];
+
+
+
+
+
+
+
+    renderTokenPopup = () => {
+        const {
+            showTokenPopup,
+            tokenPopupPosition,
+            tokenPopupActiveTab,
+            tokenPopupSearchQuery,
+            tokenPopupButtonGroup
+        } = this.state;
+
+        if (!showTokenPopup) return null;
+
+        const tokenData = this.getTokenData();
+        const filteredTokens = tokenData.filter(token => {
+            const matchesSearch = token.symbol.toLowerCase().includes(tokenPopupSearchQuery.toLowerCase());
+            const matchesTab =
+                tokenPopupActiveTab === 'all' ||
+                (tokenPopupActiveTab === 'perps' && token.type === 'PERP') ||
+                (tokenPopupActiveTab === 'spot' && token.type === 'SPOT') ||
+                (tokenPopupActiveTab === 'trending' && Math.abs(token.changePercent24h) > 10);
+
+            return matchesSearch && matchesTab;
+        });
+
+
+        const displayTokens = filteredTokens.slice(0, 20);
+
+        const tabs = [
+            { id: 'all', label: 'All' },
+            { id: 'perps', label: 'Futures' },
+            { id: 'spot', label: 'SpotGoods' },
+            { id: 'trending', label: 'Hot' },
+            { id: 'new', label: 'New Token' },
+            { id: 'gainers', label: 'Gainer list' }
+        ];
+
+        return (
+            <>
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        zIndex: 9998,
+                        backgroundColor: 'transparent'
+                    }}
+                    onClick={() => this.setState({ showTokenPopup: false })}
+                />
+                <div
+                    ref={this.tokenPopupRef}
+                    className="token-popup"
+                    style={{
+                        position: 'fixed',
+                        top: tokenPopupPosition.top,
+                        left: tokenPopupPosition.left,
+                        zIndex: 9999
+                    }}
+                >
+                    <div className="token-popup-content">
+
+                        <div className="popup-header">
+                            <div className="search-container">
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    value={tokenPopupSearchQuery}
+                                    onChange={this.handleTokenPopupSearchChange}
+                                    className="search-input"
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="popup-button-group">
+                                <button
+                                    className={`popup-group-btn ${tokenPopupButtonGroup === 'all' ? 'active' : ''}`}
+                                    onClick={() => this.handleTokenPopupButtonGroupChange('all')}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    className={`popup-group-btn ${tokenPopupButtonGroup === 'favorites' ? 'active' : ''}`}
+                                    onClick={() => this.handleTokenPopupButtonGroupChange('favorites')}
+                                >
+                                    Collect
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div className="popup-tabs">
+                            {tabs.map(tab => (
+                                <button
+                                    key={tab.id}
+                                    className={`popup-tab ${tokenPopupActiveTab === tab.id ? 'active' : ''}`}
+                                    onClick={() => this.handleTokenPopupTabChange(tab.id as any)}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+
+                        <div className="popup-content">
+                            <div className="token-table-container">
+                                <div className="token-table-scroll-container">
+                                    <HTMLTable striped interactive className="token-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Symbol</th>
+                                                <th>Type</th>
+                                                <th>Last Price</th>
+                                                <th>24h Change</th>
+                                                <th>Fee</th>
+                                                <th>Volume</th>
+                                                <th>Open interest</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {displayTokens.map((token, index) => (
+                                                <tr key={index} className="token-row">
+                                                    <td>
+                                                        <div className="token-symbol">
+                                                            {token.symbol}
+                                                            {token.leverage && <span className="leverage-badge">{token.leverage}x</span>}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span className={`type-badge ${token.type.toLowerCase()}`}>
+                                                            {token.type}
+                                                        </span>
+                                                    </td>
+                                                    <td className="price-cell">
+                                                        {token.lastPrice.toLocaleString()}
+                                                    </td>
+                                                    <td className={token.changePercent24h >= 0 ? 'positive' : 'negative'}>
+                                                        {token.change24h >= 0 ? '+' : ''}{token.change24h.toLocaleString()}
+                                                        <br />
+                                                        ({token.changePercent24h >= 0 ? '+' : ''}{token.changePercent24h.toFixed(2)}%)
+                                                    </td>
+                                                    <td className={token.fundingRate && token.fundingRate >= 0 ? 'positive' : 'negative'}>
+                                                        {token.fundingRate ? `${(token.fundingRate * 100).toFixed(4)}%` : '--'}
+                                                    </td>
+                                                    <td>${token.volume24h.toLocaleString()}</td>
+                                                    <td>
+                                                        {token.openInterest ? `$${token.openInterest.toLocaleString()}` : '--'}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </HTMLTable>
+                                </div>
+
+                                {displayTokens.length === 0 && (
+                                    <div className="no-results">
+                                        No matching token found
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    };
+
 
     renderBalanceTable = () => (
         <div className="trading-info-table-container">
@@ -529,7 +776,13 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
                             </div>
                         </div>
                     </div>
-                    <span className="price">$42,567.89</span>
+                    <span
+                        className="price clickable"
+                        onClick={this.handleTokenPriceClick}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        $42,567.89
+                    </span>
                     <span className="change positive">+2.34%</span>
                 </div>
                 <div className="timeframe-selector">
@@ -768,12 +1021,11 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
     );
 
     render() {
+        overflowManager.setOverflow('auto');
         const { visibleModules, theme } = this.state;
-
         const visibleModuleComponents = this.modules
             .sort((a, b) => a.priority - b.priority)
             .slice(0, visibleModules);
-
         return (
             <div className={`trading-layout ${theme}`}>
                 <div className="layout-container">
@@ -806,6 +1058,9 @@ class TradingLayout extends React.Component<{}, TradingLayoutState> {
                         </div>
                     </div>
                 </div>
+
+
+                {this.renderTokenPopup()}
             </div>
         );
     }
