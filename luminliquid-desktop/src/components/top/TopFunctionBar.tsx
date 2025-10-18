@@ -7,26 +7,43 @@ import {
     MenuItem
 } from '@blueprintjs/core';
 import { themeManager } from '../../globals/theme/ThemeManager';
+import { withRouter } from '../../WithRouter';
 
-interface ButtonRowState {
+interface TopFunctionBarState {
     theme: 'dark' | 'light';
     windowWidth: number;
 }
 
-class ButtonRow extends React.Component<{}, ButtonRowState> {
+interface TopFunctionBarProps {
+    navigate: (path: string, options?: any) => void;
+}
+
+class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBarState> {
     handleResize = () => {
         this.setState({ windowWidth: window.innerWidth });
     };
 
     private unsubscribe: (() => void) | null = null;
 
-    constructor(props: {}) {
+    constructor(props: TopFunctionBarProps) {
         super(props);
         this.state = {
             theme: themeManager.getTheme(),
             windowWidth: window.innerWidth
         };
     }
+
+    toPage = (page: string) => {
+        if (page === 'home') {
+            this.props.navigate('/');
+        } else {
+            this.props.navigate('/' + page);
+        }
+    }
+
+    handleHomeClick = () => {
+        this.props.navigate('/');
+    };
 
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
@@ -50,11 +67,11 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
         {
             type: 'single-row',
             buttons: [
-                { key: 'test', label: 'test', icon: 'predictive-analysis' as const },
-                { key: 'test', label: 'test', icon: 'globe-network' as const },
-                { key: 'test', label: 'test', icon: 'exchange' as const },
-                { key: 'test', label: 'test', icon: 'pulse' as const },
-                { key: 'test', label: 'test', icon: 'flash' as const }
+                { key: 'Market', label: 'Market', icon: 'predictive-analysis' as const, page: 'home' },
+                { key: 'test', label: 'test', icon: 'globe-network' as const, page: 'order-split' },
+                { key: 'test', label: 'test', icon: 'exchange' as const, page: 'arbitrage' },
+                { key: 'test', label: 'test', icon: 'pulse' as const, page: 'trade' },
+                { key: 'test', label: 'test', icon: 'flash' as const, page: 'market' }
             ]
         },
         {
@@ -131,6 +148,7 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
 
     renderSingleRowButton = (button: any, index: number) => (
         <Button
+            onClick={() => this.toPage(button.page)}
             key={button.key}
             minimal
             icon={button.icon}
@@ -259,7 +277,7 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
                         flex: '1',
                         marginBottom: '2px',
                         position: 'relative',
-                        zIndex: 2 
+                        zIndex: 2
                     }}>
                         {firstRow.map((button: any, index: number) => (
                             this.renderDoubleRowButton(button, index)
@@ -270,7 +288,7 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
                         flex: '1',
                         marginTop: '2px',
                         position: 'relative',
-                        zIndex: 2 
+                        zIndex: 2
                     }}>
                         {secondRow.map((button: any, index: number) => (
                             this.renderDoubleRowButton(button, index)
@@ -296,9 +314,9 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
                     padding: '0 8px',
                     borderBottom: theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
                     display: 'flex',
-                    alignItems: 'stretch', 
+                    alignItems: 'stretch',
                     justifyContent: 'space-between',
-                    height: '60px', 
+                    height: '60px',
                     overflow: 'hidden'
                 }}
             >
@@ -321,4 +339,5 @@ class ButtonRow extends React.Component<{}, ButtonRowState> {
     }
 }
 
-export default ButtonRow;
+// export default TopFunctionBar;
+export default withRouter(TopFunctionBar);
