@@ -1,6 +1,5 @@
 import React from "react";
 
-
 interface NewsPanelProps {
     theme: 'dark' | 'light';
     headerHeight: number;
@@ -88,7 +87,7 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
             if (!this.state.isHovered) {
                 this.addNewNews();
             }
-        }, 5000); 
+        }, 5000);
     };
 
     addNewNews = () => {
@@ -137,9 +136,9 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
         };
 
         this.setState(prevState => ({
-            news: [newNews, ...prevState.news.slice(0, 14)] 
+            news: [newNews, ...prevState.news.slice(0, 14)]
         }), () => {
-            
+
             if (this.scrollContainerRef.current && !this.state.isHovered) {
                 this.scrollContainerRef.current.scrollTop = 0;
             }
@@ -158,20 +157,38 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
         const { theme, headerHeight, scrollbarStyles } = this.props;
         const { news } = this.state;
 
+        const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+        const sidebarBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
+        const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+        const secondaryTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
+        const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+        const hoverBgColor = theme === 'dark' ? '#2D3746' : '#F1F3F5';
+        const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
+
         return (
             <>
                 <div style={{
                     height: `${headerHeight}px`,
                     padding: '8px 12px',
-                    borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                    borderBottom: `1px solid ${borderColor}`,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     flexShrink: 0,
-                    backgroundColor: theme === 'dark' ? '#30404D' : '#EBF1F5'
+                    backgroundColor: theme === 'dark' ? '#1A1D24' : '#F8F9FA'
                 }}>
-                    <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600' }}>Market News</h3>
-                    <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                    <h3 style={{
+                        margin: 0,
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: textColor
+                    }}>
+                        Market News
+                    </h3>
+                    <span style={{
+                        fontSize: '9px',
+                        color: secondaryTextColor
+                    }}>
                         Live Feed
                     </span>
                 </div>
@@ -182,27 +199,48 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
                         overflow: 'auto',
                         overflowX: 'hidden' as const,
                         minHeight: 0,
+                        backgroundColor: backgroundColor,
                         ...scrollbarStyles
                     }}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
                 >
                     {news.map((newsItem) => (
-                        <div key={`news-${newsItem.id}`} style={{
-                            padding: '6px 8px',
-                            borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
-                            fontSize: '10px',
-                            cursor: 'pointer',
-                            backgroundColor: newsItem.id === this.newsCounter ?
-                                (theme === 'dark' ? '#2A3843' : '#F0F5F9') : 'transparent',
-                            transition: 'background-color 0.2s ease'
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
+                        <div
+                            key={`news-${newsItem.id}`}
+                            style={{
+                                padding: '6px 8px',
+                                borderBottom: `1px solid ${borderColor}`,
+                                fontSize: '10px',
+                                cursor: 'pointer',
+                                backgroundColor: newsItem.id === this.newsCounter ?
+                                    hoverBgColor : backgroundColor,
+                                transition: 'background-color 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = hoverBgColor;
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                    newsItem.id === this.newsCounter ? hoverBgColor : backgroundColor;
+                            }}
+                        >
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                marginBottom: '3px'
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    flex: 1
+                                }}>
                                     <span style={{
                                         padding: '1px 3px',
-                                        backgroundColor: newsItem.impact === 'high' ? '#DB4437' :
-                                            newsItem.impact === 'medium' ? '#F4B400' : '#0F9D58',
+                                        backgroundColor: newsItem.impact === 'high' ? '#DC143C' :
+                                            newsItem.impact === 'medium' ? '#F4B400' : '#2E8B57',
                                         color: 'white',
                                         borderRadius: '2px',
                                         fontSize: '7px',
@@ -214,7 +252,7 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
                                     </span>
                                     <span style={{
                                         fontSize: '8px',
-                                        color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                                        color: secondaryTextColor,
                                         minWidth: '38px'
                                     }}>
                                         {newsItem.timestamp}
@@ -223,13 +261,13 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
                                         width: '4px',
                                         height: '4px',
                                         borderRadius: '50%',
-                                        backgroundColor: newsItem.sentiment === 'positive' ? '#0F9D58' :
-                                            newsItem.sentiment === 'negative' ? '#DB4437' : '#F4B400'
+                                        backgroundColor: newsItem.sentiment === 'positive' ? '#2E8B57' :
+                                            newsItem.sentiment === 'negative' ? '#DC143C' : '#F4B400'
                                     }} />
                                 </div>
                                 <span style={{
                                     fontSize: '8px',
-                                    color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                                    color: secondaryTextColor,
                                     fontStyle: 'italic'
                                 }}>
                                     {newsItem.source}
@@ -238,21 +276,29 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
                             <div style={{
                                 fontWeight: '600',
                                 marginBottom: '3px',
-                                color: theme === 'dark' ? '#F5F8FA' : '#182026',
+                                color: textColor,
                                 fontSize: '9px',
                                 lineHeight: '1.2'
                             }}>
                                 {newsItem.title}
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '4px',
+                                    flexWrap: 'wrap'
+                                }}>
                                     {newsItem.assets.slice(0, 3).map((asset: string) => (
                                         <span key={asset} style={{
                                             padding: '1px 3px',
-                                            backgroundColor: theme === 'dark' ? '#5C7080' : '#EBF1F5',
+                                            backgroundColor: theme === 'dark' ? '#2D323D' : '#E1E5E9',
                                             borderRadius: '2px',
                                             fontSize: '7px',
-                                            color: theme === 'dark' ? '#F5F8FA' : '#182026'
+                                            color: textColor
                                         }}>
                                             {asset}
                                         </span>
@@ -260,10 +306,10 @@ class NewsPanel extends React.Component<NewsPanelProps, NewsPanelState> {
                                 </div>
                                 <span style={{
                                     padding: '1px 4px',
-                                    backgroundColor: theme === 'dark' ? '#5C7080' : '#EBF1F5',
+                                    backgroundColor: theme === 'dark' ? '#2D323D' : '#E1E5E9',
                                     borderRadius: '2px',
                                     fontSize: '7px',
-                                    color: theme === 'dark' ? '#F5F8FA' : '#182026'
+                                    color: textColor
                                 }}>
                                     {newsItem.category}
                                 </span>

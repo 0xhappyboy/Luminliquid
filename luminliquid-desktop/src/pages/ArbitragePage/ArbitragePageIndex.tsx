@@ -53,6 +53,37 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     private containerRef = React.createRef<HTMLDivElement>();
     private resizeObserver: ResizeObserver | null = null;
 
+    private colorConfig = {
+        dark: {
+            background: '#0F1116',
+            sidebar: '#1A1D24',
+            cardBackground: '#1A1D24',
+            border: '#2D323D',
+            text: '#E8EAED',
+            textSecondary: '#8F99A8',
+            primary: '#A7B6C2',
+            hoverBg: '#2D3746',
+            selectedBg: '#3C4858',
+            success: '#2E8B57',
+            warning: '#FFA500',
+            danger: '#DC143C'
+        },
+        light: {
+            background: '#FFFFFF',
+            sidebar: '#F8F9FA',
+            cardBackground: '#FFFFFF',
+            border: '#E1E5E9',
+            text: '#1A1D24',
+            textSecondary: '#5F6B7C',
+            primary: '#404854',
+            hoverBg: '#F1F3F5',
+            selectedBg: '#E1E5E9',
+            success: '#2E8B57',
+            warning: '#FFA500',
+            danger: '#DC143C'
+        }
+    };
+
     constructor(props: {}) {
         super(props);
         this.state = {
@@ -173,7 +204,6 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         fees: 5
                     }
                 },
-
                 {
                     id: '5',
                     name: 'Stablecoin Arb',
@@ -286,20 +316,22 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     };
 
     getStatusColor = (status: string): string => {
+        const colors = this.colorConfig[this.state.theme];
         switch (status) {
-            case 'active': return '#0F9D58';
-            case 'pending': return '#F4B400';
-            case 'expired': return '#DB4437';
-            default: return '#9AA0A6';
+            case 'active': return colors.success;
+            case 'pending': return colors.warning;
+            case 'expired': return colors.danger;
+            default: return colors.textSecondary;
         }
     };
 
     getRiskLevelColor = (riskLevel: string): string => {
+        const colors = this.colorConfig[this.state.theme];
         switch (riskLevel) {
-            case 'low': return '#0F9D58';
-            case 'medium': return '#F4B400';
-            case 'high': return '#DB4437';
-            default: return '#9AA0A6';
+            case 'low': return colors.success;
+            case 'medium': return colors.warning;
+            case 'high': return colors.danger;
+            default: return colors.textSecondary;
         }
     };
 
@@ -314,14 +346,14 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
             'Bitcoin': '#F7931A',
             'Lightning': '#8A2BE2'
         };
-        return colors[network] || '#9AA0A6';
+        return colors[network] || this.colorConfig[this.state.theme].textSecondary;
     };
 
     getScrollbarStyles = () => {
-        const { theme } = this.state;
-        const trackColor = theme === 'dark' ? '#30404D' : '#EBF1F5';
-        const thumbColor = theme === 'dark' ? '#5C7080' : '#8A9BA8';
-        const thumbHoverColor = theme === 'dark' ? '#738694' : '#A7B6C2';
+        const colors = this.colorConfig[this.state.theme];
+        const trackColor = colors.background;
+        const thumbColor = colors.border;
+        const thumbHoverColor = colors.primary;
 
         return {
             /* Webkit browsers (Chrome, Safari) */
@@ -347,8 +379,8 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     };
 
     getPerformanceChartOption = (performanceData: number[]) => {
-        const { theme } = this.state;
-        const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
+        const colors = this.colorConfig[this.state.theme];
+        const textColor = colors.text;
         const backgroundColor = 'transparent';
 
         return {
@@ -376,16 +408,16 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                 symbol: 'none',
                 lineStyle: {
                     width: 1.5,
-                    color: '#0F9D58'
+                    color: colors.success
                 },
                 areaStyle: {
                     color: {
                         type: 'linear',
                         x: 0, y: 0, x2: 0, y2: 1,
                         colorStops: [{
-                            offset: 0, color: 'rgba(15, 157, 88, 0.3)'
+                            offset: 0, color: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.3)' : 'rgba(46, 139, 87, 0.2)'
                         }, {
-                            offset: 1, color: 'rgba(15, 157, 88, 0.05)'
+                            offset: 1, color: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.05)' : 'rgba(46, 139, 87, 0.05)'
                         }]
                     }
                 },
@@ -395,46 +427,41 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     };
 
     renderLeftPanel = () => {
-        const { theme, containerHeight, searchQuery, autoRefresh, opportunities, showRightPanel } = this.state;
+        const { containerHeight, searchQuery, showRightPanel } = this.state;
+        const colors = this.colorConfig[this.state.theme];
         const scrollbarStyles = this.getScrollbarStyles();
-        const filteredOpportunities = opportunities.filter(opp =>
-            opp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            opp.assets.buy.asset.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            opp.assets.sell.asset.toLowerCase().includes(searchQuery.toLowerCase())
-        );
 
         return (
             <div style={{
                 flex: showRightPanel ? '0 0 50%' : '1',
                 minWidth: showRightPanel ? '600px' : '800px',
                 maxWidth: showRightPanel ? '50%' : '100%',
-                borderRight: showRightPanel ? `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}` : 'none',
+                borderRight: showRightPanel ? `1px solid ${colors.border}` : 'none',
                 display: 'flex',
                 flexDirection: 'column',
                 height: containerHeight,
                 overflow: 'hidden',
                 width: '100%',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                backgroundColor: colors.background
             }}>
 
                 <div style={{
                     padding: '12px',
-                    borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                    borderBottom: `1px solid ${colors.border}`,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    flexShrink: 0
+                    flexShrink: 0,
+                    backgroundColor: colors.sidebar
                 }}>
-                    <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>
+                    <h2 style={{
+                        margin: 0,
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: colors.text
+                    }}>
                         Arbitrage Opportunities
-                        {!showRightPanel && (
-                            <span style={{
-                                fontSize: '11px',
-                                color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
-                                marginLeft: '8px'
-                            }}>
-                            </span>
-                        )}
                     </h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Switch
@@ -454,7 +481,6 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     </div>
                 </div>
 
-
                 <div style={{
                     flex: 1,
                     overflow: 'auto',
@@ -464,6 +490,7 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     gridTemplateColumns: 'repeat(2, 1fr)',
                     gap: '8px',
                     alignContent: 'start',
+                    backgroundColor: colors.background,
                     ...this.getScrollbarStyles()
                 }}>
                     {this.state.opportunities
@@ -479,7 +506,8 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     };
 
     renderOpportunityCard = (opportunity: ArbitragePageIndexOpportunity) => {
-        const { theme } = this.state;
+        const colors = this.colorConfig[this.state.theme];
+
         const getRiskStyle = (riskLevel: string) => {
             const baseStyle = {
                 padding: '6px',
@@ -491,44 +519,46 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                 case 'low':
                     return {
                         ...baseStyle,
-                        backgroundColor: theme === 'dark' ? 'rgba(15, 157, 88, 0.15)' : 'rgba(15, 157, 88, 0.08)',
-                        border: `1px solid ${theme === 'dark' ? 'rgba(15, 157, 88, 0.4)' : 'rgba(15, 157, 88, 0.3)'}`,
-                        color: theme === 'dark' ? '#48C78E' : '#0F9D58'
+                        backgroundColor: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.15)' : 'rgba(46, 139, 87, 0.08)',
+                        border: `1px solid ${this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.4)' : 'rgba(46, 139, 87, 0.3)'}`,
+                        color: colors.success
                     };
                 case 'medium':
                     return {
                         ...baseStyle,
-                        backgroundColor: theme === 'dark' ? 'rgba(244, 180, 0, 0.15)' : 'rgba(244, 180, 0, 0.08)',
-                        border: `1px solid ${theme === 'dark' ? 'rgba(244, 180, 0, 0.4)' : 'rgba(244, 180, 0, 0.3)'}`,
-                        color: theme === 'dark' ? '#FFD24D' : '#B38700'
+                        backgroundColor: this.state.theme === 'dark' ? 'rgba(255, 165, 0, 0.15)' : 'rgba(255, 165, 0, 0.08)',
+                        border: `1px solid ${this.state.theme === 'dark' ? 'rgba(255, 165, 0, 0.4)' : 'rgba(255, 165, 0, 0.3)'}`,
+                        color: colors.warning
                     };
                 case 'high':
                     return {
                         ...baseStyle,
-                        backgroundColor: theme === 'dark' ? 'rgba(219, 68, 55, 0.15)' : 'rgba(219, 68, 55, 0.08)',
-                        border: `1px solid ${theme === 'dark' ? 'rgba(219, 68, 55, 0.4)' : 'rgba(219, 68, 55, 0.3)'}`,
-                        color: theme === 'dark' ? '#FF6B6B' : '#DB4437'
+                        backgroundColor: this.state.theme === 'dark' ? 'rgba(220, 20, 60, 0.15)' : 'rgba(220, 20, 60, 0.08)',
+                        border: `1px solid ${this.state.theme === 'dark' ? 'rgba(220, 20, 60, 0.4)' : 'rgba(220, 20, 60, 0.3)'}`,
+                        color: colors.danger
                     };
                 default:
                     return baseStyle;
             }
         };
+
         const getRiskText = (riskLevel: string) => {
             switch (riskLevel) {
-                case 'low': return '低风险 - 相对安全';
-                case 'medium': return '中等风险 - 建议监控';
-                case 'high': return '高风险 - 谨慎操作';
+                case 'low': return 'Low risk - relatively safe';
+                case 'medium': return 'Medium risk - monitoring recommended';
+                case 'high': return 'High risk - proceed with caution';
                 default: return '';
             }
         };
+
         return (
             <Card
                 key={opportunity.id}
                 elevation={Elevation.TWO}
                 style={{
                     margin: 0,
-                    backgroundColor: theme === 'dark' ? '#30404D' : '#FFFFFF',
-                    border: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                    backgroundColor: colors.cardBackground,
+                    border: `1px solid ${colors.border}`,
                     padding: '12px',
                     height: 'auto',
                     minHeight: '330px',
@@ -559,7 +589,8 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                lineHeight: '1.2'
+                                lineHeight: '1.2',
+                                color: colors.text
                             }}>
                                 {opportunity.name}
                             </h4>
@@ -585,7 +616,6 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             </Tag>
                         </div>
 
-
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr',
@@ -595,25 +625,24 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             lineHeight: '1.3'
                         }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Buy:</span>
-                                <span style={{ fontWeight: '600' }}>{opportunity.assets.buy.asset}</span>
+                                <span style={{ color: colors.textSecondary }}>Buy:</span>
+                                <span style={{ fontWeight: '600', color: colors.text }}>{opportunity.assets.buy.asset}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Price:</span>
-                                <span>{this.formatCurrency(opportunity.assets.buy.price)}</span>
+                                <span style={{ color: colors.textSecondary }}>Price:</span>
+                                <span style={{ color: colors.text }}>{this.formatCurrency(opportunity.assets.buy.price)}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Sell:</span>
-                                <span style={{ fontWeight: '600' }}>{opportunity.assets.sell.asset}</span>
+                                <span style={{ color: colors.textSecondary }}>Sell:</span>
+                                <span style={{ fontWeight: '600', color: colors.text }}>{opportunity.assets.sell.asset}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Price:</span>
-                                <span>{this.formatCurrency(opportunity.assets.sell.price)}</span>
+                                <span style={{ color: colors.textSecondary }}>Price:</span>
+                                <span style={{ color: colors.text }}>{this.formatCurrency(opportunity.assets.sell.price)}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
 
                 <div style={{
                     display: 'grid',
@@ -624,19 +653,18 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     lineHeight: '1.3'
                 }}>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Profit</div>
-                        <div style={{ fontWeight: '600', color: '#0F9D58' }}>+{opportunity.profitPotential}%</div>
+                        <div style={{ color: colors.textSecondary }}>Profit</div>
+                        <div style={{ fontWeight: '600', color: colors.success }}>+{opportunity.profitPotential}%</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Gas Cost</div>
-                        <div style={{ fontWeight: '600' }}>{this.formatCurrency(opportunity.gasCost)}</div>
+                        <div style={{ color: colors.textSecondary }}>Gas Cost</div>
+                        <div style={{ fontWeight: '600', color: colors.text }}>{this.formatCurrency(opportunity.gasCost)}</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                        <div style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Volume</div>
-                        <div style={{ fontWeight: '600' }}>{this.formatCurrency(opportunity.volume)}</div>
+                        <div style={{ color: colors.textSecondary }}>Volume</div>
+                        <div style={{ fontWeight: '600', color: colors.text }}>{this.formatCurrency(opportunity.volume)}</div>
                     </div>
                 </div>
-
 
                 <div style={{
                     display: 'flex',
@@ -660,7 +688,7 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         ))}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                        <span style={{ fontSize: '9px', color: colors.textSecondary }}>
                             Confidence
                         </span>
                         <ProgressBar
@@ -668,12 +696,11 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             intent={opportunity.confidence > 80 ? 'success' : opportunity.confidence > 60 ? 'warning' : 'danger'}
                             style={{ height: '3px', width: '30px' }}
                         />
-                        <span style={{ fontSize: '9px', fontWeight: '600' }}>
+                        <span style={{ fontSize: '9px', fontWeight: '600', color: colors.text }}>
                             {opportunity.confidence}%
                         </span>
                     </div>
                 </div>
-
 
                 <div style={{
                     display: 'flex',
@@ -681,7 +708,7 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     marginBottom: '8px',
                     justifyContent: 'space-between',
                     padding: '6px',
-                    backgroundColor: theme === 'dark' ? 'rgba(92, 112, 128, 0.2)' : 'rgba(235, 241, 245, 0.6)',
+                    backgroundColor: colors.hoverBg,
                     borderRadius: '4px',
                     minHeight: '32px'
                 }}>
@@ -690,14 +717,14 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         minimal
                         intent="success"
                         icon="arrow-up"
-                        text="买入详情"
+                        text="Buy details"
                         style={{
                             fontSize: '9px',
                             flex: 1,
                             padding: '2px 4px',
-                            backgroundColor: theme === 'dark' ? 'rgba(15, 157, 88, 0.1)' : 'rgba(15, 157, 88, 0.05)',
-                            border: `1px solid ${theme === 'dark' ? 'rgba(15, 157, 88, 0.3)' : 'rgba(15, 157, 88, 0.2)'}`,
-                            color: theme === 'dark' ? '#48C78E' : '#0F9D58',
+                            backgroundColor: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.1)' : 'rgba(46, 139, 87, 0.05)',
+                            border: `1px solid ${this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.3)' : 'rgba(46, 139, 87, 0.2)'}`,
+                            color: colors.success,
                             minWidth: '60px'
                         }}
                     />
@@ -711,9 +738,9 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             fontSize: '9px',
                             flex: 1,
                             padding: '2px 4px',
-                            backgroundColor: theme === 'dark' ? 'rgba(219, 68, 55, 0.1)' : 'rgba(219, 68, 55, 0.05)',
-                            border: `1px solid ${theme === 'dark' ? 'rgba(219, 68, 55, 0.3)' : 'rgba(219, 68, 55, 0.2)'}`,
-                            color: theme === 'dark' ? '#FF6B6B' : '#DB4437',
+                            backgroundColor: this.state.theme === 'dark' ? 'rgba(220, 20, 60, 0.1)' : 'rgba(220, 20, 60, 0.05)',
+                            border: `1px solid ${this.state.theme === 'dark' ? 'rgba(220, 20, 60, 0.3)' : 'rgba(220, 20, 60, 0.2)'}`,
+                            color: colors.danger,
                             minWidth: '60px'
                         }}
                     />
@@ -722,26 +749,25 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         minimal
                         intent="primary"
                         icon="trending-up"
-                        text="执行套利"
+                        text="execution arbitrage"
                         style={{
                             fontSize: '9px',
                             flex: 1,
                             padding: '2px 4px',
-                            backgroundColor: theme === 'dark' ? 'rgba(66, 133, 244, 0.1)' : 'rgba(66, 133, 244, 0.05)',
-                            border: `1px solid ${theme === 'dark' ? 'rgba(66, 133, 244, 0.3)' : 'rgba(66, 133, 244, 0.2)'}`,
-                            color: theme === 'dark' ? '#64B5F6' : '#4285F4',
+                            backgroundColor: this.state.theme === 'dark' ? 'rgba(167, 182, 194, 0.1)' : 'rgba(64, 72, 84, 0.05)',
+                            border: `1px solid ${this.state.theme === 'dark' ? 'rgba(167, 182, 194, 0.3)' : 'rgba(64, 72, 84, 0.2)'}`,
+                            color: colors.primary,
                             minWidth: '60px'
                         }}
                     />
                 </div>
 
-
                 <div style={{
                     flex: 1,
                     padding: '8px',
-                    backgroundColor: theme === 'dark' ? 'rgba(16, 22, 26, 0.3)' : 'rgba(245, 248, 250, 0.6)',
+                    backgroundColor: colors.hoverBg,
                     borderRadius: '4px',
-                    border: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                    border: `1px solid ${colors.border}`,
                     wordWrap: 'break-word',
                     overflowWrap: 'break-word',
                     overflow: 'hidden',
@@ -749,7 +775,6 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     display: 'flex',
                     flexDirection: 'column'
                 }}>
-
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
@@ -760,32 +785,31 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     }}>
                         <div>
                             <div style={{
-                                color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                                color: colors.textSecondary,
                                 marginBottom: '1px',
                                 whiteSpace: 'nowrap',
                                 fontSize: '9px'
                             }}>
                                 spread
                             </div>
-                            <div style={{ fontWeight: '600', fontSize: '10px' }}>
+                            <div style={{ fontWeight: '600', fontSize: '10px', color: colors.text }}>
                                 {((opportunity.assets.sell.price - opportunity.assets.buy.price) / opportunity.assets.buy.price * 100).toFixed(2)}%
                             </div>
                         </div>
                         <div>
                             <div style={{
-                                color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                                color: colors.textSecondary,
                                 marginBottom: '1px',
                                 whiteSpace: 'nowrap',
                                 fontSize: '9px'
                             }}>
                                 net income
                             </div>
-                            <div style={{ fontWeight: '600', color: '#0F9D58', fontSize: '10px' }}>
+                            <div style={{ fontWeight: '600', color: colors.success, fontSize: '10px' }}>
                                 {this.formatCurrency(opportunity.volume * opportunity.profitPotential / 100)}
                             </div>
                         </div>
                     </div>
-
 
                     <div style={{
                         marginBottom: '8px',
@@ -797,34 +821,34 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             justifyContent: 'space-between',
                             marginBottom: '2px'
                         }}>
-                            <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080', fontSize: '9px' }}>滑点:</span>
-                            <span style={{ fontWeight: '600', fontSize: '10px' }}>{opportunity.slippage}%</span>
+                            <span style={{ color: colors.textSecondary, fontSize: '9px' }}>滑点:</span>
+                            <span style={{ fontWeight: '600', fontSize: '10px', color: colors.text }}>{opportunity.slippage}%</span>
                         </div>
                         <div style={{
                             display: 'flex',
                             justifyContent: 'space-between',
                             marginBottom: '2px'
                         }}>
-                            <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080', fontSize: '9px' }}>时间窗口:</span>
-                            <span style={{ fontWeight: '600', fontSize: '10px' }}>{opportunity.timeframe}</span>
+                            <span style={{ color: colors.textSecondary, fontSize: '9px' }}>时间窗口:</span>
+                            <span style={{ fontWeight: '600', fontSize: '10px', color: colors.text }}>{opportunity.timeframe}</span>
                         </div>
                         <div style={{
                             display: 'flex',
                             justifyContent: 'space-between'
                         }}>
-                            <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080', fontSize: '9px' }}>网络:</span>
+                            <span style={{ color: colors.textSecondary, fontSize: '9px' }}>网络:</span>
                             <span style={{
                                 fontWeight: '600',
                                 fontSize: '9px',
                                 textAlign: 'right',
                                 maxWidth: '60%',
-                                wordBreak: 'break-all'
+                                wordBreak: 'break-all',
+                                color: colors.text
                             }}>
                                 {opportunity.networks.join(', ')}
                             </span>
                         </div>
                     </div>
-
 
                     <div style={{
                         ...getRiskStyle(opportunity.riskLevel),
@@ -834,7 +858,7 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         lineHeight: '1.2'
                     }}>
                         <div style={{
-                            color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                            color: colors.textSecondary,
                             marginBottom: '1px',
                             fontSize: '8px'
                         }}>
@@ -849,11 +873,8 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
         );
     };
 
-
-
-
     getCompactPerformanceChartOption = (performanceData: number[]) => {
-        const { theme } = this.state;
+        const colors = this.colorConfig[this.state.theme];
 
         return {
             backgroundColor: 'transparent',
@@ -878,16 +899,16 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                 symbol: 'none',
                 lineStyle: {
                     width: 1,
-                    color: '#0F9D58'
+                    color: colors.success
                 },
                 areaStyle: {
                     color: {
                         type: 'linear',
                         x: 0, y: 0, x2: 0, y2: 1,
                         colorStops: [{
-                            offset: 0, color: 'rgba(15, 157, 88, 0.3)'
+                            offset: 0, color: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.3)' : 'rgba(46, 139, 87, 0.2)'
                         }, {
-                            offset: 1, color: 'rgba(15, 157, 88, 0.05)'
+                            offset: 1, color: this.state.theme === 'dark' ? 'rgba(46, 139, 87, 0.05)' : 'rgba(46, 139, 87, 0.05)'
                         }]
                     }
                 },
@@ -898,9 +919,11 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
 
     renderRightPanel = () => {
         const { theme, containerHeight } = this.state;
+        const colors = this.colorConfig[theme];
         const scrollbarStyles = this.getScrollbarStyles();
         const headerHeight = 35;
         const panelHeight = containerHeight / 3;
+
         return (
             <div style={{
                 flex: '0 0 50%',
@@ -908,19 +931,19 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                 flexDirection: 'column',
                 height: containerHeight || '100vh',
                 overflow: 'hidden',
-                backgroundColor: theme === 'dark' ? '#202B33' : '#F5F8FA'
+                backgroundColor: colors.background
             }}>
                 <div style={{
                     flex: '0 0 33.333%',
                     display: 'flex',
                     minHeight: 0,
-                    borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`
+                    borderBottom: `1px solid ${colors.border}`
                 }}>
                     <div style={{
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        borderRight: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`
+                        borderRight: `1px solid ${colors.border}`
                     }}>
                         <NewsPanel
                             theme={theme}
@@ -947,20 +970,20 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     display: 'flex',
                     flexDirection: 'column',
                     minHeight: 0,
-                    borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`
+                    borderBottom: `1px solid ${colors.border}`
                 }}>
                     <div style={{
                         height: `${headerHeight}px`,
                         padding: '8px 12px',
-                        borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                        borderBottom: `1px solid ${colors.border}`,
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         flexShrink: 0,
-                        backgroundColor: theme === 'dark' ? '#30404D' : '#EBF1F5'
+                        backgroundColor: colors.sidebar
                     }}>
-                        <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600' }}>Trading Signals</h3>
-                        <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                        <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: colors.text }}>Trading Signals</h3>
+                        <span style={{ fontSize: '9px', color: colors.textSecondary }}>
                             Auto-refresh
                         </span>
                     </div>
@@ -971,7 +994,6 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         minHeight: 0,
                         ...scrollbarStyles
                     }}>
-
                         {[
                             { id: 1, type: 'ARB', pair: 'ETH/USDT', exchanges: 'Binance→Kraken', spread: 0.45, timestamp: '14:35:22', confidence: 92 },
                             { id: 2, type: 'MM', pair: 'BTC/USD', exchanges: 'Coinbase Pro', spread: 0.12, timestamp: '14:34:15', confidence: 88 },
@@ -984,15 +1006,16 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                         ].map(signal => (
                             <div key={signal.id} style={{
                                 padding: '6px 8px',
-                                borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
-                                fontSize: '10px'
+                                borderBottom: `1px solid ${colors.border}`,
+                                fontSize: '10px',
+                                backgroundColor: colors.background
                             }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <span style={{
                                             padding: '1px 4px',
-                                            backgroundColor: signal.type === 'ARB' ? '#0F9D58' :
-                                                signal.type === 'MM' ? '#4285F4' : '#F4B400',
+                                            backgroundColor: signal.type === 'ARB' ? colors.success :
+                                                signal.type === 'MM' ? colors.primary : colors.warning,
                                             color: 'white',
                                             borderRadius: '3px',
                                             fontSize: '8px',
@@ -1000,36 +1023,36 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                                         }}>
                                             {signal.type}
                                         </span>
-                                        <span style={{ fontWeight: '600' }}>{signal.pair}</span>
+                                        <span style={{ fontWeight: '600', color: colors.text }}>{signal.pair}</span>
                                     </div>
                                     <span style={{
                                         fontSize: '9px',
-                                        color: '#0F9D58',
+                                        color: colors.success,
                                         fontWeight: '600'
                                     }}>
                                         +{signal.spread}%
                                     </span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                                    <span style={{ fontSize: '9px', color: colors.textSecondary }}>
                                         {signal.exchanges}
                                     </span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <span style={{ fontSize: '8px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                                        <span style={{ fontSize: '8px', color: colors.textSecondary }}>
                                             {signal.timestamp}
                                         </span>
                                         <div style={{
                                             width: '20px',
                                             height: '4px',
-                                            backgroundColor: theme === 'dark' ? '#5C7080' : '#E1E8ED',
+                                            backgroundColor: colors.border,
                                             borderRadius: '2px',
                                             overflow: 'hidden'
                                         }}>
                                             <div style={{
                                                 width: `${signal.confidence}%`,
                                                 height: '100%',
-                                                backgroundColor: signal.confidence > 80 ? '#0F9D58' :
-                                                    signal.confidence > 70 ? '#F4B400' : '#DB4437'
+                                                backgroundColor: signal.confidence > 80 ? colors.success :
+                                                    signal.confidence > 70 ? colors.warning : colors.danger
                                             }} />
                                         </div>
                                     </div>
@@ -1047,15 +1070,15 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                     <div style={{
                         height: `${headerHeight}px`,
                         padding: '8px 12px',
-                        borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                        borderBottom: `1px solid ${colors.border}`,
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         flexShrink: 0,
-                        backgroundColor: theme === 'dark' ? '#30404D' : '#EBF1F5'
+                        backgroundColor: colors.sidebar
                     }}>
-                        <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600' }}>Risk & System</h3>
-                        <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                        <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: colors.text }}>Risk & System</h3>
+                        <span style={{ fontSize: '9px', color: colors.textSecondary }}>
                             All Systems Normal
                         </span>
                     </div>
@@ -1106,7 +1129,7 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             gap: '3px',
                             marginTop: '6px',
                             padding: '4px 0',
-                            borderTop: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                            borderTop: `1px solid ${colors.border}`,
                             fontSize: '8px'
                         }}>
                             <RiskIndicator
@@ -1140,33 +1163,32 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
                             alignItems: 'center',
                             marginTop: '6px',
                             padding: '4px 0',
-                            borderTop: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                            borderTop: `1px solid ${colors.border}`,
                             fontSize: '8px'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>Risk Level:</span>
+                                <span style={{ color: colors.textSecondary }}>Risk Level:</span>
                                 <span style={{
                                     fontWeight: '600',
-                                    color: '#F4B400'
+                                    color: colors.warning
                                 }}>
                                     MEDIUM
                                 </span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <span style={{ color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>System:</span>
+                                <span style={{ color: colors.textSecondary }}>System:</span>
                                 <span style={{
                                     width: '6px',
                                     height: '6px',
                                     borderRadius: '50%',
-                                    backgroundColor: '#0F9D58',
+                                    backgroundColor: colors.success,
                                     animation: 'pulse 2s infinite'
                                 }} />
-                                <span style={{ fontWeight: '600', color: '#0F9D58' }}>STABLE</span>
+                                <span style={{ fontWeight: '600', color: colors.success }}>STABLE</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         );
     };
@@ -1174,14 +1196,16 @@ class ArbitragePageIndex extends React.Component<{}, ArbitragePageIndexState> {
     render() {
         overflowManager.setOverflow('hidden');
         const { containerHeight, showRightPanel } = this.state;
+        const colors = this.colorConfig[this.state.theme];
+
         return (
             <div
                 ref={this.containerRef}
                 style={{
                     padding: '0',
-                    backgroundColor: this.state.theme === 'dark' ? '#2F343C' : '#FFFFFF',
+                    backgroundColor: colors.background,
                     minHeight: '100vh',
-                    color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026',
+                    color: colors.text,
                     display: 'flex',
                     height: containerHeight || '100vh',
                     minWidth: '800px',

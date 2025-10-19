@@ -1,6 +1,5 @@
 import React from "react";
 
-
 interface EventsPanelProps {
     theme: 'dark' | 'light';
     headerHeight: number;
@@ -148,20 +147,37 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
         const { theme, headerHeight, scrollbarStyles } = this.props;
         const { events } = this.state;
 
+        const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+        const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+        const secondaryTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
+        const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
+        const hoverBg = theme === 'dark' ? '#2D323D' : '#F1F3F5';
+        const newEventBg = theme === 'dark' ? '#2D323D' : '#F1F3F5';
+
         return (
             <>
                 <div style={{
                     height: `${headerHeight}px`,
                     padding: '8px 12px',
-                    borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                    borderBottom: `1px solid ${borderColor}`,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     flexShrink: 0,
-                    backgroundColor: theme === 'dark' ? '#30404D' : '#EBF1F5'
+                    backgroundColor: headerBg
                 }}>
-                    <h3 style={{ margin: 0, fontSize: '12px', fontWeight: '600' }}>Live Events</h3>
-                    <span style={{ fontSize: '9px', color: theme === 'dark' ? '#8A9BA8' : '#5C7080' }}>
+                    <h3 style={{ 
+                        margin: 0, 
+                        fontSize: '12px', 
+                        fontWeight: '600',
+                        color: textColor
+                    }}>
+                        Live Events
+                    </h3>
+                    <span style={{ 
+                        fontSize: '9px', 
+                        color: secondaryTextColor 
+                    }}>
                         Real-time
                     </span>
                 </div>
@@ -180,19 +196,25 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                     {events.map((event) => (
                         <div key={`event-${event.id}`} style={{
                             padding: '6px 8px',
-                            borderBottom: `1px solid ${theme === 'dark' ? '#5C7080' : '#E1E8ED'}`,
+                            borderBottom: `1px solid ${borderColor}`,
                             fontSize: '10px',
                             cursor: 'pointer',
-                            backgroundColor: event.id === this.eventsCounter ?
-                                (theme === 'dark' ? '#2A3843' : '#F0F5F9') : 'transparent',
+                            backgroundColor: event.id === this.eventsCounter ? newEventBg : 'transparent',
                             transition: 'background-color 0.2s ease'
-                        }}>
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = hoverBg;
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = event.id === this.eventsCounter ? newEventBg : 'transparent';
+                        }}
+                        >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
                                     <span style={{
                                         padding: '1px 3px',
-                                        backgroundColor: event.type === 'arbitrage' ? '#0F9D58' :
-                                            event.type === 'liquidation' ? '#DB4437' :
+                                        backgroundColor: event.type === 'arbitrage' ? '#2E8B57' :
+                                            event.type === 'liquidation' ? '#DC143C' :
                                                 event.type === 'flash_loan' ? '#4285F4' : '#F4B400',
                                         color: 'white',
                                         borderRadius: '2px',
@@ -205,7 +227,7 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                                     </span>
                                     <span style={{
                                         fontSize: '8px',
-                                        color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                                        color: secondaryTextColor,
                                         minWidth: '38px'
                                     }}>
                                         {event.timestamp}
@@ -214,7 +236,7 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                                         width: '6px',
                                         height: '6px',
                                         borderRadius: '50%',
-                                        backgroundColor: event.status === 'completed' ? '#0F9D58' :
+                                        backgroundColor: event.status === 'completed' ? '#2E8B57' :
                                             event.status === 'executing' ? '#F4B400' : '#4285F4',
                                         animation: event.status === 'executing' ? 'pulse 1.5s infinite' : 'none'
                                     }} />
@@ -222,7 +244,7 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                                 <span style={{
                                     fontSize: '9px',
                                     fontWeight: '600',
-                                    color: '#0F9D58'
+                                    color: '#2E8B57'
                                 }}>
                                     {event.profit}
                                 </span>
@@ -230,7 +252,7 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                             <div style={{
                                 fontWeight: '600',
                                 marginBottom: '3px',
-                                color: theme === 'dark' ? '#F5F8FA' : '#182026',
+                                color: textColor,
                                 fontSize: '9px',
                                 lineHeight: '1.2'
                             }}>
@@ -239,14 +261,14 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{
                                     fontSize: '8px',
-                                    color: theme === 'dark' ? '#8A9BA8' : '#5C7080'
+                                    color: secondaryTextColor
                                 }}>
                                     {event.exchanges}
                                 </span>
                                 <span style={{
                                     fontSize: '8px',
                                     fontWeight: '600',
-                                    color: theme === 'dark' ? '#F5F8FA' : '#182026'
+                                    color: textColor
                                 }}>
                                     Size: {event.size}
                                 </span>
@@ -260,4 +282,3 @@ class EventsPanel extends React.Component<EventsPanelProps, EventsPanelState> {
 }
 
 export default EventsPanel;
-

@@ -1,4 +1,5 @@
 import React from "react";
+
 interface RiskIndicatorProps {
     theme: 'dark' | 'light';
     label: string;
@@ -32,16 +33,20 @@ class RiskIndicator extends React.Component<RiskIndicatorProps, RiskIndicatorSta
         const { theme, label, value, change, trend, status } = this.props;
         const { isHovered } = this.state;
 
-        const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-        const secondaryColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
-        const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
-        const hoverBorderColor = theme === 'dark' ? '#8A9BA8' : '#A7B6C2';
+        const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+        const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+        const secondaryTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
+        const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+        const hoverBorderColor = theme === 'dark' ? '#A7B6C2' : '#404854';
+        const hoverBgColor = theme === 'dark' ? '#2D3746' : '#F1F3F5';
 
-        const statusColor = status === 'good' ? '#0F9D58' :
+        const statusColor = status === 'good' ? '#2E8B57' :
             status === 'warning' ? '#F4B400' :
-                secondaryColor;
+                secondaryTextColor;
 
-        const changeColor = trend === 'up' ? '#0F9D58' : '#DB4437';
+        const changeColor = trend === 'up' ? '#2E8B57' : '#DC143C';
+
+        const progressBgColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
 
         return (
             <div
@@ -52,17 +57,16 @@ class RiskIndicator extends React.Component<RiskIndicatorProps, RiskIndicatorSta
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    transition: 'border-color 0.2s ease',
+                    transition: 'all 0.2s ease',
                     cursor: 'pointer',
-                    backgroundColor: isHovered ?
-                        (theme === 'dark' ? '#2A3843' : '#F8F9FA') : 'transparent'
+                    backgroundColor: isHovered ? hoverBgColor : backgroundColor
                 }}
                 onMouseEnter={this.handleMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
                 title={`${label}: ${value} (${change})`}
             >
                 <div style={{
-                    color: secondaryColor,
+                    color: secondaryTextColor,
                     fontSize: '8px',
                     fontWeight: '600',
                     marginBottom: '2px'
@@ -92,7 +96,7 @@ class RiskIndicator extends React.Component<RiskIndicatorProps, RiskIndicatorSta
                 <div style={{
                     width: '100%',
                     height: '2px',
-                    backgroundColor: theme === 'dark' ? '#5C7080' : '#E1E8ED',
+                    backgroundColor: progressBgColor,
                     borderRadius: '1px',
                     marginTop: '2px',
                     overflow: 'hidden'
