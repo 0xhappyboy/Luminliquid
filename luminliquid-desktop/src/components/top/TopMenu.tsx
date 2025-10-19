@@ -9,7 +9,7 @@ import {
 import { themeManager } from '../../globals/theme/ThemeManager';
 import { withRouter } from '../../WithRouter';
 import pages from '../../globals/config/pages.json';
-import { handleCloseWindow, handleMaximizeWindow, handleMinimizeWindow, handleRecoveryWindow } from '../../globals/commands/SystemCommand';
+import { handleCloseWindow, handleDragWindowMouseDown, handleMaximizeWindow, handleMinimizeWindow, handleRecoveryWindow } from '../../globals/commands/WindowsCommand';
 
 interface MenuItemData {
   key: string;
@@ -29,6 +29,7 @@ interface TopMenuBarProps {
 
 class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
   private unsubscribe: (() => void) | null = null;
+
   constructor(props: TopMenuBarProps) {
     super(props);
     this.state = {
@@ -36,6 +37,26 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
       windowWidth: window.innerWidth,
       isMaximized: false,
     };
+  }
+
+  isNotDragElement = (element: HTMLElement): boolean => {
+    const interactiveSelectors = [
+      'button', 'input', 'select', 'textarea', 'a', 'span',
+      '[role="button"]', '[contenteditable="true"]'
+    ];
+    return interactiveSelectors.some(selector =>
+      element.matches?.(selector) || element.closest?.(selector)
+    );
+  };
+
+  handleDragWindowMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    if (this.isNotDragElement(event.target as HTMLElement)) {
+      return;
+    }
+    if (event.button === 0) {
+      handleDragWindowMouseDown(event);
+    }
   }
 
   handleMinimizeWindowButtonClick = () => {
@@ -63,6 +84,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
   handleResize = () => {
     this.setState({ windowWidth: window.innerWidth });
   };
+  
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     this.unsubscribe = themeManager.subscribe((theme) => {
@@ -190,8 +212,13 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
 
     return (
       <div
+        onMouseDown={(event) => { this.handleDragWindowMouseDown(event) }}
         className={`custom-top-navbar ${theme === 'dark' ? 'bp4-dark' : 'bp4-light'}`}
         style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none',
           width: '100%',
           minWidth: '400px',
           backgroundColor: theme === 'dark' ? '#1C2127' : '#FFFFFF',

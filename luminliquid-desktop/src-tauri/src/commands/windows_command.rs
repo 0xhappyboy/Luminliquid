@@ -1,6 +1,11 @@
-use tauri::{command, Window};
+use std::sync::Mutex;
 
-use crate::global::{WINDOW_SIZE_MANAGE, WINDOW_SIZE_MANAGE_KEY};
+use tauri::{command, PhysicalPosition, State, Window};
+
+use crate::{
+    context::AppState,
+    global::{WINDOW_SIZE_MANAGE, WINDOW_SIZE_MANAGE_KEY},
+};
 
 /// minimize window
 #[command]
@@ -55,4 +60,12 @@ pub fn recovery_window(window: Window) {
 #[command]
 pub fn close_window(window: Window) {
     window.close().unwrap();
+}
+
+/// drag window
+#[tauri::command]
+pub fn drag_window(window: tauri::Window) -> Result<(), String> {
+    window.start_dragging()
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }

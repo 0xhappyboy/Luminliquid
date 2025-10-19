@@ -1,5 +1,5 @@
 /// page type
-pub enum PageType{
+pub enum PageType {
     MarketPage,
     TradePage,
     WalletPage,

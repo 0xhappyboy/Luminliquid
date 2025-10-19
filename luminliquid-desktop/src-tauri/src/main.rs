@@ -4,6 +4,5 @@
 pub mod types;
 
 fn main() {
-  app_lib::run();
+    app_lib::run();
 }
-
