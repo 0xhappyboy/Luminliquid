@@ -452,8 +452,8 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
       .table-container {
         display: flex;
         flex-direction: column;
-        height: '100%';
-        overflow: 'hidden';
+        height: 100%;
+        overflow: hidden;
       }
 
       .table-scroll-container {
@@ -1597,7 +1597,7 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
   };
 
   private renderMarketTable = () => {
-    const { theme, tableHeaderFixed } = this.state;
+    const { theme, tableHeaderFixed, containerHeight } = this.state;
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
     const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
     const secondaryTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
@@ -1668,8 +1668,22 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
     };
 
     return (
-      <div className="table-container">
-        <div className="table-scroll-container global-scrollbar" ref={this.tableContainerRef} onScroll={this.handleTableScroll}>
+      <div className="table-container" style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}>
+        <div
+          className="table-scroll-container global-scrollbar"
+          ref={this.tableContainerRef}
+          onScroll={this.handleTableScroll}
+          style={{
+            flex: 1,
+            overflow: 'auto',
+            height: '100%'
+          }}
+        >
           <table style={{
             width: '100%',
             borderCollapse: 'collapse',
@@ -1867,7 +1881,6 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
       >
         <style>{this.applyGlobalTheme()}</style>
 
-
         <div
           style={{
             width: isCollapsed ? '60px' : '280px',
@@ -1886,7 +1899,6 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
           </div>
         </div>
 
-
         <div
           style={{
             flex: 1,
@@ -1898,9 +1910,10 @@ class PredictionMarketPage extends React.Component<PredictionMarketPageProps, Pr
         >
           {this.renderVolumeStats()}
           {this.renderFilterButtons()}
-          {this.renderMarketTable()}
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            {this.renderMarketTable()}
+          </div>
         </div>
-
 
         {isDetailDrawerOpen && this.renderMarketDetailDrawer()}
       </div>

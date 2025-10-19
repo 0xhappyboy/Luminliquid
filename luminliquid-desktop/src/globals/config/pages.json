@@ -1,0 +1,58 @@
+{
+  "market": {
+    "name": "Market",
+    "path": "/"
+  },
+  "ordersplit": {
+    "name": "ArderSplit",
+    "path": "/ordersplit"
+  },
+  "arbitrage": {
+    "name": "Arbitrage",
+    "path": "/arbitrage"
+  },
+  "trade": {
+    "name": "Trade",
+    "path": "/trade"
+  },
+  "market": {
+    "name": "Market",
+    "path": "/market"
+  },
+  "lend": {
+    "name": "Lend",
+    "path": "/lend"
+  },
+  "news": {
+    "name": "News",
+    "path": "/news"
+  },
+  "tradestrategy": {
+    "name": "TradeStrategy",
+    "path": "/tradestrategy"
+  },
+  "tool": {
+    "name": "Tool",
+    "path": "/tool"
+  },
+  "profile": {
+    "name": "Profile",
+    "path": "/profile"
+  },
+  "socialmonitor": {
+    "name": "SocialMonitor",
+    "path": "/socialmonitor"
+  },
+  "contractanalysis": {
+    "name": "ContractAnalysis",
+    "path": "/contractanalysis"
+  },
+  "predictionmarket": {
+    "name": "PredictionMarket",
+    "path": "/predictionmarket"
+  },
+  "wallet": {
+    "name": "Wallet",
+    "path": "/wallet"
+  }
+}

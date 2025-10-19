@@ -75,7 +75,7 @@ interface OrderSplittingState {
   showRightPanel: boolean;
 }
 
-class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
+class OrderSplitPageIndex extends React.Component<{}, OrderSplittingState> {
   private unsubscribe: (() => void) | null = null;
   private containerRef = React.createRef<HTMLDivElement>();
   private tradeHistoryRef = React.createRef<HTMLDivElement>();
@@ -1606,4 +1606,4 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
   }
 }
 
-export default OrderSplitPage;
+export default OrderSplitPageIndex;

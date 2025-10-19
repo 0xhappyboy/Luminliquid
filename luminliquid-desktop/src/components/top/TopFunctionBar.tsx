@@ -25,7 +25,7 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 { key: pages.ordersplit.name, label: pages.ordersplit.name, icon: 'globe-network' as const, page: pages.ordersplit.path },
                 { key: pages.arbitrage.name, label: pages.arbitrage.name, icon: 'exchange' as const, page: pages.arbitrage.path },
                 { key: pages.trade.name, label: pages.trade.name, icon: 'pulse' as const, page: pages.trade.path },
-                { key: pages.market.name, label: pages.market.name, icon: 'flash' as const, page: pages.market.path }
+                { key: pages.wallet.name, label: pages.wallet.name, icon: 'flash' as const, page: pages.wallet.path }
             ]
         },
         {

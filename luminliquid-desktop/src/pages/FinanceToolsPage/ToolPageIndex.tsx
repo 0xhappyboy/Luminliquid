@@ -176,24 +176,24 @@ class FinanceToolsPageIndex extends React.Component<FinanceToolsPageIndexProps, 
       { id: '1', name: 'Smart Contract Security Scan', category: 'blockchain', description: 'Detect security vulnerabilities and risks in smart contracts', icon: 'shield', popularity: 95, lastUsed: '2 hours ago' },
       { id: '2', name: 'Token Liquidity Analysis', category: 'blockchain', description: 'Analyze token liquidity and trading pairs in DEX', icon: 'flow-review', popularity: 88, lastUsed: '1 day ago' },
       { id: '3', name: 'Gas Optimization Calculator', category: 'blockchain', description: 'Calculate optimal gas fees and transaction timing', icon: 'gas-station', popularity: 92, lastUsed: '5 hours ago' },
-      
+
       // Stock Tools
       { id: '4', name: 'Technical Indicator Analyzer', category: 'stocks', description: 'Comprehensive analysis and signal generation of multiple technical indicators', icon: 'chart', popularity: 89, lastUsed: '3 hours ago' },
       { id: '5', name: 'Fundamental Scoring System', category: 'stocks', description: 'Company fundamental assessment based on financial data', icon: 'document', popularity: 85, lastUsed: '1 day ago' },
       { id: '6', name: 'Options Strategy Builder', category: 'stocks', description: 'Visual construction and backtesting of options trading strategies', icon: 'polygon-filter', popularity: 78, lastUsed: '2 days ago' },
-      
+
       // Futures Tools
       { id: '7', name: 'Futures Spread Analysis', category: 'futures', description: 'Analyze spreads and arbitrage opportunities between different contracts', icon: 'comparison', popularity: 82, lastUsed: '6 hours ago' },
       { id: '8', name: 'Margin Risk Monitoring', category: 'futures', description: 'Real-time monitoring of margin levels and risk exposure', icon: 'warning-sign', popularity: 91, lastUsed: '4 hours ago' },
-      
+
       // Forex Tools
       { id: '9', name: 'Currency Pair Correlation Analysis', category: 'forex', description: 'Analyze correlations and联动 effects between currency pairs', icon: 'git-repo', popularity: 76, lastUsed: '3 days ago' },
       { id: '10', name: 'Economic Calendar Analyzer', category: 'forex', description: 'Analysis tool for economic events impact on exchange rates', icon: 'calendar', popularity: 84, lastUsed: '1 day ago' },
-      
+
       // Cryptocurrency Tools
       { id: '11', name: 'Cross-Exchange Arbitrage', category: 'crypto', description: 'Discover price difference opportunities across different exchanges', icon: 'arrows-horizontal', popularity: 90, lastUsed: '2 hours ago' },
       { id: '12', name: 'DeFi Yield Comparison', category: 'crypto', description: 'Compare yields and risks of different DeFi protocols', icon: 'percentage', popularity: 87, lastUsed: '8 hours ago' },
-      
+
       // Advanced Analytics Tools
       { id: '13', name: 'Portfolio Risk Analysis', category: 'analytics', description: 'Multi-asset portfolio risk measurement and stress testing', icon: 'pie-chart', popularity: 83, lastUsed: '1 day ago' },
       { id: '14', name: 'Monte Carlo Simulator', category: 'analytics', description: 'Investment return prediction based on stochastic simulation', icon: 'random', popularity: 79, lastUsed: '2 days ago' },
@@ -355,322 +355,6 @@ class FinanceToolsPageIndex extends React.Component<FinanceToolsPageIndexProps, 
     `;
   };
 
-  private renderFilterButtons = () => {
-    const { theme, selectedFilter, expandedFilter, selectedTime } = this.state;
-    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
-    const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
-    const activeBgColor = theme === 'dark' ? '#3C4858' : '#E1E5E9';
-    const subButtonActiveBg = theme === 'dark' ? '#2D3746' : '#F1F3F5';
-
-    const handleMainButtonClick = (filterKey: string) => {
-      this.setState({
-        expandedFilter: expandedFilter === filterKey ? null : filterKey
-      });
-    };
-
-    const handleSubButtonClick = (filterKey: string, subKey: string) => {
-      this.setState({
-        selectedFilter: `${filterKey}-${subKey}`,
-      });
-    };
-
-    const handleTimeSelect = (timeKey: string) => {
-      this.setState({
-        selectedTime: timeKey,
-        expandedFilter: null
-      });
-    };
-
-    const handleResetAll = () => {
-      this.setState({
-        selectedFilter: '',
-        selectedTime: '24h',
-        expandedFilter: null
-      });
-    };
-
-    const handleOutsideClick = () => {
-      this.setState({ expandedFilter: null });
-    };
-
-    return (
-      <div style={{
-        padding: '5px 10px',
-        borderBottom: `1px solid ${borderColor}`,
-        backgroundColor: theme === 'dark' ? '#0F1116' : '#F8F9FA',
-        flexShrink: 0
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          flexWrap: 'wrap'
-        }}>
-          <div
-            onClick={handleResetAll}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 12px',
-              fontSize: '13px',
-              border: `1px solid ${borderColor}`,
-              backgroundColor: 'transparent',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              color: theme === 'dark' ? '#E8EAED' : '#1A1D24'
-            }}
-          >
-            <Icon icon="refresh" size={12} />
-            <span>Reset Filters</span>
-          </div>
-
-          <div style={{ position: 'relative' }}>
-            <div
-              onClick={() => {
-                this.setState({
-                  expandedFilter: expandedFilter === 'time' ? null : 'time'
-                });
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 12px',
-                fontSize: '13px',
-                border: `1px solid ${expandedFilter === 'time' ? primaryColor : borderColor}`,
-                backgroundColor: expandedFilter === 'time' ? activeBgColor : 'transparent',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                color: theme === 'dark' ? '#E8EAED' : '#1A1D24'
-              }}
-            >
-              <Icon icon="time" size={12} />
-              <span>{this.timeOptions.find(t => t.key === selectedTime)?.label || 'Last 24 Hours'}</span>
-              <Icon
-                icon={expandedFilter === 'time' ? "chevron-up" : "chevron-down"}
-                size={10}
-                style={{ opacity: 0.7 }}
-              />
-            </div>
-
-            {expandedFilter === 'time' && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  marginTop: '4px',
-                  backgroundColor: theme === 'dark' ? '#1A1D24' : '#FFFFFF',
-                  border: `1px solid ${borderColor}`,
-                  boxShadow: theme === 'dark'
-                    ? '0 4px 12px rgba(0,0,0,0.3)'
-                    : '0 4px 12px rgba(0,0,0,0.1)',
-                  zIndex: 1001,
-                  minWidth: '160px',
-                  padding: '4px 0'
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {this.timeOptions.map((time) => {
-                  const isSelected = selectedTime === time.key;
-                  return (
-                    <div
-                      key={time.key}
-                      onClick={() => handleTimeSelect(time.key)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 12px',
-                        fontSize: '13px',
-                        fontWeight: isSelected ? '600' : '400',
-                        color: isSelected ?
-                          (theme === 'dark' ? '#FFFFFF' : '#182026') :
-                          (theme === 'dark' ? '#E8EAED' : '#1A1D24'),
-                        backgroundColor: isSelected ? activeBgColor : 'transparent',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      {isSelected && (
-                        <Icon icon="tick" size={12} color={primaryColor} />
-                      )}
-                      <span>{time.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            {this.filterGroups.map((filter) => {
-              const hasSubButtons = filter.subButtons && filter.subButtons.length > 0;
-              const isExpanded = expandedFilter === filter.key;
-              const isSelected = selectedFilter.startsWith(filter.key);
-              const currentSubKey = isSelected ? selectedFilter.split('-')[1] : null;
-
-              return (
-                <div key={filter.key} style={{ position: 'relative' }}>
-                  <div
-                    onClick={() => handleMainButtonClick(filter.key)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      border: `1px solid ${isExpanded || isSelected ? primaryColor : borderColor}`,
-                      backgroundColor: isExpanded || isSelected ? activeBgColor : 'transparent',
-                      transition: 'all 0.2s ease',
-                      cursor: 'pointer',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '8px 12px',
-                      fontSize: '13px',
-                      fontWeight: isSelected ? '600' : '400',
-                      color: isExpanded || isSelected ?
-                        (theme === 'dark' ? '#FFFFFF' : '#182026') :
-                        (theme === 'dark' ? '#E8EAED' : '#1A1D24'),
-                      borderRight: hasSubButtons && isExpanded ? `1px solid ${borderColor}` : 'none',
-                      userSelect: 'none'
-                    }}>
-                      <Icon
-                        icon={filter.icon as any}
-                        size={12}
-                        color={isExpanded || isSelected ? primaryColor : undefined}
-                      />
-                      <span>{filter.label}</span>
-                      {hasSubButtons && (
-                        <Icon
-                          icon={isExpanded ? "chevron-up" : "chevron-down"}
-                          size={10}
-                          style={{ marginLeft: '4px', opacity: 0.7 }}
-                        />
-                      )}
-                    </div>
-
-                    {hasSubButtons && isExpanded && (
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
-                      >
-                        {filter.subButtons.map((subButton, index) => {
-                          const isSubSelected = currentSubKey === subButton.key;
-                          return (
-                            <div
-                              key={subButton.key}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                handleSubButtonClick(filter.key, subButton.key);
-                              }}
-                              onMouseDown={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                              }}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '8px 8px',
-                                fontSize: '11px',
-                                fontWeight: isSubSelected ? '600' : '400',
-                                color: isSubSelected ?
-                                  (theme === 'dark' ? '#FFFFFF' : '#182026') :
-                                  (theme === 'dark' ? '#E8EAED' : '#1A1D24'),
-                                backgroundColor: isSubSelected ? subButtonActiveBg : 'transparent',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease',
-                                minWidth: '32px',
-                                borderLeft: index > 0 ? `1px solid ${borderColor}` : 'none',
-                                userSelect: 'none'
-                              }}
-                            >
-                              {subButton.label}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            marginLeft: 'auto'
-          }}>
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
-              <Icon
-                icon="search"
-                size={12}
-                color={theme === 'dark' ? '#8F99A8' : '#5F6B7C'}
-                style={{
-                  position: 'absolute',
-                  left: '10px',
-                  zIndex: 1
-                }}
-              />
-              <input
-                type="text"
-                placeholder="Search tools..."
-                style={{
-                  padding: '8px 12px 8px 30px',
-                  fontSize: '13px',
-                  border: `1px solid ${borderColor}`,
-                  backgroundColor: theme === 'dark' ? '#1A1D24' : '#FFFFFF',
-                  color: theme === 'dark' ? '#E8EAED' : '#1A1D24',
-                  outline: 'none',
-                  width: '200px',
-                  transition: 'all 0.2s ease'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = primaryColor;
-                  e.target.style.boxShadow = `0 0 0 2px ${theme === 'dark' ? 'rgba(143, 153, 168, 0.2)' : 'rgba(95, 107, 124, 0.1)'}`;
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = borderColor;
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {expandedFilter && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1000
-            }}
-            onClick={handleOutsideClick}
-          />
-        )}
-      </div>
-    );
-  };
 
   private handleMenuToggle = (menuKey: string) => {
     this.setState(prevState => {
@@ -1231,7 +915,6 @@ class FinanceToolsPageIndex extends React.Component<FinanceToolsPageIndexProps, 
           {this.renderLogoSection()}
           {this.renderMenuContent()}
         </div>
-
         <div
           style={{
             flex: 1,
@@ -1241,8 +924,6 @@ class FinanceToolsPageIndex extends React.Component<FinanceToolsPageIndexProps, 
             minWidth: 0
           }}
         >
-          {this.renderFilterButtons()}
-
           <div
             style={{
               flex: 1,

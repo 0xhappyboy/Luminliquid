@@ -8,7 +8,6 @@ import { BrowserRouter as Router, Route, BrowserRouter, Routes } from 'react-rou
 import FinanceToolsPageIndex from './pages/FinanceToolsPage/ToolPageIndex';
 import MarketPage from './pages/MarketPageIndex';
 import NewsPage from './pages/NewsPageIndex';
-import OrderSplitPage from './pages/OrderSplitPage/OrderSplitPageIndex';
 import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
 import TradePage from './pages/TradePageIndex';
 import LendPageIndex from './pages/LendPageIndex';
@@ -18,6 +17,8 @@ import SocialMonitorPageIndex from './pages/SocialMonitorPage';
 import ContractAnalysisPage from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
 import ContractAnalysisPageIndex from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
 import PredictionMarketPage from './pages/PredictionMarket';
+import WalletAnalysisDashboard from './pages/WalletPageIndex';
+import OrderSplitPageIndex from './pages/OrderSplitPage/OrderSplitPageIndex';
 // blueprintjs
 require('normalize.css');
 require('@blueprintjs/core/lib/css/blueprint.css');
@@ -36,7 +37,7 @@ class App extends React.Component {
             <Routes>
               <Route path='/market' element={<MarketPage />} />
               <Route path='/news' element={<NewsPage />} />
-              <Route path='/ordersplit' element={<OrderSplitPage />} />
+              <Route path='/ordersplit' element={<OrderSplitPageIndex />} />
               <Route path='/arbitrage' element={<ArbitragePageIndex />} />
               <Route path='/trade' element={<TradePage />} />
               <Route path='/lend' element={<LendPageIndex />} />
@@ -46,6 +47,7 @@ class App extends React.Component {
               <Route path='/socialmonitor' element={<SocialMonitorPageIndex />} />
               <Route path='/contractanalysis' element={<ContractAnalysisPageIndex />} />
               <Route path='/predictionmarket' element={<PredictionMarketPage />} />
+              <Route path='/wallet' element={<WalletAnalysisDashboard />} />
             </Routes>
           </MiddleArea>
           <BottomArea />
