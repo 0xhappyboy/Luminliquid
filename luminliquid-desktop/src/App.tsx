@@ -9,7 +9,7 @@ import FinanceToolsPageIndex from './pages/FinanceToolsPage/ToolPageIndex';
 import MarketPage from './pages/MarketPageIndex';
 import NewsPage from './pages/NewsPageIndex';
 import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
-import TradePage from './pages/TradePageIndex';
+import TradePage from './pages/TradePage/TradePageIndex';
 import LendPageIndex from './pages/LendPageIndex';
 import TradeStrategyPageIndex from './pages/TradeStrategyPageIndex';
 import ProfilePage from './pages/ProfilePageIndex';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { HTMLTable } from '@blueprintjs/core';
-import '../styles/TradePage.css';
-import { overflowManager } from '../globals/theme/OverflowTypeManager';
+// import '../styles/TradePage.css';
+import '../../styles/TradePage.css';
+import { overflowManager } from '../../globals/theme/OverflowTypeManager';
 
 interface TradePageState {
     visibleModules: number;

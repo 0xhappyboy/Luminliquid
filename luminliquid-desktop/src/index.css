@@ -171,3 +171,8 @@ code {
   outline-offset: 0 !important;
   box-shadow: none !important;
 }
+
+/* Force overwriting all BlueprintJS Popover styles */
+.bp6-popover-transition-container {
+  z-index: 10000 !important;
+}
