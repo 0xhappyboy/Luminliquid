@@ -9,6 +9,7 @@ import {
 import { themeManager } from '../../globals/theme/ThemeManager';
 import { withRouter } from '../../WithRouter';
 import pages from '../../globals/config/pages.json';
+import { handleCloseWindow, handleMaximizeWindow, handleMinimizeWindow, handleRecoveryWindow } from '../../globals/commands/SystemCommand';
 
 interface MenuItemData {
   key: string;
@@ -19,6 +20,7 @@ interface MenuItemData {
 interface TopMenuBarState {
   theme: 'dark' | 'light';
   windowWidth: number;
+  isMaximized: boolean;
 }
 
 interface TopMenuBarProps {
@@ -31,12 +33,33 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
     super(props);
     this.state = {
       theme: themeManager.getTheme(),
-      windowWidth: window.innerWidth
+      windowWidth: window.innerWidth,
+      isMaximized: false,
     };
   }
+
+  handleMinimizeWindowButtonClick = () => {
+    handleMinimizeWindow();
+  }
+
+  handleMaximizeOrRecoveryWindowButtonClick = () => {
+    if (this.state.isMaximized) {
+      handleRecoveryWindow();
+      this.setState({ isMaximized: false });
+    } else {
+      handleMaximizeWindow();
+      this.setState({ isMaximized: true });
+    }
+  }
+
+  handleCloseWindowButtonClick = () => {
+    handleCloseWindow();
+  }
+
   toPage = (page: string) => {
     this.props.navigate(page);
   }
+
   handleResize = () => {
     this.setState({ windowWidth: window.innerWidth });
   };
@@ -164,6 +187,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
     const visibleMenuItems = this.getVisibleMenuItems();
     const showCenterTitle = this.shouldShowCenterTitle();
     const { title } = this.props;
+
     return (
       <div
         className={`custom-top-navbar ${theme === 'dark' ? 'bp4-dark' : 'bp4-light'}`}
@@ -319,6 +343,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
           />
           <Button
             minimal
+            onClick={() => this.handleMinimizeWindowButtonClick()}
             icon="minus"
             style={{
               height: '30px',
@@ -334,7 +359,8 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
           />
           <Button
             minimal
-            icon="square"
+            onClick={() => this.handleMaximizeOrRecoveryWindowButtonClick()}
+            icon={this.state.isMaximized ? "minimize" : "square"}
             style={{
               height: '30px',
               width: '28px',
@@ -349,6 +375,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
           />
           <Button
             minimal
+            onClick={() => this.handleCloseWindowButtonClick()}
             icon="cross"
             style={{
               height: '30px',
