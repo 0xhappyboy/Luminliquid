@@ -158,3 +158,16 @@ code {
   background: inherit;
   z-index: 100;
 }
+
+/* remove switch style */
+.bp6-control input:focus ~ .bp6-control-indicator {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}
+
+.bp6-switch.bp6-control input:focus ~ .bp6-control-indicator::before {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+}

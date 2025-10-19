@@ -1,13 +1,10 @@
 import React from 'react';
 import {
     Button,
-    Switch,
-    Popover,
-    Menu,
-    MenuItem
 } from '@blueprintjs/core';
 import { themeManager } from '../../globals/theme/ThemeManager';
 import { withRouter } from '../../WithRouter';
+import pages from '../../globals/config/pages.json';
 
 interface TopFunctionBarState {
     theme: 'dark' | 'light';
@@ -19,69 +16,26 @@ interface TopFunctionBarProps {
 }
 
 class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBarState> {
-    handleResize = () => {
-        this.setState({ windowWidth: window.innerWidth });
-    };
-
     private unsubscribe: (() => void) | null = null;
-
-    constructor(props: TopFunctionBarProps) {
-        super(props);
-        this.state = {
-            theme: themeManager.getTheme(),
-            windowWidth: window.innerWidth
-        };
-    }
-
-    toPage = (page: string) => {
-        if (page === 'home') {
-            this.props.navigate('/');
-        } else {
-            this.props.navigate('/' + page);
-        }
-    }
-
-    handleHomeClick = () => {
-        this.props.navigate('/');
-    };
-
-    componentDidMount() {
-        window.addEventListener('resize', this.handleResize);
-        this.unsubscribe = themeManager.subscribe((theme) => {
-            this.setState({ theme });
-        });
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.handleResize);
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
-    }
-
-    toggleTheme = () => {
-        themeManager.toggleTheme();
-    };
-
     buttonGroups = [
         {
             type: 'single-row',
             buttons: [
-                { key: 'Market', label: 'Market', icon: 'predictive-analysis' as const, page: 'home' },
-                { key: 'test', label: 'test', icon: 'globe-network' as const, page: 'order-split' },
-                { key: 'test', label: 'test', icon: 'exchange' as const, page: 'arbitrage' },
-                { key: 'test', label: 'test', icon: 'pulse' as const, page: 'trade' },
-                { key: 'test', label: 'test', icon: 'flash' as const, page: 'market' }
+                { key: pages.market.name, label: pages.market.name, icon: 'predictive-analysis' as const, page: pages.market.path },
+                { key: pages.ordersplit.name, label: pages.ordersplit.name, icon: 'globe-network' as const, page: pages.ordersplit.path },
+                { key: pages.arbitrage.name, label: pages.arbitrage.name, icon: 'exchange' as const, page: pages.arbitrage.path },
+                { key: pages.trade.name, label: pages.trade.name, icon: 'pulse' as const, page: pages.trade.path },
+                { key: pages.market.name, label: pages.market.name, icon: 'flash' as const, page: pages.market.path }
             ]
         },
         {
             type: 'single-row',
             buttons: [
-                { key: 'test', label: 'test', icon: 'circle' as const },
-                { key: 'test', label: 'test)', icon: 'refresh' as const },
-                { key: 'test', label: 'test', icon: 'document' as const },
-                { key: 'test', label: 'test', icon: 'font' as const },
-                { key: 'test', label: 'test', icon: 'more' as const }
+                { key: pages.lend.name, label: pages.lend.name, icon: 'circle' as const, page: pages.lend.path },
+                { key: pages.news.name, label: pages.news.name, icon: 'refresh' as const, page: pages.news.path },
+                { key: pages.tradestrategy.name, label: pages.tradestrategy.name, icon: 'document' as const, page: pages.tradestrategy.path },
+                { key: pages.tool.name, label: pages.tool.name, icon: 'font' as const, page: pages.tool.name },
+                { key: pages.socialmonitor.name, label: pages.socialmonitor.name, icon: 'more' as const, page: pages.socialmonitor.name }
             ]
         },
         {
@@ -129,6 +83,35 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
             ]
         },
     ];
+
+    constructor(props: TopFunctionBarProps) {
+        super(props);
+        this.state = {
+            theme: themeManager.getTheme(),
+            windowWidth: window.innerWidth
+        };
+    }
+    handleResize = () => {
+        this.setState({ windowWidth: window.innerWidth });
+    };
+    toPage = (page: string) => {
+        this.props.navigate(page);
+    }
+    componentDidMount() {
+        window.addEventListener('resize', this.handleResize);
+        this.unsubscribe = themeManager.subscribe((theme) => {
+            this.setState({ theme });
+        });
+    }
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize);
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    }
+    toggleTheme = () => {
+        themeManager.toggleTheme();
+    };
 
     getVisibleGroups = () => {
         const { windowWidth } = this.state;
@@ -182,7 +165,7 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 fontSize: '10px',
                 lineHeight: '10px'
             }}>
-                {button.label}
+                {/* {button.label} */}
             </span>
         </Button>
     );
@@ -225,7 +208,6 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
 
     renderButtonGroup = (group: any, groupIndex: number) => {
         const { theme } = this.state;
-
         if (group.type === 'single-row') {
             return (
                 <div
@@ -255,7 +237,6 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
         } else if (group.type === 'double-row') {
             const firstRow = group.buttons.slice(0, 6);
             const secondRow = group.buttons.slice(6, 12);
-
             return (
                 <div
                     key={`group-${groupIndex}`}
@@ -339,5 +320,4 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
     }
 }
 
-// export default TopFunctionBar;
 export default withRouter(TopFunctionBar);

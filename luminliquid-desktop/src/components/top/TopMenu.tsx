@@ -7,6 +7,8 @@ import {
   Switch
 } from '@blueprintjs/core';
 import { themeManager } from '../../globals/theme/ThemeManager';
+import { withRouter } from '../../WithRouter';
+import pages from '../../globals/config/pages.json';
 
 interface MenuItemData {
   key: string;
@@ -19,28 +21,31 @@ interface TopMenuBarState {
   windowWidth: number;
 }
 
-class TopMenuBar extends React.Component<{}, TopMenuBarState> {
-  handleResize = () => {
-    this.setState({ windowWidth: window.innerWidth });
-  };
+interface TopMenuBarProps {
+  navigate: (path: string, options?: any) => void;
+}
 
+class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
   private unsubscribe: (() => void) | null = null;
-
-  constructor(props: {}) {
+  constructor(props: TopMenuBarProps) {
     super(props);
     this.state = {
       theme: themeManager.getTheme(),
       windowWidth: window.innerWidth
     };
   }
-
+  toPage = (page: string) => {
+    this.props.navigate(page);
+  }
+  handleResize = () => {
+    this.setState({ windowWidth: window.innerWidth });
+  };
   componentDidMount() {
     window.addEventListener('resize', this.handleResize);
     this.unsubscribe = themeManager.subscribe((theme) => {
       this.setState({ theme });
     });
   }
-
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
     if (this.unsubscribe) {
@@ -138,13 +143,10 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
 
   getVisibleMenuItems = () => {
     const { windowWidth } = this.state;
-
-    const rightControlsWidth = 180;
+    const rightControlsWidth = 220;
     const availableWidth = windowWidth - rightControlsWidth;
-
     const itemWidth = 45;
     const maxVisibleItems = Math.floor(availableWidth / itemWidth);
-
     return this.menuItems.slice(0, Math.max(3, Math.min(10, maxVisibleItems)));
   };
 
@@ -156,7 +158,6 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
   static defaultProps = {
     title: '✨ Luminliquid',
   }
-
 
   render() {
     const { theme } = this.state;
@@ -170,7 +171,7 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
           width: '100%',
           minWidth: '400px',
           backgroundColor: theme === 'dark' ? '#1C2127' : '#FFFFFF',
-          height: '24px',
+          height: '30px',
           display: 'flex',
           alignItems: 'center',
           borderBottom: theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
@@ -181,7 +182,7 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
           flex: 1,
           display: 'flex',
           alignItems: 'center',
-          height: '24px',
+          height: '30px',
           paddingLeft: '8px',
           overflow: 'hidden',
           minWidth: '150px'
@@ -200,16 +201,15 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
                 }}
                 popoverClassName="menu-popover"
               >
-
                 <Button
                   minimal
                   text={item.label}
                   style={{
                     fontSize: '12px',
                     padding: '0 10px',
-                    height: '22px',
-                    minHeight: '22px',
-                    lineHeight: '22px',
+                    height: '30px',
+                    minHeight: '30px',
+                    lineHeight: '30px',
                     margin: '0 1px',
                     borderRadius: '0',
                     border: 'none',
@@ -223,7 +223,6 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
               </Popover>
             </div>
           ))}
-
           {visibleMenuItems.length < this.menuItems.length && (
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <Popover
@@ -246,9 +245,9 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
                   style={{
                     fontSize: '12px',
                     padding: '0 8px',
-                    height: '22px',
-                    minHeight: '22px',
-                    lineHeight: '22px',
+                    height: '30px',
+                    minHeight: '30px',
+                    lineHeight: '30px',
                     margin: '0 1px',
                     borderRadius: '0',
                     border: 'none',
@@ -260,7 +259,6 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
             </div>
           )}
         </div>
-
         {showCenterTitle && (
           <div style={{
             position: 'absolute',
@@ -277,14 +275,13 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
             {title}
           </div>
         )}
-
         <div style={{
           flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
-          height: '24px',
+          height: '30px',
           paddingRight: '8px',
-          minWidth: '180px',
+          minWidth: '220px',
           backgroundColor: 'inherit',
           zIndex: 2,
           position: 'relative'
@@ -301,46 +298,68 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
               checked={theme === 'light'}
               onChange={this.toggleTheme}
               style={{ margin: 0 }}
+              className="no-switch-focus"
             />
           </div>
-
+          <Button
+            minimal
+            onClick={() => this.toPage(pages.profile.path)}
+            icon="user"
+            text="Profile"
+            style={{
+              height: '30px',
+              minHeight: '30px',
+              padding: '0 8px',
+              margin: '0 4px',
+              fontSize: '12px',
+              color: theme === 'dark' ? '#F5F8FA' : '#182026',
+              border: 'none',
+              outline: 'none'
+            }}
+          />
           <Button
             minimal
             icon="minus"
             style={{
-              height: '22px',
+              height: '30px',
               width: '28px',
-              minHeight: '22px',
+              minHeight: '30px',
               minWidth: '28px',
               padding: 0,
               margin: '0 1px',
-              color: theme === 'dark' ? '#F5F8FA' : '#182026'
+              color: theme === 'dark' ? '#F5F8FA' : '#182026',
+              border: 'none',
+              outline: 'none'
             }}
           />
           <Button
             minimal
             icon="square"
             style={{
-              height: '22px',
+              height: '30px',
               width: '28px',
-              minHeight: '22px',
+              minHeight: '30px',
               minWidth: '28px',
               padding: 0,
               margin: '0 1px',
-              color: theme === 'dark' ? '#F5F8FA' : '#182026'
+              color: theme === 'dark' ? '#F5F8FA' : '#182026',
+              border: 'none',
+              outline: 'none'
             }}
           />
           <Button
             minimal
             icon="cross"
             style={{
-              height: '22px',
+              height: '30px',
               width: '28px',
-              minHeight: '22px',
+              minHeight: '30px',
               minWidth: '28px',
               padding: 0,
               margin: '0 1px',
-              color: theme === 'dark' ? '#F5F8FA' : '#182026'
+              color: theme === 'dark' ? '#F5F8FA' : '#182026',
+              border: 'none',
+              outline: 'none'
             }}
           />
         </div>
@@ -349,4 +368,4 @@ class TopMenuBar extends React.Component<{}, TopMenuBarState> {
   }
 }
 
-export default TopMenuBar;
+export default withRouter(TopMenuBar);
