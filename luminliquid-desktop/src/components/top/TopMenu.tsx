@@ -106,7 +106,6 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
   }
 
   handleDocumentClick = (event: MouseEvent) => {
-    // 如果点击的不是菜单按钮，关闭所有菜单
     const target = event.target as HTMLElement;
     const isMenuButton = target.closest('.menu-button');
     if (!isMenuButton) {
@@ -190,14 +189,13 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
     }, 100);
   };
 
-  // 处理菜单点击事件
   handleMenuClick = (menuKey: string, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
 
     const buttonElement = event.currentTarget as HTMLButtonElement;
     const rect = buttonElement.getBoundingClientRect();
-    
+
     this.setState(prevState => ({
       activeMenu: prevState.activeMenu === menuKey ? null : menuKey,
       menuPosition: {
@@ -207,28 +205,26 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
     }));
   };
 
-  // 关闭所有菜单
   closeAllMenus = () => {
-    this.setState({ 
+    this.setState({
       activeMenu: null,
-      menuPosition: null 
+      menuPosition: null
     });
   };
 
-  // 渲染下拉菜单内容
   renderDropdownMenu = (items: MenuItemData[]) => (
-    <Menu 
-      style={{ 
-        minWidth: '120px', 
-        fontSize: '12px', 
+    <Menu
+      style={{
+        minWidth: '120px',
+        fontSize: '12px',
         margin: '0',
         padding: '0',
         backgroundColor: this.state.theme === 'dark' ? '#1C2127' : '#FFFFFF',
         color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026',
         border: this.state.theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
         borderRadius: '2px',
-        boxShadow: this.state.theme === 'dark' 
-          ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
+        boxShadow: this.state.theme === 'dark'
+          ? '0 2px 8px rgba(0, 0, 0, 0.3)'
           : '0 2px 8px rgba(0, 0, 0, 0.15)'
       }}
     >
@@ -236,8 +232,8 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
         <MenuItem
           key={item.key}
           text={item.label}
-          style={{ 
-            fontSize: '12px', 
+          style={{
+            fontSize: '12px',
             padding: '6px 12px',
             backgroundColor: 'transparent',
             color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026'
@@ -251,13 +247,12 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
     </Menu>
   );
 
-  // 渲染绝对定位的菜单
   renderAbsoluteMenu = () => {
     const { activeMenu, menuPosition, theme } = this.state;
-    
+
     if (!activeMenu || !menuPosition) return null;
 
-    const menuItems = activeMenu === 'more' 
+    const menuItems = activeMenu === 'more'
       ? this.menuItems.slice(this.getVisibleMenuItems().length)
       : this.menuItems.find(item => item.key === activeMenu)?.children || [];
 
@@ -271,18 +266,18 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
           minWidth: '120px'
         }}
       >
-        <Menu 
-          style={{ 
-            minWidth: '120px', 
-            fontSize: '12px', 
+        <Menu
+          style={{
+            minWidth: '120px',
+            fontSize: '12px',
             margin: '0',
             padding: '0',
             backgroundColor: theme === 'dark' ? '#1C2127' : '#FFFFFF',
             color: theme === 'dark' ? '#F5F8FA' : '#182026',
             border: theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
             borderRadius: '2px',
-            boxShadow: theme === 'dark' 
-              ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
+            boxShadow: theme === 'dark'
+              ? '0 2px 8px rgba(0, 0, 0, 0.3)'
               : '0 2px 8px rgba(0, 0, 0, 0.15)'
           }}
         >
@@ -290,8 +285,8 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
             <MenuItem
               key={item.key}
               text={item.label}
-              style={{ 
-                fontSize: '12px', 
+              style={{
+                fontSize: '12px',
                 padding: '6px 12px',
                 backgroundColor: 'transparent',
                 color: theme === 'dark' ? '#F5F8FA' : '#182026'
@@ -379,7 +374,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
                     color: theme === 'dark' ? '#F5F8FA' : '#182026',
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
-                    backgroundColor: activeMenu === item.key ? 
+                    backgroundColor: activeMenu === item.key ?
                       (theme === 'dark' ? '#394B59' : '#DCE0E5') : 'transparent'
                   }}
                   className="menu-button"
@@ -403,7 +398,7 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
                     border: 'none',
                     outline: 'none',
                     color: theme === 'dark' ? '#F5F8FA' : '#182026',
-                    backgroundColor: activeMenu === 'more' ? 
+                    backgroundColor: activeMenu === 'more' ?
                       (theme === 'dark' ? '#394B59' : '#DCE0E5') : 'transparent'
                   }}
                   className="menu-button"
@@ -519,8 +514,6 @@ class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {
             />
           </div>
         </div>
-        
-        {/* 绝对定位的菜单 */}
         {this.renderAbsoluteMenu()}
       </>
     );

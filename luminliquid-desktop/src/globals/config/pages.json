@@ -54,5 +54,9 @@
   "wallet": {
     "name": "Wallet",
     "path": "/wallet"
+  },
+  "networkstatus": {
+    "name": "NetworkStatus",
+    "path": "/networkstatus"
   }
 }

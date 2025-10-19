@@ -60,7 +60,7 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
             buttons: [
                 { key: pages.contractanalysis.name, label: pages.contractanalysis.name, icon: 'circle' as const, page: pages.contractanalysis.path },
                 { key: pages.predictionmarket.name, label: pages.predictionmarket.name, icon: 'refresh' as const, page: pages.predictionmarket.path },
-                { key: 'test', label: 'test', icon: 'document' as const },
+                { key: pages.networkstatus.name, label: pages.networkstatus.name, icon: 'document' as const, page: pages.networkstatus.path },
                 { key: 'test', label: 'test', icon: 'font' as const },
                 { key: 'test', label: 'test', icon: 'more' as const }
             ]

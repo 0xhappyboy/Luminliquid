@@ -74,7 +74,6 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
             quotes[(currentIndex + 3) % quotes.length],
         ];
 
-        // 使用与 MarketPageIndex 一致的配色方案
         const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
         const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
         const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
@@ -84,7 +83,6 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
         const quoteBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
         const quoteHoverBg = theme === 'dark' ? '#2D323D' : '#E1E5E9';
         
-        // 涨跌颜色 - 与 MarketPageIndex 一致
         const positiveColor = '#2E8B57';
         const negativeColor = '#DC143C';
 
