@@ -171,7 +171,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     };
   }
 
-
   tradeRecords: TradeRecord[] = [
     {
       id: 'trade-1',
@@ -579,348 +578,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           timestamp: '2024-01-13 17:20:01'
         }
       ]
-    },
-    {
-      id: 'trade-11',
-      parentOrderId: 'parent-11',
-      symbol: 'LTC/USDT',
-      side: 'buy',
-      totalQuantity: 800,
-      totalValue: 64000,
-      avgPrice: 80,
-      status: 'completed',
-      timestamp: '2024-01-13 15:45:00',
-      profitLoss: 1280,
-      profitLossPercentage: 2.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-12-1',
-          exchange: 'Binance',
-          symbol: 'LTC/USDT',
-          side: 'buy',
-          quantity: 400,
-          filledQuantity: 400,
-          price: 79.5,
-          status: 'filled',
-          avgFillPrice: 79.3,
-          exchangeColor: '#F3BA2F',
-          timestamp: '2024-01-13 15:45:01'
-        },
-        {
-          id: 'leg-12-2',
-          exchange: 'Coinbase',
-          symbol: 'LTC/USDT',
-          side: 'buy',
-          quantity: 400,
-          filledQuantity: 400,
-          price: 80.5,
-          status: 'filled',
-          avgFillPrice: 80.2,
-          exchangeColor: '#0052FF',
-          timestamp: '2024-01-13 15:45:02'
-        }
-      ]
-    },
-    {
-      id: 'trade-12',
-      parentOrderId: 'parent-12',
-      symbol: 'ATOM/USDT',
-      side: 'sell',
-      totalQuantity: 1000,
-      totalValue: 9500,
-      avgPrice: 9.5,
-      status: 'completed',
-      timestamp: '2024-01-13 14:10:00',
-      profitLoss: -475,
-      profitLossPercentage: -5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-13-1',
-          exchange: 'Kraken',
-          symbol: 'ATOM/USDT',
-          side: 'sell',
-          quantity: 1000,
-          filledQuantity: 1000,
-          price: 9.45,
-          status: 'filled',
-          avgFillPrice: 9.455,
-          exchangeColor: '#5521B5',
-          timestamp: '2024-01-13 14:10:01'
-        }
-      ]
-    },
-    {
-      id: 'trade-13',
-      parentOrderId: 'parent-13',
-      symbol: 'NEAR/USDT',
-      side: 'buy',
-      totalQuantity: 2000,
-      totalValue: 6000,
-      avgPrice: 3,
-      status: 'completed',
-      timestamp: '2024-01-13 12:30:00',
-      profitLoss: 300,
-      profitLossPercentage: 5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-14-1',
-          exchange: 'Binance',
-          symbol: 'NEAR/USDT',
-          side: 'buy',
-          quantity: 1000,
-          filledQuantity: 1000,
-          price: 2.95,
-          status: 'filled',
-          avgFillPrice: 2.94,
-          exchangeColor: '#F3BA2F',
-          timestamp: '2024-01-13 12:30:01'
-        },
-        {
-          id: 'leg-14-2',
-          exchange: 'FTX',
-          symbol: 'NEAR/USDT',
-          side: 'buy',
-          quantity: 1000,
-          filledQuantity: 1000,
-          price: 3.05,
-          status: 'filled',
-          avgFillPrice: 3.04,
-          exchangeColor: '#02A6C2',
-          timestamp: '2024-01-13 12:30:02'
-        }
-      ]
-    },
-    {
-      id: 'trade-14',
-      parentOrderId: 'parent-14',
-      symbol: 'ALGO/USDT',
-      side: 'sell',
-      totalQuantity: 5000,
-      totalValue: 4000,
-      avgPrice: 0.8,
-      status: 'completed',
-      timestamp: '2024-01-13 11:15:00',
-      profitLoss: 200,
-      profitLossPercentage: 5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-15-1',
-          exchange: 'Coinbase',
-          symbol: 'ALGO/USDT',
-          side: 'sell',
-          quantity: 5000,
-          filledQuantity: 5000,
-          price: 0.82,
-          status: 'filled',
-          avgFillPrice: 0.816,
-          exchangeColor: '#0052FF',
-          timestamp: '2024-01-13 11:15:01'
-        }
-      ]
-    },
-    {
-      id: 'trade-15',
-      parentOrderId: 'parent-15',
-      symbol: 'FIL/USDT',
-      side: 'buy',
-      totalQuantity: 1500,
-      totalValue: 4500,
-      avgPrice: 3,
-      status: 'completed',
-      timestamp: '2024-01-13 10:00:00',
-      profitLoss: -225,
-      profitLossPercentage: -5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-16-1',
-          exchange: 'Kraken',
-          symbol: 'FIL/USDT',
-          side: 'buy',
-          quantity: 1500,
-          filledQuantity: 1500,
-          price: 2.85,
-          status: 'filled',
-          avgFillPrice: 2.87,
-          exchangeColor: '#5521B5',
-          timestamp: '2024-01-13 10:00:01'
-        }
-      ]
-    },
-    {
-      id: 'trade-16',
-      parentOrderId: 'parent-16',
-      symbol: 'ETC/USDT',
-      side: 'sell',
-      totalQuantity: 600,
-      totalValue: 12000,
-      avgPrice: 20,
-      status: 'completed',
-      timestamp: '2024-01-12 16:45:00',
-      profitLoss: 720,
-      profitLossPercentage: 6.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-17-1',
-          exchange: 'Binance',
-          symbol: 'ETC/USDT',
-          side: 'sell',
-          quantity: 300,
-          filledQuantity: 300,
-          price: 20.2,
-          status: 'filled',
-          avgFillPrice: 20.1,
-          exchangeColor: '#F3BA2F',
-          timestamp: '2024-01-12 16:45:01'
-        },
-        {
-          id: 'leg-17-2',
-          exchange: 'Coinbase',
-          symbol: 'ETC/USDT',
-          side: 'sell',
-          quantity: 300,
-          filledQuantity: 300,
-          price: 19.8,
-          status: 'filled',
-          avgFillPrice: 19.9,
-          exchangeColor: '#0052FF',
-          timestamp: '2024-01-12 16:45:02'
-        }
-      ]
-    },
-    {
-      id: 'trade-17',
-      parentOrderId: 'parent-17',
-      symbol: 'XTZ/USDT',
-      side: 'buy',
-      totalQuantity: 2000,
-      totalValue: 4000,
-      avgPrice: 2,
-      status: 'completed',
-      timestamp: '2024-01-12 14:20:00',
-      profitLoss: 160,
-      profitLossPercentage: 4.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-18-1',
-          exchange: 'FTX',
-          symbol: 'XTZ/USDT',
-          side: 'buy',
-          quantity: 2000,
-          filledQuantity: 2000,
-          price: 1.96,
-          status: 'filled',
-          avgFillPrice: 1.97,
-          exchangeColor: '#02A6C2',
-          timestamp: '2024-01-12 14:20:01'
-        }
-      ]
-    },
-    {
-      id: 'trade-18',
-      parentOrderId: 'parent-18',
-      symbol: 'EOS/USDT',
-      side: 'sell',
-      totalQuantity: 3000,
-      totalValue: 3000,
-      avgPrice: 1,
-      status: 'completed',
-      timestamp: '2024-01-12 13:10:00',
-      profitLoss: -150,
-      profitLossPercentage: -5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-19-1',
-          exchange: 'Kraken',
-          symbol: 'EOS/USDT',
-          side: 'sell',
-          quantity: 3000,
-          filledQuantity: 3000,
-          price: 0.95,
-          status: 'filled',
-          avgFillPrice: 0.955,
-          exchangeColor: '#5521B5',
-          timestamp: '2024-01-12 13:10:01'
-        }
-      ]
-    },
-    {
-      id: 'trade-19',
-      parentOrderId: 'parent-19',
-      symbol: 'AAVE/USDT',
-      side: 'buy',
-      totalQuantity: 100,
-      totalValue: 10000,
-      avgPrice: 100,
-      status: 'completed',
-      timestamp: '2024-01-12 11:45:00',
-      profitLoss: 500,
-      profitLossPercentage: 5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-20-1',
-          exchange: 'Binance',
-          symbol: 'AAVE/USDT',
-          side: 'buy',
-          quantity: 50,
-          filledQuantity: 50,
-          price: 99,
-          status: 'filled',
-          avgFillPrice: 98.8,
-          exchangeColor: '#F3BA2F',
-          timestamp: '2024-01-12 11:45:01'
-        },
-        {
-          id: 'leg-20-2',
-          exchange: 'Coinbase',
-          symbol: 'AAVE/USDT',
-          side: 'buy',
-          quantity: 50,
-          filledQuantity: 50,
-          price: 101,
-          status: 'filled',
-          avgFillPrice: 100.8,
-          exchangeColor: '#0052FF',
-          timestamp: '2024-01-12 11:45:02'
-        }
-      ]
-    },
-    {
-      id: 'trade-20',
-      parentOrderId: 'parent-20',
-      symbol: 'COMP/USDT',
-      side: 'sell',
-      totalQuantity: 80,
-      totalValue: 4000,
-      avgPrice: 50,
-      status: 'completed',
-      timestamp: '2024-01-12 10:30:00',
-      profitLoss: 200,
-      profitLossPercentage: 5.0,
-      isExpanded: false,
-      legs: [
-        {
-          id: 'leg-21-1',
-          exchange: 'FTX',
-          symbol: 'COMP/USDT',
-          side: 'sell',
-          quantity: 80,
-          filledQuantity: 80,
-          price: 50.5,
-          status: 'filled',
-          avgFillPrice: 50.3,
-          exchangeColor: '#02A6C2',
-          timestamp: '2024-01-12 10:30:01'
-        }
-      ]
     }
   ];
 
@@ -971,15 +628,13 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     }
   };
 
-
   getScrollbarStyles = () => {
     const { theme } = this.state;
-    const trackColor = theme === 'dark' ? '#30404D' : '#EBF1F5';
-    const thumbColor = theme === 'dark' ? '#5C7080' : '#8A9BA8';
-    const thumbHoverColor = theme === 'dark' ? '#738694' : '#A7B6C2';
+    const trackColor = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
+    const thumbColor = theme === 'dark' ? '#5A6270' : '#C4C9D1';
+    const thumbHoverColor = theme === 'dark' ? '#767E8C' : '#A8AFB8';
 
     return {
-      /* Webkit browsers (Chrome, Safari) */
       '&::-webkit-scrollbar': {
         width: '6px',
         height: '6px'
@@ -995,7 +650,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           background: thumbHoverColor
         }
       },
-      /* Firefox */
       scrollbarWidth: 'thin' as const,
       scrollbarColor: `${thumbColor} ${trackColor}`
     };
@@ -1180,27 +834,56 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
   getStatusColor = (status: string): string => {
     switch (status) {
       case 'filled':
-      case 'completed': return '#0F9D58';
-      case 'partial': return '#F4B400';
-      case 'pending': return '#4285F4';
-      case 'cancelled': return '#DB4437';
-      default: return '#9AA0A6';
+      case 'completed': return '#2E8B57';
+      case 'partial': return '#FFA500';
+      case 'pending': return '#1E90FF';
+      case 'cancelled': return '#DC143C';
+      default: return '#8F99A8';
     }
   };
 
   getSideColor = (side: 'buy' | 'sell'): string => {
-    return side === 'buy' ? '#0F9D58' : '#DB4437';
+    return side === 'buy' ? '#2E8B57' : '#DC143C';
   };
 
   renderExchangePanel = () => {
     const { theme, exchanges, selectedSplit } = this.state;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const headerBg = theme === 'dark' ? '#30404D' : '#EBF1F5';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+    const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const rowBg = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+    const rowHoverBg = theme === 'dark' ? '#2D323D' : '#F8F9FA';
+
+    const exchangeScrollbarStyles = `
+        .exchange-table-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .exchange-table-scroll::-webkit-scrollbar-track {
+            background: ${theme === 'dark' ? '#1A1D24' : '#F8F9FA'};
+            border-radius: 3px;
+        }
+        .exchange-table-scroll::-webkit-scrollbar-thumb {
+            background: ${theme === 'dark' ? '#5A6270' : '#C4C9D1'};
+            border-radius: 3px;
+        }
+        .exchange-table-scroll::-webkit-scrollbar-thumb:hover {
+            background: ${theme === 'dark' ? '#767E8C' : '#A8AFB8'};
+        }
+    `;
 
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '200px' }}>
-        <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600', color: textColor, paddingLeft: '12px' }}>Available Exchanges</h4>
+        <style>{exchangeScrollbarStyles}</style>
+        <h4 style={{
+          margin: '0 0 8px 0',
+          fontSize: '12px',
+          fontWeight: '600',
+          color: textColor,
+          paddingLeft: '12px'
+        }}>
+          Available Exchanges
+        </h4>
         <div
           ref={this.exchangeTableRef}
           style={{
@@ -1209,10 +892,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             flexDirection: 'column',
             border: `1px solid ${borderColor}`,
             borderRadius: '0px',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            backgroundColor: rowBg
           }}
         >
-
           <div style={{
             flexShrink: 0,
             backgroundColor: headerBg,
@@ -1221,21 +904,75 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             <HTMLTable compact style={{ width: '100%', fontSize: '11px', margin: 0 }}>
               <thead>
                 <tr>
-                  <th style={{ padding: '8px', textAlign: 'left', color: textColor, fontSize: '11px', fontWeight: '600' }}>Exchange</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: textColor, fontSize: '11px', fontWeight: '600' }}>Latency</th>
-                  <th style={{ padding: '8px', textAlign: 'right', color: textColor, fontSize: '11px', fontWeight: '600' }}>Fee</th>
-                  <th style={{ padding: '8px', textAlign: 'center', color: textColor, fontSize: '11px', fontWeight: '600' }}>Action</th>
+                  <th style={{
+                    padding: '8px',
+                    textAlign: 'left',
+                    color: textColor,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: headerBg
+                  }}>
+                    Exchange
+                  </th>
+                  <th style={{
+                    padding: '8px',
+                    textAlign: 'right',
+                    color: textColor,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: headerBg
+                  }}>
+                    Latency
+                  </th>
+                  <th style={{
+                    padding: '8px',
+                    textAlign: 'right',
+                    color: textColor,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: headerBg
+                  }}>
+                    Fee
+                  </th>
+                  <th style={{
+                    padding: '8px',
+                    textAlign: 'center',
+                    color: textColor,
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: headerBg
+                  }}>
+                    Action
+                  </th>
                 </tr>
               </thead>
             </HTMLTable>
           </div>
 
-
-          <div style={{ flex: 1, overflow: 'auto' }}>
+          <div
+            style={{
+              flex: 1,
+              overflow: 'auto'
+            }}
+            className="exchange-table-scroll"
+          >
             <HTMLTable compact style={{ width: '100%', fontSize: '11px', margin: 0 }}>
               <tbody>
                 {exchanges.map((exchange) => (
-                  <tr key={exchange.name} style={{ borderBottom: `1px solid ${borderColor}` }}>
+                  <tr
+                    key={exchange.name}
+                    style={{
+                      borderBottom: `1px solid ${borderColor}`,
+                      backgroundColor: rowBg,
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = rowHoverBg;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = rowBg;
+                    }}
+                  >
                     <td style={{ padding: '6px 8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <div
@@ -1246,7 +983,9 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                             backgroundColor: exchange.color
                           }}
                         />
-                        <span style={{ fontWeight: '600', color: textColor, fontSize: '11px' }}>{exchange.name}</span>
+                        <span style={{ fontWeight: '600', color: textColor, fontSize: '11px' }}>
+                          {exchange.name}
+                        </span>
                       </div>
                     </td>
                     <td style={{ padding: '6px 8px', textAlign: 'right', color: textColor, fontSize: '11px' }}>
@@ -1275,13 +1014,13 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     );
   };
 
-
   renderTradeRecords = () => {
     const { theme, expandedTrades } = this.state;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
-    const rowBg = theme === 'dark' ? '#394B59' : '#FFFFFF';
-    const rowHoverBg = theme === 'dark' ? '#30404D' : '#F8F9FA';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const rowBg = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+    const rowHoverBg = theme === 'dark' ? '#2D323D' : '#F8F9FA';
+    const expandedBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
 
     return (
       <div style={{
@@ -1307,7 +1046,8 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             flexDirection: 'column',
             border: `1px solid ${borderColor}`,
             borderRadius: '0px',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            backgroundColor: rowBg
           }}
         >
           <div style={{
@@ -1335,13 +1075,16 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                     flexShrink: 0
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = rowHoverBg;
+                    if (!expandedTrades.has(trade.id)) {
+                      e.currentTarget.style.backgroundColor = rowHoverBg;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = rowBg;
+                    if (!expandedTrades.has(trade.id)) {
+                      e.currentTarget.style.backgroundColor = rowBg;
+                    }
                   }}
                 >
-
                   <div
                     style={{
                       display: 'flex',
@@ -1349,7 +1092,8 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                       alignItems: 'center',
                       padding: '8px',
                       minHeight: '40px',
-                      margin: 0
+                      margin: 0,
+                      backgroundColor: expandedTrades.has(trade.id) ? expandedBg : 'transparent'
                     }}
                     onClick={() => this.toggleTradeExpanded(trade.id)}
                   >
@@ -1369,7 +1113,9 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                             fontSize: '9px',
                             padding: '2px 4px',
                             color: this.getSideColor(trade.side),
-                            margin: 0
+                            margin: 0,
+                            backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                            border: `1px solid ${theme === 'dark' ? '#3A4250' : '#E1E5E9'}`
                           }}
                         >
                           {trade.side.toUpperCase()}
@@ -1383,7 +1129,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                       <div style={{
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: trade.profitLoss >= 0 ? '#0F9D58' : '#DB4437',
+                        color: trade.profitLoss >= 0 ? '#2E8B57' : '#DC143C',
                         minWidth: '70px',
                         textAlign: 'right',
                         margin: 0
@@ -1396,7 +1142,9 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                           fontSize: '9px',
                           padding: '2px 4px',
                           color: this.getStatusColor(trade.status),
-                          margin: 0
+                          margin: 0,
+                          backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                          border: `1px solid ${theme === 'dark' ? '#3A4250' : '#E1E5E9'}`
                         }}
                       >
                         {trade.status.toUpperCase()}
@@ -1404,11 +1152,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                     </div>
                   </div>
 
-
                   <Collapse isOpen={expandedTrades.has(trade.id)}>
                     <div style={{
                       padding: '8px',
-                      backgroundColor: theme === 'dark' ? '#30404D' : '#F8F9FA',
+                      backgroundColor: expandedBg,
                       borderTop: `1px solid ${borderColor}`,
                       margin: 0
                     }}>
@@ -1426,7 +1173,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                           key={leg.id}
                           style={{
                             padding: '6px',
-                            backgroundColor: theme === 'dark' ? '#2F343C' : '#FFFFFF',
+                            backgroundColor: theme === 'dark' ? '#0F1116' : '#FFFFFF',
                             borderLeft: `3px solid ${leg.exchangeColor}`,
                             marginBottom: '4px',
                             borderRadius: '0px',
@@ -1453,14 +1200,16 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                                   fontSize: '8px',
                                   padding: '1px 3px',
                                   color: this.getStatusColor(leg.status),
-                                  margin: 0
+                                  margin: 0,
+                                  backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                                  border: `1px solid ${theme === 'dark' ? '#3A4250' : '#E1E5E9'}`
                                 }}
                               >
                                 {leg.status.toUpperCase()}
                               </Tag>
                             </div>
                           </div>
-                          <div style={{ fontSize: '8px', color: textColor, marginTop: '2px', margin: 0 }}>
+                          <div style={{ fontSize: '8px', color: theme === 'dark' ? '#8F99A8' : '#5F6B7C', marginTop: '2px', margin: 0 }}>
                             Time: {leg.timestamp}
                           </div>
                         </div>
@@ -1476,13 +1225,13 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     );
   };
 
-
   renderStatsPanel = () => {
     const { theme } = this.state;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const cardBg = theme === 'dark' ? '#394B59' : '#FFFFFF';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
-    const mutedTextColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+    const cardBg = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const mutedTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
+    const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
 
     const statsData = {
       totalTrades: 156,
@@ -1496,8 +1245,14 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', height: '140px' }}>
         <h4 style={{
-          margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600', color: textColor, paddingLeft: '12px'
-        }}>Trading Statistics</h4>
+          margin: '0 0 8px 0',
+          fontSize: '12px',
+          fontWeight: '600',
+          color: textColor,
+          paddingLeft: '12px'
+        }}>
+          Trading Statistics
+        </h4>
         <div
           style={{
             flex: 1,
@@ -1510,7 +1265,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flex: 1 }}>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: mutedTextColor }}>Total Trades</span>
@@ -1518,14 +1272,13 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: mutedTextColor }}>Success Rate</span>
-                <span style={{ fontSize: '11px', fontWeight: '600', color: '#0F9D58' }}>{statsData.successRate}%</span>
+                <span style={{ fontSize: '11px', fontWeight: '600', color: '#2E8B57' }}>{statsData.successRate}%</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: mutedTextColor }}>Avg Profit</span>
-                <span style={{ fontSize: '11px', fontWeight: '600', color: '#0F9D58' }}>+{statsData.avgProfit}%</span>
+                <span style={{ fontSize: '11px', fontWeight: '600', color: '#2E8B57' }}>+{statsData.avgProfit}%</span>
               </div>
             </div>
-
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1543,11 +1296,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             </div>
           </div>
 
-
           <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${borderColor}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <span style={{ fontSize: '10px', color: mutedTextColor }}>Performance Score</span>
-              <span style={{ fontSize: '11px', fontWeight: '600', color: '#0F9D58' }}>Excellent</span>
+              <span style={{ fontSize: '11px', fontWeight: '600', color: '#2E8B57' }}>Excellent</span>
             </div>
             <ProgressBar
               value={0.87}
@@ -1567,8 +1319,9 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
 
   renderLeftPanel = () => {
     const { theme, splits, totalQuantity, showRightPanel } = this.state;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
 
     return (
       <div style={{
@@ -1579,7 +1332,8 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor
       }}>
         <div style={{
           padding: '12px',
@@ -1587,14 +1341,20 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          flexShrink: 0
+          flexShrink: 0,
+          backgroundColor
         }}>
-          <h2 style={{ margin: 0, fontSize: '14px', fontWeight: '600' }}>
+          <h2 style={{
+            margin: 0,
+            fontSize: '14px',
+            fontWeight: '600',
+            color: textColor
+          }}>
             Order Splits
             {!showRightPanel && (
               <span style={{
                 fontSize: '11px',
-                color: theme === 'dark' ? '#8A9BA8' : '#5C7080',
+                color: theme === 'dark' ? '#8F99A8' : '#5F6B7C',
                 marginLeft: '8px'
               }}>
               </span>
@@ -1610,7 +1370,9 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           overflow: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: '8px',
+          padding: '8px',
+          backgroundColor
         }}>
           <DndContext onDragEnd={this.handleDragEnd}>
             <SortableContext items={splits.map(s => s.id)} strategy={verticalListSortingStrategy}>
@@ -1640,8 +1402,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
 
   renderMiddlePanel = () => {
     const { theme, selectedSplit, slippageTolerance, executionSpeed, splits } = this.state;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+    const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
 
     return (
       <div style={{
@@ -1650,17 +1414,43 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
         flexDirection: 'column',
         borderRight: `1px solid ${borderColor}`,
         height: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor
       }}>
-        <div style={{ padding: '12px', borderBottom: `1px solid ${borderColor}`, paddingLeft: '0px', paddingRight: '0px', paddingBottom: '0px' }}>
+        <div style={{
+          padding: '12px',
+          borderBottom: `1px solid ${borderColor}`,
+          paddingLeft: '0px',
+          paddingRight: '0px',
+          paddingBottom: '0px',
+          backgroundColor
+        }}>
           {this.renderExchangePanel()}
         </div>
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '12px' }}>
-          <h4 style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600', color: textColor }}>Execution Parameters</h4>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '12px',
+          backgroundColor
+        }}>
+          <h4 style={{
+            margin: '0 0 8px 0',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: textColor
+          }}>
+            Execution Parameters
+          </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
-              <label style={{ fontSize: '10px', marginBottom: '4px', display: 'block', color: textColor }}>
+              <label style={{
+                fontSize: '10px',
+                marginBottom: '4px',
+                display: 'block',
+                color: textColor
+              }}>
                 Slippage Tolerance: {slippageTolerance}%
               </label>
               <Slider
@@ -1674,7 +1464,12 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
               />
             </div>
             <div>
-              <label style={{ fontSize: '10px', marginBottom: '4px', display: 'block', color: textColor }}>
+              <label style={{
+                fontSize: '10px',
+                marginBottom: '4px',
+                display: 'block',
+                color: textColor
+              }}>
                 Execution Speed: {executionSpeed}%
               </label>
               <Slider
@@ -1687,9 +1482,18 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <Checkbox label="Post Only" style={{ fontSize: '10px', color: textColor, margin: 0 }} />
-              <Checkbox label="Reduce Only" style={{ fontSize: '10px', color: textColor, margin: 0 }} />
-              <Checkbox label="Iceberg Order" style={{ fontSize: '10px', color: textColor, margin: 0 }} />
+              <Checkbox
+                label="Post Only"
+                style={{ fontSize: '10px', color: textColor, margin: 0 }}
+              />
+              <Checkbox
+                label="Reduce Only"
+                style={{ fontSize: '10px', color: textColor, margin: 0 }}
+              />
+              <Checkbox
+                label="Iceberg Order"
+                style={{ fontSize: '10px', color: textColor, margin: 0 }}
+              />
             </div>
             <Button
               intent="primary"
@@ -1703,10 +1507,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     );
   };
 
-
   renderRightPanel = () => {
     const { theme, containerHeight } = this.state;
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
+    const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+    const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
 
     return (
       <div style={{
@@ -1714,27 +1518,34 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
         display: 'flex',
         flexDirection: 'column',
         height: containerHeight || '100vh',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        backgroundColor
       }}>
-
         <div style={{
           flex: '0 0 40%',
           display: 'flex',
           flexDirection: 'column',
           padding: '12px',
           borderBottom: `1px solid ${borderColor}`,
-          overflow: 'hidden', paddingLeft: '0px', paddingRight: '0px', paddingBottom: '0px'
+          overflow: 'hidden',
+          paddingLeft: '0px',
+          paddingRight: '0px',
+          paddingBottom: '0px',
+          backgroundColor
         }}>
           {this.renderStatsPanel()}
         </div>
-
 
         <div style={{
           flex: '0 0 60%',
           display: 'flex',
           flexDirection: 'column',
           padding: '12px',
-          overflow: 'hidden', paddingLeft: '0px', paddingRight: '0px', paddingBottom: '0px'
+          overflow: 'hidden',
+          paddingLeft: '0px',
+          paddingRight: '0px',
+          paddingBottom: '0px',
+          backgroundColor
         }}>
           {this.renderTradeRecords()}
         </div>
@@ -1742,11 +1553,10 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
     );
   };
 
-
   render() {
     const { theme, containerHeight, showRightPanel } = this.state;
-    const backgroundColor = theme === 'dark' ? '#2F343C' : '#FFFFFF';
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
+    const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+    const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
     overflowManager.setOverflow('hidden');
 
     const scrollbarStyles = `
@@ -1755,19 +1565,19 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
       height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: ${theme === 'dark' ? '#30404D' : '#EBF1F5'};
-      border-radius: 0px;
+      background: ${theme === 'dark' ? '#1A1D24' : '#F8F9FA'};
+      border-radius: 3px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: ${theme === 'dark' ? '#5C7080' : '#8A9BA8'};
-      border-radius: 0px;
+      background: ${theme === 'dark' ? '#5A6270' : '#C4C9D1'};
+      border-radius: 3px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: ${theme === 'dark' ? '#738694' : '#A7B6C2'};
+      background: ${theme === 'dark' ? '#767E8C' : '#A8AFB8'};
     }
     .custom-scrollbar {
       scrollbar-width: thin;
-      scrollbar-color: ${theme === 'dark' ? '#5C7080 #30404D' : '#8A9BA8 #EBF1F5'};
+      scrollbar-color: ${theme === 'dark' ? '#5A6270 #1A1D24' : '#C4C9D1 #F8F9FA'};
     }
   `;
 
@@ -1786,7 +1596,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           overflow: 'hidden'
         }}
       >
-
         <style>{scrollbarStyles}</style>
 
         {this.renderLeftPanel()}
@@ -1795,7 +1604,6 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
       </div>
     );
   }
-
 }
 
 export default OrderSplitPage;

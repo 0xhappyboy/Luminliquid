@@ -38,6 +38,7 @@ class SortableSplit extends React.Component<{
     onDragEnd?: () => void;
 }> {
     private nodeRef = React.createRef<HTMLDivElement>();
+
     getStatusColor = (status: string): string => {
         switch (status) {
             case 'filled': return '#2E8B57';
@@ -51,30 +52,40 @@ class SortableSplit extends React.Component<{
             default: return '#8F99A8';
         }
     };
+
     getSideColor = (side: 'buy' | 'sell'): string => {
         return side === 'buy' ? '#2E8B57' : '#DC143C';
     };
+
     handleMouseDown = (e: React.MouseEvent) => {
         this.props.onDragStart?.(this.props.split.id);
     };
+
     handleMouseUp = () => {
         this.props.onDragEnd?.();
     };
 
     render() {
         const { split, index, theme, selectedSplit, onSelect, onRemoveLeg, onExecuteSplit, onLegQuantityChange } = this.props;
-        const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-        const cardBg = theme === 'dark' ? '#394B59' : '#FFFFFF';
-        const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
+        const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
+        const cardBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
+        const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
+        const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
+        const secondaryTextColor = theme === 'dark' ? '#8F99A8' : '#5F6B7C';
+        const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
+        const hoverBgColor = theme === 'dark' ? '#2D3746' : '#F1F3F5';
+        const selectedBgColor = theme === 'dark' ? '#3C4858' : '#E1E5E9';
+
         return (
             <div ref={this.nodeRef}>
                 <div
                     style={{
                         padding: '8px',
                         backgroundColor: cardBg,
-                        border: `1px solid ${selectedSplit === split.id ? '#2D72D2' : borderColor}`,
+                        border: `1px solid ${selectedSplit === split.id ? primaryColor : borderColor}`,
                         borderBottom: `1px solid ${borderColor}`,
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
                     }}
                     onClick={() => onSelect(split.id)}
                 >
@@ -85,7 +96,12 @@ class SortableSplit extends React.Component<{
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: textColor }}>
+                                <h4 style={{
+                                    margin: 0,
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    color: textColor
+                                }}>
                                     Split {index + 1} - {split.percentage.toFixed(1)}%
                                 </h4>
                                 <Tag
@@ -93,13 +109,19 @@ class SortableSplit extends React.Component<{
                                     style={{
                                         fontSize: '9px',
                                         padding: '1px 4px',
-                                        color: this.getStatusColor(split.status)
+                                        color: this.getStatusColor(split.status),
+                                        backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                                        border: `1px solid ${theme === 'dark' ? '#3A4250' : '#E1E5E9'}`
                                     }}
                                 >
                                     {split.status.toUpperCase()}
                                 </Tag>
                             </div>
-                            <div style={{ fontSize: '11px', fontWeight: '600', color: textColor }}>
+                            <div style={{
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: textColor
+                            }}>
                                 Qty: {split.quantity}
                             </div>
                         </div>
@@ -111,16 +133,22 @@ class SortableSplit extends React.Component<{
                                 key={leg.id}
                                 style={{
                                     padding: '4px 6px',
-                                    backgroundColor: theme === 'dark' ? '#30404D' : '#F8F9FA',
+                                    backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
                                     borderLeft: `3px solid ${leg.exchangeColor}`,
                                     marginBottom: '2px',
                                     border: `1px solid ${borderColor}`,
-                                    borderRadius: '0px'
+                                    borderRadius: '0px',
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
-                                        <div style={{ fontSize: '9px', fontWeight: '600', color: textColor, minWidth: '60px' }}>
+                                        <div style={{
+                                            fontSize: '9px',
+                                            fontWeight: '600',
+                                            color: textColor,
+                                            minWidth: '60px'
+                                        }}>
                                             {leg.exchange}
                                         </div>
                                         <Tag
@@ -128,7 +156,9 @@ class SortableSplit extends React.Component<{
                                             style={{
                                                 fontSize: '7px',
                                                 padding: '1px 3px',
-                                                color: this.getSideColor(leg.side)
+                                                color: this.getSideColor(leg.side),
+                                                backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                                                border: `1px solid ${theme === 'dark' ? '#3A4250' : '#E1E5E9'}`
                                             }}
                                         >
                                             {leg.side.toUpperCase()}
@@ -140,18 +170,40 @@ class SortableSplit extends React.Component<{
                                             min={0}
                                             stepSize={1}
                                             minorStepSize={0.1}
-                                            style={{ width: '60px', fontSize: '8px', height: '20px' }}
+                                            style={{
+                                                width: '60px',
+                                                fontSize: '8px',
+                                                height: '20px',
+                                                backgroundColor: theme === 'dark' ? '#1A1D24' : '#FFFFFF',
+                                                color: textColor,
+                                                border: `1px solid ${borderColor}`
+                                            }}
+                                            buttonProps={{
+                                                style: {
+                                                    backgroundColor: theme === 'dark' ? '#2D323D' : '#F1F5F9',
+                                                    color: textColor
+                                                }
+                                            }}
                                         />
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <div style={{ fontSize: '8px', color: textColor, minWidth: '45px' }}>
+                                        <div style={{
+                                            fontSize: '8px',
+                                            color: textColor,
+                                            minWidth: '45px'
+                                        }}>
                                             ${leg.price.toFixed(2)}
                                         </div>
                                         <Button
                                             small
                                             minimal
                                             icon="cross"
-                                            style={{ padding: '1px', width: '16px', height: '16px' }}
+                                            style={{
+                                                padding: '1px',
+                                                width: '16px',
+                                                height: '16px',
+                                                color: secondaryTextColor
+                                            }}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onRemoveLeg(split.id, leg.id);
@@ -168,7 +220,13 @@ class SortableSplit extends React.Component<{
                             small
                             intent="success"
                             text="Execute"
-                            style={{ fontSize: '9px', flex: 1, height: '22px' }}
+                            style={{
+                                fontSize: '9px',
+                                flex: 1,
+                                height: '22px',
+                                backgroundColor: theme === 'dark' ? '#2E8B57' : '#2E8B57',
+                                border: `1px solid ${theme === 'dark' ? '#3A7A5A' : '#2A7850'}`
+                            }}
                             onClick={() => onExecuteSplit(split.id)}
                             disabled={split.legs.length === 0}
                         />
