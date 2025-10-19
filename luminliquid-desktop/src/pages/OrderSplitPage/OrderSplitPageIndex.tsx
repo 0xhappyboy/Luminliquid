@@ -3,8 +3,9 @@ import { Card, Elevation, Button, HTMLTable, InputGroup, NumericInput, Slider, T
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import ReactECharts from 'echarts-for-react';
-import { themeManager } from '../globals/theme/ThemeManager';
-import { overflowManager } from '../globals/theme/OverflowTypeManager';
+import { themeManager } from '../../globals/theme/ThemeManager';
+import { overflowManager } from '../../globals/theme/OverflowTypeManager';
+import SortableSplit from './SortableSplit';
 
 interface OrderLeg {
   id: string;
@@ -72,165 +73,6 @@ interface OrderSplittingState {
   executionSpeed: number;
   containerWidth: number;
   showRightPanel: boolean;
-}
-
-class SortableSplit extends React.Component<{
-  split: OrderSplit;
-  index: number;
-  theme: 'dark' | 'light';
-  selectedSplit: string | null;
-  onSelect: (id: string) => void;
-  onRemoveLeg: (splitId: string, legId: string) => void;
-  onExecuteSplit: (splitId: string) => void;
-  onLegQuantityChange: (splitId: string, legId: string, quantity: number) => void;
-  onDragStart?: (id: string) => void;
-  onDragEnd?: () => void;
-}> {
-  private nodeRef = React.createRef<HTMLDivElement>();
-
-  getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'filled': return '#0F9D58';
-      case 'partial': return '#F4B400';
-      case 'pending': return '#4285F4';
-      case 'cancelled': return '#DB4437';
-      case 'submitted': return '#9C27B0';
-      case 'executing': return '#FF9800';
-      case 'completed': return '#0F9D58';
-      case 'draft': return '#9AA0A6';
-      default: return '#9AA0A6';
-    }
-  };
-
-  getSideColor = (side: 'buy' | 'sell'): string => {
-    return side === 'buy' ? '#0F9D58' : '#DB4437';
-  };
-
-  handleMouseDown = (e: React.MouseEvent) => {
-    this.props.onDragStart?.(this.props.split.id);
-  };
-
-  handleMouseUp = () => {
-    this.props.onDragEnd?.();
-  };
-
-  render() {
-    const { split, index, theme, selectedSplit, onSelect, onRemoveLeg, onExecuteSplit, onLegQuantityChange } = this.props;
-    const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-    const cardBg = theme === 'dark' ? '#394B59' : '#FFFFFF';
-    const borderColor = theme === 'dark' ? '#5C7080' : '#E1E8ED';
-
-    return (
-      <div ref={this.nodeRef}>
-        <div
-          style={{
-            padding: '8px',
-            backgroundColor: cardBg,
-            border: `1px solid ${selectedSplit === split.id ? '#2D72D2' : borderColor}`,
-            borderBottom: `1px solid ${borderColor}`,
-            cursor: 'pointer'
-          }}
-          onClick={() => onSelect(split.id)}
-        >
-          <div
-            style={{ cursor: 'grab' }}
-            onMouseDown={this.handleMouseDown}
-            onMouseUp={this.handleMouseUp}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: textColor }}>
-                  Split {index + 1} - {split.percentage.toFixed(1)}%
-                </h4>
-                <Tag
-                  minimal
-                  style={{
-                    fontSize: '9px',
-                    padding: '1px 4px',
-                    color: this.getStatusColor(split.status)
-                  }}
-                >
-                  {split.status.toUpperCase()}
-                </Tag>
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: '600', color: textColor }}>
-                Qty: {split.quantity}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ minHeight: '40px' }}>
-            {split.legs.map((leg) => (
-              <div
-                key={leg.id}
-                style={{
-                  padding: '4px 6px',
-                  backgroundColor: theme === 'dark' ? '#30404D' : '#F8F9FA',
-                  borderLeft: `3px solid ${leg.exchangeColor}`,
-                  marginBottom: '2px',
-                  border: `1px solid ${borderColor}`,
-                  borderRadius: '0px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
-                    <div style={{ fontSize: '9px', fontWeight: '600', color: textColor, minWidth: '60px' }}>
-                      {leg.exchange}
-                    </div>
-                    <Tag
-                      minimal
-                      style={{
-                        fontSize: '7px',
-                        padding: '1px 3px',
-                        color: this.getSideColor(leg.side)
-                      }}
-                    >
-                      {leg.side.toUpperCase()}
-                    </Tag>
-                    <NumericInput
-                      small
-                      value={leg.quantity}
-                      onValueChange={(value) => onLegQuantityChange(split.id, leg.id, value)}
-                      min={0}
-                      stepSize={1}
-                      minorStepSize={0.1}
-                      style={{ width: '60px', fontSize: '8px', height: '20px' }}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ fontSize: '8px', color: textColor, minWidth: '45px' }}>
-                      ${leg.price.toFixed(2)}
-                    </div>
-                    <Button
-                      small
-                      minimal
-                      icon="cross"
-                      style={{ padding: '1px', width: '16px', height: '16px' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveLeg(split.id, leg.id);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-            <Button
-              small
-              intent="success"
-              text="Execute"
-              style={{ fontSize: '9px', flex: 1, height: '22px' }}
-              onClick={() => onExecuteSplit(split.id)}
-              disabled={split.legs.length === 0}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
 }
 
 class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
@@ -1370,7 +1212,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             overflow: 'hidden'
           }}
         >
-          
+
           <div style={{
             flexShrink: 0,
             backgroundColor: headerBg,
@@ -1388,7 +1230,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             </HTMLTable>
           </div>
 
-          
+
           <div style={{ flex: 1, overflow: 'auto' }}>
             <HTMLTable compact style={{ width: '100%', fontSize: '11px', margin: 0 }}>
               <tbody>
@@ -1499,7 +1341,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                     e.currentTarget.style.backgroundColor = rowBg;
                   }}
                 >
-                  
+
                   <div
                     style={{
                       display: 'flex',
@@ -1562,7 +1404,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
                     </div>
                   </div>
 
-                  
+
                   <Collapse isOpen={expandedTrades.has(trade.id)}>
                     <div style={{
                       padding: '8px',
@@ -1668,7 +1510,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           }}
         >
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flex: 1 }}>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: mutedTextColor }}>Total Trades</span>
@@ -1684,7 +1526,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
               </div>
             </div>
 
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '10px', color: mutedTextColor }}>Total Volume</span>
@@ -1701,7 +1543,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
             </div>
           </div>
 
-          
+
           <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${borderColor}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <span style={{ fontSize: '10px', color: mutedTextColor }}>Performance Score</span>
@@ -1874,7 +1716,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
         height: containerHeight || '100vh',
         overflow: 'hidden'
       }}>
-        
+
         <div style={{
           flex: '0 0 40%',
           display: 'flex',
@@ -1886,7 +1728,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           {this.renderStatsPanel()}
         </div>
 
-        
+
         <div style={{
           flex: '0 0 60%',
           display: 'flex',
@@ -1944,7 +1786,7 @@ class OrderSplitPage extends React.Component<{}, OrderSplittingState> {
           overflow: 'hidden'
         }}
       >
-        
+
         <style>{scrollbarStyles}</style>
 
         {this.renderLeftPanel()}
