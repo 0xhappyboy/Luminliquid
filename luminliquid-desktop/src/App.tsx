@@ -1,21 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { themeManager } from './globals/theme/ThemeManager';
 import TopArea from './components/top/TopArea';
 import MiddleArea from './components/center/MiddleArea';
-import NewsPage from './pages/NewsPage';
 import BottomArea from './components/bottom/BottomArea';
-import OrderSplitPage from './pages/OrderSplitPage';
-import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
-import TradePage from './pages/TradePage';
-import MarketPage from './pages/MarketPage';
 import { BrowserRouter as Router, Route, BrowserRouter, Routes } from 'react-router-dom';
-import LendingPageIndex from './pages/LendingPage';
+import FinanceToolsPageIndex from './pages/FinanceToolsPage/ToolPageIndex';
+import MarketPage from './pages/MarketPageIndex';
+import NewsPage from './pages/NewsPageIndex';
+import OrderSplitPage from './pages/OrderSplitPage/OrderSplitPageIndex';
+import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
+import TradePage from './pages/TradePageIndex';
+import LendPageIndex from './pages/LendPageIndex';
+import TradeStrategyPageIndex from './pages/TradeStrategyPageIndex';
+import ProfilePage from './pages/ProfilePageIndex';
+import SocialMonitorPageIndex from './pages/SocialMonitorPage';
+import ContractAnalysisPage from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
+import ContractAnalysisPageIndex from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
+import PredictionMarketPage from './pages/PredictionMarket';
 // blueprintjs
 require('normalize.css');
 require('@blueprintjs/core/lib/css/blueprint.css');
 require('@blueprintjs/icons/lib/css/blueprint-icons.css');
+
 class App extends React.Component {
   componentDidMount() {
     themeManager.getTheme();
@@ -26,16 +33,20 @@ class App extends React.Component {
         <BrowserRouter>
           <TopArea />
           <MiddleArea >
-            <LendingPageIndex />
-            {/* <Routes>
-              <Route path='/' element={<NewsPage />} />
-              <Route path='/news' element={<NewsPage />} />
+            <Routes>
               <Route path='/market' element={<MarketPage />} />
-              <Route path='/order-split' element={<OrderSplitPage />} />
+              <Route path='/news' element={<NewsPage />} />
+              <Route path='/ordersplit' element={<OrderSplitPage />} />
               <Route path='/arbitrage' element={<ArbitragePageIndex />} />
               <Route path='/trade' element={<TradePage />} />
-              <Route path='/lend' element={<LendingPageIndex />} />
-            </Routes> */}
+              <Route path='/lend' element={<LendPageIndex />} />
+              <Route path='/tradestrategy' element={<TradeStrategyPageIndex />} />
+              <Route path='/tool' element={<FinanceToolsPageIndex />} />
+              <Route path='/profile' element={<ProfilePage />} />
+              <Route path='/socialmonitor' element={<SocialMonitorPageIndex />} />
+              <Route path='/contractanalysis' element={<ContractAnalysisPageIndex />} />
+              <Route path='/predictionmarket' element={<PredictionMarketPage />} />
+            </Routes>
           </MiddleArea>
           <BottomArea />
         </BrowserRouter>

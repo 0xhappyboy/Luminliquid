@@ -34,8 +34,8 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 { key: pages.lend.name, label: pages.lend.name, icon: 'circle' as const, page: pages.lend.path },
                 { key: pages.news.name, label: pages.news.name, icon: 'refresh' as const, page: pages.news.path },
                 { key: pages.tradestrategy.name, label: pages.tradestrategy.name, icon: 'document' as const, page: pages.tradestrategy.path },
-                { key: pages.tool.name, label: pages.tool.name, icon: 'font' as const, page: pages.tool.name },
-                { key: pages.socialmonitor.name, label: pages.socialmonitor.name, icon: 'more' as const, page: pages.socialmonitor.name }
+                { key: pages.tool.name, label: pages.tool.name, icon: 'font' as const, page: pages.tool.path },
+                { key: pages.socialmonitor.name, label: pages.socialmonitor.name, icon: 'more' as const, page: pages.socialmonitor.path }
             ]
         },
         {
@@ -58,8 +58,8 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
         {
             type: 'single-row',
             buttons: [
-                { key: 'test', label: 'test', icon: 'circle' as const },
-                { key: 'test', label: 'test)', icon: 'refresh' as const },
+                { key: pages.contractanalysis.name, label: pages.contractanalysis.name, icon: 'circle' as const, page: pages.contractanalysis.path },
+                { key: pages.predictionmarket.name, label: pages.predictionmarket.name, icon: 'refresh' as const, page: pages.predictionmarket.path },
                 { key: 'test', label: 'test', icon: 'document' as const },
                 { key: 'test', label: 'test', icon: 'font' as const },
                 { key: 'test', label: 'test', icon: 'more' as const }

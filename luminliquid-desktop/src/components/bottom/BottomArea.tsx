@@ -1,6 +1,6 @@
 import React from 'react';
-import BottomBar from './BottomMenu';
-import TickerTape from './PriceMarquee';
+import BottomBar from './BottomBar';
+import TickerTape from './TickerTape';
 
 class BottomArea extends React.Component {
     render() {
