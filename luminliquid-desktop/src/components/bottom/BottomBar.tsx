@@ -10,6 +10,7 @@ interface BottomBarState {
     isSearchFocused: boolean;
     searchValue: string;
     activeSearchTab: string;
+    networkSpeed: 'excellent' | 'good' | 'fair' | 'poor';
 }
 
 interface TokenInfo {
@@ -27,26 +28,27 @@ interface TokenInfo {
 class BottomBar extends React.Component<{}, BottomBarState> {
     private timer: NodeJS.Timeout | null = null;
     private unsubscribe: (() => void) | null = null;
-    private searchInputRef: React.RefObject<HTMLInputElement> = React.createRef();
-    private searchPopupRef: React.RefObject<HTMLDivElement> = React.createRef();
-    
+    private networkTimer: NodeJS.Timeout | null = null;
+    private searchInputRef: React.RefObject<HTMLInputElement | null> = React.createRef();
+    private searchPopupRef: React.RefObject<HTMLDivElement | null> = React.createRef();
+
     // Search suggestions data
     private searchSuggestions = {
         hotTokens: [
-            { 
-                symbol: 'BTC/USDT', 
-                color: '#F7931A', 
-                name: 'Bitcoin', 
+            {
+                symbol: 'BTC/USDT',
+                color: '#F7931A',
+                name: 'Bitcoin',
                 network: 'Bitcoin',
                 website: 'https://bitcoin.org',
                 twitter: 'https://twitter.com/bitcoin',
                 price: '$43,250.67',
                 change24h: '+2.34%'
             },
-            { 
-                symbol: 'ETH/USDT', 
-                color: '#627EEA', 
-                name: 'Ethereum', 
+            {
+                symbol: 'ETH/USDT',
+                color: '#627EEA',
+                name: 'Ethereum',
                 network: 'Ethereum',
                 website: 'https://ethereum.org',
                 twitter: 'https://twitter.com/ethereum',
@@ -54,10 +56,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$2,345.89',
                 change24h: '+1.78%'
             },
-            { 
-                symbol: 'BNB/USDT', 
-                color: '#F3BA2F', 
-                name: 'Binance Coin', 
+            {
+                symbol: 'BNB/USDT',
+                color: '#F3BA2F',
+                name: 'Binance Coin',
                 network: 'BSC',
                 website: 'https://binance.org',
                 twitter: 'https://twitter.com/binance',
@@ -65,20 +67,20 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$312.45',
                 change24h: '-0.56%'
             },
-            { 
-                symbol: 'XRP/USDT', 
-                color: '#23292F', 
-                name: 'Ripple', 
+            {
+                symbol: 'XRP/USDT',
+                color: '#23292F',
+                name: 'Ripple',
                 network: 'XRP Ledger',
                 website: 'https://ripple.com',
                 twitter: 'https://twitter.com/Ripple',
                 price: '$0.6234',
                 change24h: '+3.21%'
             },
-            { 
-                symbol: 'ADA/USDT', 
-                color: '#0033AD', 
-                name: 'Cardano', 
+            {
+                symbol: 'ADA/USDT',
+                color: '#0033AD',
+                name: 'Cardano',
                 network: 'Cardano',
                 website: 'https://cardano.org',
                 twitter: 'https://twitter.com/Cardano',
@@ -86,10 +88,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$0.4567',
                 change24h: '+5.12%'
             },
-            { 
-                symbol: 'SOL/USDT', 
-                color: '#00FFA3', 
-                name: 'Solana', 
+            {
+                symbol: 'SOL/USDT',
+                color: '#00FFA3',
+                name: 'Solana',
                 network: 'Solana',
                 website: 'https://solana.com',
                 twitter: 'https://twitter.com/solana',
@@ -97,10 +99,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$98.76',
                 change24h: '+8.45%'
             },
-            { 
-                symbol: 'DOT/USDT', 
-                color: '#E6007A', 
-                name: 'Polkadot', 
+            {
+                symbol: 'DOT/USDT',
+                color: '#E6007A',
+                name: 'Polkadot',
                 network: 'Polkadot',
                 website: 'https://polkadot.network',
                 twitter: 'https://twitter.com/Polkadot',
@@ -108,10 +110,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$7.234',
                 change24h: '+1.23%'
             },
-            { 
-                symbol: 'DOGE/USDT', 
-                color: '#C2A633', 
-                name: 'Dogecoin', 
+            {
+                symbol: 'DOGE/USDT',
+                color: '#C2A633',
+                name: 'Dogecoin',
                 network: 'Dogecoin',
                 website: 'https://dogecoin.com',
                 twitter: 'https://twitter.com/dogecoin',
@@ -120,20 +122,20 @@ class BottomBar extends React.Component<{}, BottomBarState> {
             }
         ],
         latestTokens: [
-            { 
-                symbol: 'APE/USDT', 
-                color: '#0052FF', 
-                name: 'ApeCoin', 
+            {
+                symbol: 'APE/USDT',
+                color: '#0052FF',
+                name: 'ApeCoin',
                 network: 'Ethereum',
                 website: 'https://apecoin.com',
                 twitter: 'https://twitter.com/apecoin',
                 price: '$1.567',
                 change24h: '+12.34%'
             },
-            { 
-                symbol: 'SAND/USDT', 
-                color: '#00ADEF', 
-                name: 'The Sandbox', 
+            {
+                symbol: 'SAND/USDT',
+                color: '#00ADEF',
+                name: 'The Sandbox',
                 network: 'Ethereum',
                 website: 'https://sandbox.game',
                 twitter: 'https://twitter.com/TheSandboxGame',
@@ -141,20 +143,20 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$0.4567',
                 change24h: '+3.45%'
             },
-            { 
-                symbol: 'MANA/USDT', 
-                color: '#FF2D55', 
-                name: 'Decentraland', 
+            {
+                symbol: 'MANA/USDT',
+                color: '#FF2D55',
+                name: 'Decentraland',
                 network: 'Ethereum',
                 website: 'https://decentraland.org',
                 twitter: 'https://twitter.com/decentraland',
                 price: '$0.3789',
                 change24h: '+2.67%'
             },
-            { 
-                symbol: 'GALA/USDT', 
-                color: '#00B1C9', 
-                name: 'Gala', 
+            {
+                symbol: 'GALA/USDT',
+                color: '#00B1C9',
+                name: 'Gala',
                 network: 'Ethereum',
                 website: 'https://gala.com',
                 twitter: 'https://twitter.com/gogalagames',
@@ -162,10 +164,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$0.0234',
                 change24h: '+15.78%'
             },
-            { 
-                symbol: 'ENJ/USDT', 
-                color: '#624DBF', 
-                name: 'Enjin Coin', 
+            {
+                symbol: 'ENJ/USDT',
+                color: '#624DBF',
+                name: 'Enjin Coin',
                 network: 'Ethereum',
                 website: 'https://enjin.io',
                 twitter: 'https://twitter.com/enjin',
@@ -173,10 +175,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$0.3456',
                 change24h: '+4.56%'
             },
-            { 
-                symbol: 'AXS/USDT', 
-                color: '#0055D5', 
-                name: 'Axie Infinity', 
+            {
+                symbol: 'AXS/USDT',
+                color: '#0055D5',
+                name: 'Axie Infinity',
                 network: 'Ethereum',
                 website: 'https://axieinfinity.com',
                 twitter: 'https://twitter.com/AxieInfinity',
@@ -184,10 +186,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$7.890',
                 change24h: '-1.23%'
             },
-            { 
-                symbol: 'IMX/USDT', 
-                color: '#16C784', 
-                name: 'Immutable X', 
+            {
+                symbol: 'IMX/USDT',
+                color: '#16C784',
+                name: 'Immutable X',
                 network: 'Ethereum L2',
                 website: 'https://immutable.com',
                 twitter: 'https://twitter.com/Immutable',
@@ -195,10 +197,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 price: '$1.234',
                 change24h: '+6.78%'
             },
-            { 
-                symbol: 'RNDR/USDT', 
-                color: '#FF6B00', 
-                name: 'Render Token', 
+            {
+                symbol: 'RNDR/USDT',
+                color: '#FF6B00',
+                name: 'Render Token',
                 network: 'Ethereum',
                 website: 'https://rendertoken.com',
                 twitter: 'https://twitter.com/rendertoken',
@@ -293,9 +295,16 @@ class BottomBar extends React.Component<{}, BottomBarState> {
             windowWidth: window.innerWidth,
             isSearchFocused: false,
             searchValue: '',
-            activeSearchTab: 'hot'
+            activeSearchTab: 'hot',
+            networkSpeed: 'good' 
         };
     }
+
+    private simulateNetworkChange = () => {
+        const speeds: ('excellent' | 'good' | 'fair' | 'poor')[] = ['excellent', 'good', 'fair', 'poor'];
+        const randomSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+        this.setState({ networkSpeed: randomSpeed });
+    };
 
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
@@ -307,7 +316,9 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 currentTime: new Date().toLocaleTimeString()
             });
         }, 1000);
-        
+
+        this.networkTimer = setInterval(this.simulateNetworkChange, 5000);
+
         document.addEventListener('mousedown', this.handleClickOutside);
     }
 
@@ -319,18 +330,98 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         if (this.timer) {
             clearInterval(this.timer);
         }
+        if (this.networkTimer) {
+            clearInterval(this.networkTimer);
+        }
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
+
+    handleSettingsClick = () => {
+        alert('Settings clicked!');
+    };
 
     handleResize = () => {
         this.setState({ windowWidth: window.innerWidth });
     };
 
+    renderNetworkIndicator = () => {
+        const { theme, networkSpeed } = this.state;
+        const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
+        const activeColor = theme === 'dark' ? '#15B371' : '#0A6640';
+
+        let signalIcon;
+        switch (networkSpeed) {
+            case 'excellent':
+                signalIcon = '📶';
+                break;
+            case 'good':
+                signalIcon = '📶';
+                break;
+            case 'fair':
+                signalIcon = '📶';
+                break;
+            case 'poor':
+                signalIcon = '📶';
+                break;
+            default:
+                signalIcon = '📶';
+        }
+
+        return (
+            <div
+                style={{
+                    fontSize: '14px',
+                    cursor: 'default',
+                    color: networkSpeed === 'excellent' ? activeColor : iconColor,
+                    transition: 'color 0.3s ease',
+                    userSelect: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                title={`Network: ${networkSpeed}`}
+            >
+                {signalIcon}
+            </div>
+        );
+    };
+
+    renderSettingsIcon = () => {
+        const { theme } = this.state;
+        const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
+        const hoverColor = theme === 'dark' ? '#F5F8FA' : '#182026';
+
+        return (
+            <div
+                style={{
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    color: iconColor,
+                    transition: 'color 0.2s ease, transform 0.2s ease',
+                    userSelect: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.color = hoverColor;
+                    e.currentTarget.style.transform = 'rotate(30deg)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.color = iconColor;
+                    e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+                onClick={this.handleSettingsClick}
+                title="Settings"
+            >
+                ⚙️
+            </div>
+        );
+    };
+
     handleClickOutside = (event: MouseEvent) => {
         if (
-            this.searchInputRef.current && 
+            this.searchInputRef.current &&
             !this.searchInputRef.current.contains(event.target as Node) &&
-            this.searchPopupRef.current && 
+            this.searchPopupRef.current &&
             !this.searchPopupRef.current.contains(event.target as Node)
         ) {
             this.setState({ isSearchFocused: false });
@@ -364,9 +455,9 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
 
         return (
-            <Menu 
-                style={{ 
-                    minWidth: '120px', 
+            <Menu
+                style={{
+                    minWidth: '120px',
                     fontSize: '12px',
                     backgroundColor: backgroundColor,
                     color: textColor,
@@ -378,8 +469,8 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     <MenuItem
                         key={item.key}
                         text={item.label}
-                        style={{ 
-                            fontSize: '12px', 
+                        style={{
+                            fontSize: '12px',
                             padding: '4px 12px',
                             color: textColor,
                             backgroundColor: backgroundColor
@@ -579,8 +670,8 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         const positiveColor = '#15B371';
         const negativeColor = '#DB3737';
 
-        const currentTokens = activeSearchTab === 'hot' 
-            ? this.searchSuggestions.hotTokens 
+        const currentTokens = activeSearchTab === 'hot'
+            ? this.searchSuggestions.hotTokens
             : this.searchSuggestions.latestTokens;
 
         return (
@@ -644,53 +735,53 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                                 <div style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
                                     {this.renderTokenLogo(token.color, token.symbol)}
                                 </div>
-                                
+
                                 {/* Main content area - horizontal layout */}
-                                <div style={{ 
-                                    flex: 1, 
-                                    display: 'flex', 
+                                <div style={{
+                                    flex: 1,
+                                    display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'space-between',
                                     minWidth: 0,
                                     userSelect: 'none'
                                 }}>
                                     {/* Left: Token basic info */}
-                                    <div style={{ 
-                                        display: 'flex', 
+                                    <div style={{
+                                        display: 'flex',
                                         flexDirection: 'column',
                                         flex: 1,
                                         minWidth: 0,
                                         marginRight: '12px',
                                         userSelect: 'none'
                                     }}>
-                                        <div style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
                                             gap: '8px',
                                             marginBottom: '2px'
                                         }}>
-                                            <div style={{ 
-                                                fontWeight: 'bold', 
+                                            <div style={{
+                                                fontWeight: 'bold',
                                                 fontSize: '13px',
                                                 whiteSpace: 'nowrap'
                                             }}>
                                                 {token.symbol}
                                             </div>
-                                            <div style={{ 
-                                                fontSize: '11px', 
+                                            <div style={{
+                                                fontSize: '11px',
                                                 color: secondaryTextColor,
                                                 whiteSpace: 'nowrap'
                                             }}>
                                                 {token.name}
                                             </div>
                                         </div>
-                                        <div style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
                                             gap: '12px'
                                         }}>
-                                            <div style={{ 
-                                                fontSize: '11px', 
+                                            <div style={{
+                                                fontSize: '11px',
                                                 color: secondaryTextColor,
                                                 whiteSpace: 'nowrap'
                                             }}>
@@ -701,23 +792,23 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                                     </div>
 
                                     {/* Right: Price info */}
-                                    <div style={{ 
-                                        display: 'flex', 
+                                    <div style={{
+                                        display: 'flex',
                                         flexDirection: 'column',
                                         alignItems: 'flex-end',
                                         textAlign: 'right',
                                         whiteSpace: 'nowrap',
                                         userSelect: 'none'
                                     }}>
-                                        <div style={{ 
-                                            fontSize: '13px', 
+                                        <div style={{
+                                            fontSize: '13px',
                                             fontWeight: 'bold',
                                             marginBottom: '2px'
                                         }}>
                                             {token.price}
                                         </div>
-                                        <div style={{ 
-                                            fontSize: '11px', 
+                                        <div style={{
+                                            fontSize: '11px',
                                             color: token.change24h?.startsWith('+') ? positiveColor : negativeColor
                                         }}>
                                             {token.change24h}
@@ -913,6 +1004,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                         />
                         {isSearchFocused && this.renderSearchPopup()}
                     </div>
+
+                    {/* 添加网络信号和齿轮图标 */}
+                    {this.renderNetworkIndicator()}
+                    {this.renderSettingsIcon()}
 
                     <div
                         style={{

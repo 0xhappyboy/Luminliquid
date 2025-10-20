@@ -69,3 +69,5 @@ pub fn drag_window(window: tauri::Window) -> Result<(), String> {
         .map_err(|e| e.to_string())?;
     Ok(())
 }
+
+

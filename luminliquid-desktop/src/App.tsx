@@ -19,6 +19,20 @@ import ContractAnalysisPageIndex from './pages/ContractAnalysisPage/ContractAnal
 import PredictionMarketPage from './pages/PredictionMarket';
 import WalletAnalysisDashboard from './pages/WalletPageIndex';
 import OrderSplitPageIndex from './pages/OrderSplitPage/OrderSplitPageIndex';
+import KLineChart from './components/trade/TradeKLine';
+import SimpleKLineChart from './components/trade/TradeKLine';
+import MinimalKLineChart from './components/trade/TradeKLine';
+import KLineChartV5 from './components/trade/TradeKLine';
+import SafeKLineChart from './components/trade/TradeKLine';
+import NetworkStatusPageIndex from './pages/NetworkStatusPageIndex';
+import TradingChart from './components/trade/TradeKLine';
+
+
+import { CandleView } from 'candleview';
+import CandleView2 from './components/Testssssss/CandleView';
+import SettingsPage from './pages/SettingPageIndex';
+import SettingPageIndex from './pages/SettingPageIndex';
+
 // blueprintjs
 require('normalize.css');
 require('@blueprintjs/core/lib/css/blueprint.css');
@@ -48,6 +62,8 @@ class App extends React.Component {
               <Route path='/contractanalysis' element={<ContractAnalysisPageIndex />} />
               <Route path='/predictionmarket' element={<PredictionMarketPage />} />
               <Route path='/wallet' element={<WalletAnalysisDashboard />} />
+              <Route path='/networkstatus' element={<NetworkStatusPageIndex />} />
+              <Route path='/settting' element={<SettingPageIndex />} />
             </Routes>
           </MiddleArea>
           <BottomArea />
