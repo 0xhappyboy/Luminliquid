@@ -1,5 +1,5 @@
 <h1 align="center">
-  ✨ Luminliquid
+  ✨ 光效流动性
 </h1>
 <h4 align="center">
 一款运行在多个平台的金融终端.
