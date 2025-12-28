@@ -5,6 +5,7 @@ import {
 import { themeManager } from '../../globals/theme/ThemeManager';
 import { withRouter } from '../../WithRouter';
 import pages from '../../globals/config/pages.json';
+import { handleMultiPanelWindow } from '../../globals/commands/WindowsCommand';
 
 interface TopFunctionBarState {
     theme: 'dark' | 'light';
@@ -12,7 +13,7 @@ interface TopFunctionBarState {
 }
 
 interface TopFunctionBarProps {
-    navigate: (path: string, options?: any) => void;
+    navigate?: (path: string, options?: any) => void;
 }
 
 class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBarState> {
@@ -61,7 +62,7 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 { key: pages.contractanalysis.name, label: pages.contractanalysis.name, icon: 'circle' as const, page: pages.contractanalysis.path },
                 { key: pages.predictionmarket.name, label: pages.predictionmarket.name, icon: 'refresh' as const, page: pages.predictionmarket.path },
                 { key: pages.networkstatus.name, label: pages.networkstatus.name, icon: 'document' as const, page: pages.networkstatus.path },
-                { key: 'test', label: 'test', icon: 'font' as const },
+                { key: 'multi_panel_window', label: 'MultiPanelWindow', icon: 'font' as const },
                 { key: 'test', label: 'test', icon: 'more' as const }
             ]
         },
@@ -143,7 +144,13 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
 
     renderSingleRowButton = (button: any, index: number) => (
         <Button
-            onClick={() => button.page && this.toPage(button.page)}
+            onClick={() => {
+                if (button.key === 'multi_panel_window') {
+                    handleMultiPanelWindow();
+                } else {
+                    button.page && this.toPage(button.page)
+                }
+            }}
             key={button.key}
             minimal
             icon={button.icon}

@@ -25,7 +25,7 @@ interface TopMenuBarState {
 }
 
 interface TopMenuBarProps {
-  navigate: (path: string, options?: any) => void;
+  navigate?: (path: string, options?: any) => void;
 }
 
 class TopMenuBar extends React.Component<TopMenuBarProps, TopMenuBarState> {

@@ -20,6 +20,7 @@ import OrderSplitPageIndex from './pages/OrderSplitPage/OrderSplitPageIndex';
 import NetworkStatusPageIndex from './pages/NetworkStatusPageIndex';
 
 import SettingPageIndex from './pages/SettingPageIndex';
+import MultiPanelPage from './pages/MultiPanelPage';
 
 // blueprintjs
 require('normalize.css');
@@ -37,6 +38,7 @@ class App extends React.Component {
           <TopArea />
           <MiddleArea >
             <Routes>
+              <Route path='/' element={<MarketPage />} />
               <Route path='/market' element={<MarketPage />} />
               <Route path='/news' element={<NewsPage />} />
               <Route path='/ordersplit' element={<OrderSplitPageIndex />} />
@@ -52,6 +54,7 @@ class App extends React.Component {
               <Route path='/predictionmarket' element={<PredictionMarketPage />} />
               <Route path='/networkstatus' element={<NetworkStatusPageIndex />} />
               <Route path='/settting' element={<SettingPageIndex />} />
+              <Route path='/multi_panel' element={<MultiPanelPage />} />
             </Routes>
           </MiddleArea>
           <BottomArea />

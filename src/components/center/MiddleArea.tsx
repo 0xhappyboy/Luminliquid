@@ -1,8 +1,11 @@
 import React from "react"
 import { themeManager } from "../../globals/theme/ThemeManager";
 import { overflowManager } from "../../globals/theme/OverflowTypeManager";
+import { withRouter } from "../../WithRouter";
 
-interface MiddleAreaProps { }
+interface MiddleAreaProps {
+  location?: any;
+}
 
 interface MiddleAreaState {
   contentHeight: number;
@@ -16,6 +19,7 @@ class MiddleArea extends React.Component<MiddleAreaProps, MiddleAreaState> {
   private unsubscribeOverflow: (() => void) | null = null;
   private TOP_AREA_HEIGHT = 90;
   private BOTTOM_AREA_HEIGHT = 60;
+
   constructor(props: MiddleAreaProps) {
     super(props);
     this.contentRef = React.createRef() as React.RefObject<HTMLDivElement>;
@@ -25,14 +29,17 @@ class MiddleArea extends React.Component<MiddleAreaProps, MiddleAreaState> {
       overflow: overflowManager.getOverflow()
     };
   }
+
   getCurrentTheme = (): 'dark' | 'light' => {
     return document.documentElement.classList.contains('bp4-dark') ? 'dark' : 'light';
   };
+
   handleThemeChange = (event: any) => {
     const newTheme = event.detail?.theme ||
       (document.documentElement.classList.contains('bp4-dark') ? 'dark' : 'light');
     this.setState({ theme: newTheme });
   };
+
   componentDidMount() {
     this.updateContentHeight();
     window.addEventListener('resize', this.updateContentHeight);
@@ -43,23 +50,40 @@ class MiddleArea extends React.Component<MiddleAreaProps, MiddleAreaState> {
       this.setState({ overflow });
     });
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateContentHeight);
   }
+
   updateContentHeight = () => {
     const container = this.contentRef.current;
+    const { location } = this.props;
+    const isMultiPanel = location?.pathname === '/multi_panel';
     if (container) {
       const windowHeight = window.innerHeight;
-      const contentHeight = window.innerHeight - this.TOP_AREA_HEIGHT - this.BOTTOM_AREA_HEIGHT;
+      let contentHeight;
+      if (isMultiPanel) {
+        contentHeight = windowHeight - this.BOTTOM_AREA_HEIGHT - 30;
+      } else {
+        contentHeight = windowHeight - this.TOP_AREA_HEIGHT - this.BOTTOM_AREA_HEIGHT;
+      }
       this.setState({ contentHeight });
     }
   }
+
+  componentDidUpdate(prevProps: MiddleAreaProps) {
+    if (prevProps.location?.pathname !== this.props.location?.pathname) {
+      this.updateContentHeight();
+    }
+  }
+
   handleOverflowChange = (overflow: 'auto' | 'hidden' | 'scroll' | 'visible') => {
     this.setState({ overflow });
   };
+
   render() {
     const { contentHeight, overflow } = this.state;
-    const { theme, } = this.state;
+    const { theme } = this.state;
     const backgroundColor = theme === 'dark' ? '#1C2127' : '#FFFFFF';
     const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
     const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
@@ -69,7 +93,6 @@ class MiddleArea extends React.Component<MiddleAreaProps, MiddleAreaState> {
         style={{
           height: contentHeight > 0 ? `${contentHeight}px` : 'calc(100vh - 110px)',
           overflow: overflow,
-          // overflow: 'hidden',
           width: '100%',
           backgroundColor: backgroundColor,
           color: textColor,
@@ -82,4 +105,4 @@ class MiddleArea extends React.Component<MiddleAreaProps, MiddleAreaState> {
   }
 }
 
-export default MiddleArea
+export default withRouter(MiddleArea);

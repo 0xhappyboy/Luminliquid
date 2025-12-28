@@ -5,6 +5,7 @@ const MAXIMIZE_WINDOW = "maximize_window";
 const RECOVERY_WINDOW = "recovery_window";
 const DRAG_WINDOW = "drag_window";
 const CLOSE_WINDOW = "close_window";
+const MULTI_PANEL_WINDOW = "multi_panel_window";
 
 export async function handleMinimizeWindow() {
     await invoke(MINIMIZE_WINDOW);
@@ -24,4 +25,8 @@ export async function handleCloseWindow() {
 
 export async function handleDragWindowMouseDown(event: React.MouseEvent<HTMLElement>) {
     await invoke(DRAG_WINDOW);
+}
+
+export async function handleMultiPanelWindow() {
+    await invoke(MULTI_PANEL_WINDOW);
 }

@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use tauri::{command, PhysicalPosition, State, Window};
+use tauri::{command, PhysicalPosition, State, WebviewUrl, WebviewWindowBuilder, Window};
 
 use crate::{
     context::AppState,
@@ -65,9 +65,20 @@ pub fn close_window(window: Window) {
 /// drag window
 #[tauri::command]
 pub fn drag_window(window: tauri::Window) -> Result<(), String> {
-    window.start_dragging()
-        .map_err(|e| e.to_string())?;
+    window.start_dragging().map_err(|e| e.to_string())?;
     Ok(())
 }
 
-
+/// multi panel window
+#[tauri::command]
+pub async fn multi_panel_window(app: tauri::AppHandle) -> Result<(), String> {
+    let label = format!("multi_panel_{}", chrono::Utc::now().timestamp_millis());
+    let _window = WebviewWindowBuilder::new(&app, label, WebviewUrl::App("/multi_panel".into()))
+        .inner_size(1200.0, 800.0)
+        .min_inner_size(800.0, 600.0)
+        .resizable(true)
+        .decorations(false)
+        .build()
+        .map_err(|e| format!("create window error: {}", e))?;
+    Ok(())
+}
