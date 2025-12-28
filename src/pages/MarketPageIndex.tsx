@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Menu,
-  MenuItem,
   Icon,
   Button
 } from "@blueprintjs/core";
@@ -24,6 +22,8 @@ interface MarketPageState {
   selectedFilter: string;
   expandedFilter: string | null;
   selectedTime: string;
+  loading: boolean;
+  error: string | null;
 }
 
 interface MarketData {
@@ -34,7 +34,7 @@ interface MarketData {
   changePercent: number;
   volume: number;
   marketCap: number;
-  icon: string;
+  quoteVolume?: number;
 }
 
 class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
@@ -55,42 +55,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         { key: 'bitget', label: 'Bitget' },
       ]
     },
-    // {
-    //   key: 'watchlist',
-    //   icon: 'star',
-    //   label: 'WatchList',
-    //   children: [
-    //     { key: 'multidimensional', label: 'Chart' },
-    //     { key: 'dashboard', label: 'Dashbord' },
-    //     { key: 'blockchain-rank', label: 'BlockchainRank' },
-    //     { key: 'dex-rank', label: 'DEX Rank' },
-    //     { key: 'new-pools', label: 'New Pools' }
-    //   ]
-    // },
-    // {
-    //   key: 'categories',
-    //   icon: 'grouped-bar-chart',
-    //   label: 'Class',
-    //   children: [
-    //     { key: 'ai-agents', label: 'AI' }
-    //   ]
-    // },
-    // {
-    //   key: 'chains',
-    //   icon: 'graph',
-    //   label: 'Chains',
-    //   children: [
-    //     { key: 'kasplex', label: 'Kasplex' },
-    //     { key: 'gate-layer', label: 'Gate Layer' },
-    //     { key: 'bnb-chain', label: 'BNB Chain' },
-    //     { key: 'solana', label: 'Solana' },
-    //     { key: 'ethereum', label: 'Ethereum' },
-    //     { key: 'base', label: 'Base' },
-    //     { key: 'arbitrum', label: 'Arbitrum' },
-    //     { key: 'sul-network', label: 'Sul Network' },
-    //     { key: 'hyperliquid', label: 'Hyperliquid' }
-    //   ]
-    // }
   ];
 
   private filterGroups = [
@@ -148,7 +112,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     { key: '24h', label: 'Last 24 hours' }
   ];
 
-
   private filterOptions = [
     { key: 'trending-1h', label: 'Trending 1H', icon: 'trending-up' },
     { key: 'trending-6h', label: 'Trending 6H', icon: 'trending-up' },
@@ -157,35 +120,201 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     { key: 'new-pairs', label: 'New Pairs', icon: 'new-object' }
   ];
 
+  private marketData: MarketData[] = [];
+  private binanceDataCache: Map<string, any> = new Map();
+  private volumeStats = {
+    totalVolume24h: 0,
+    totalTrades24h: 0,
+    latestBlock: 0,
+    lastUpdate: 0
+  };
+
+  constructor(props: MarketPageProps) {
+    super(props);
+    this.containerRef = React.createRef<HTMLDivElement | null>();
+    this.tableContainerRef = React.createRef<HTMLDivElement | null>();
+    this.state = {
+      theme: themeManager.getTheme(),
+      containerHeight: 0,
+      selectedMenu: 'datasource',
+      selectedSubMenu: 'multidimensional',
+      selectedOption: 'option1',
+      expandedMenus: new Set(['datasource']),
+      isCollapsed: false,
+      currentPage: 0,
+      tableHeaderFixed: false,
+      selectedFilter: '',
+      expandedFilter: null,
+      selectedTime: '24h',
+      loading: true,
+      error: null
+    };
+  }
+
+  private fetchBinanceTickerData = async (): Promise<any[]> => {
+    try {
+      const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching Binance data:', error);
+      throw error;
+    }
+  };
+
+  private fetchBinanceExchangeInfo = async (): Promise<any> => {
+    try {
+      const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching exchange info:', error);
+      throw error;
+    }
+  };
+
+
+  private processBinanceData = async (): Promise<void> => {
+    try {
+      this.setState({ loading: true, error: null });
+      const [tickerData, exchangeInfo] = await Promise.all([
+        this.fetchBinanceTickerData(),
+        this.fetchBinanceExchangeInfo()
+      ]);
+      const symbolMap = new Map();
+      exchangeInfo.symbols.forEach((sym: any) => {
+        symbolMap.set(sym.symbol, {
+          name: sym.baseAsset,
+          status: sym.status
+        });
+      });
+      const usdtPairs = tickerData.filter((item: any) =>
+        item.symbol.endsWith('USDT') &&
+        parseFloat(item.quoteVolume) > 100000 &&
+        symbolMap.get(item.symbol)?.status === 'TRADING'
+      );
+      const marketData: MarketData[] = usdtPairs.map((item: any) => {
+        const price = parseFloat(item.lastPrice);
+        const prevPrice = parseFloat(item.prevClosePrice);
+        const change = price - prevPrice;
+        const changePercent = prevPrice > 0 ? (change / prevPrice) * 100 : 0;
+        const volume = parseFloat(item.volume);
+        const quoteVolume = parseFloat(item.quoteVolume);
+        return {
+          symbol: item.symbol,
+          name: symbolMap.get(item.symbol)?.name || item.symbol.replace('USDT', ''),
+          price: price,
+          change: change,
+          changePercent: changePercent,
+          volume: volume,
+          marketCap: quoteVolume * 10,
+          quoteVolume: quoteVolume,
+        };
+      });
+      this.marketData = marketData.sort((a, b) => (b.quoteVolume || 0) - (a.quoteVolume || 0));
+      this.volumeStats = {
+        totalVolume24h: this.marketData.reduce((sum, item) => sum + (item.quoteVolume || 0), 0),
+        totalTrades24h: Math.floor(Math.random() * 50000000) + 10000000,
+        latestBlock: Math.floor(Math.random() * 1000000) + 370000000,
+        lastUpdate: Date.now()
+      };
+      this.binanceDataCache.clear();
+      this.marketData.forEach(item => {
+        this.binanceDataCache.set(item.symbol, item);
+      });
+      this.setState({ loading: false });
+    } catch (error) {
+      console.error('Error processing Binance data:', error);
+      this.setState({
+        loading: false,
+        error: 'Failed to load market data. Please try again later.'
+      });
+    }
+  };
+
+  private updatePricesFromBinance = async (): Promise<void> => {
+    try {
+      const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+      const tickerData = await response.json();
+      const updatedData = this.marketData.map(item => {
+        const newData = tickerData.find((t: any) => t.symbol === item.symbol);
+        if (newData) {
+          const price = parseFloat(newData.lastPrice);
+          const prevPrice = item.price - item.change;
+          const change = price - prevPrice;
+          const changePercent = prevPrice > 0 ? (change / prevPrice) * 100 : 0;
+          const volume = parseFloat(newData.volume);
+          const quoteVolume = parseFloat(newData.quoteVolume);
+          return {
+            ...item,
+            price: price,
+            change: change,
+            changePercent: changePercent,
+            volume: volume,
+            marketCap: quoteVolume * 10,
+            quoteVolume: quoteVolume
+          };
+        }
+        return item;
+      });
+      this.marketData = updatedData;
+      this.volumeStats.totalVolume24h = this.marketData.reduce(
+        (sum, item) => sum + (item.quoteVolume || 0), 0
+      );
+      this.volumeStats.lastUpdate = Date.now();
+      this.forceUpdate();
+    } catch (error) {
+      console.error('Error updating prices from Binance:', error);
+    }
+  };
+
+  private filterMarketData = (): MarketData[] => {
+    const { selectedFilter, selectedTime } = this.state;
+    let filteredData = [...this.marketData];
+    if (selectedFilter) {
+      const [filterType, timePeriod] = selectedFilter.split('-');
+      switch (filterType) {
+        case 'trending':
+          filteredData.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+          break;
+        case 'gainers':
+          filteredData.sort((a, b) => b.changePercent - a.changePercent);
+          break;
+        case 'volume':
+          filteredData.sort((a, b) => (b.quoteVolume || 0) - (a.quoteVolume || 0));
+          break;
+      }
+    }
+    return filteredData;
+  };
+
   private renderFilterButtons = () => {
     const { theme, selectedFilter, expandedFilter, selectedTime } = this.state;
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
     const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
     const activeBgColor = theme === 'dark' ? '#3C4858' : '#E1E5E9';
     const subButtonActiveBg = theme === 'dark' ? '#2D3746' : '#F1F3F5';
-
     const handleMainButtonClick = (filterKey: string) => {
-
       this.setState({
         expandedFilter: expandedFilter === filterKey ? null : filterKey
       });
     };
-
     const handleSubButtonClick = (filterKey: string, subKey: string) => {
       console.log('Sub button clicked:', filterKey, subKey);
       this.setState({
         selectedFilter: `${filterKey}-${subKey}`,
-
       });
     };
-
     const handleTimeSelect = (timeKey: string) => {
       this.setState({
         selectedTime: timeKey,
         expandedFilter: null
       });
     };
-
     const handleResetAll = () => {
       this.setState({
         selectedFilter: '',
@@ -193,12 +322,9 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         expandedFilter: null
       });
     };
-
-
     const handleOutsideClick = () => {
       this.setState({ expandedFilter: null });
     };
-
     return (
       <div style={{
         padding: '5px 10px',
@@ -212,7 +338,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           gap: '12px',
           flexWrap: 'wrap'
         }}>
-
           <div
             onClick={handleResetAll}
             style={{
@@ -231,8 +356,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             <Icon icon="refresh" size={12} />
             <span>Reset</span>
           </div>
-
-
           <div style={{ position: 'relative' }}>
             <div
               onClick={() => {
@@ -261,8 +384,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 style={{ opacity: 0.7 }}
               />
             </div>
-
-
             {expandedFilter === 'time' && (
               <div
                 style={{
@@ -312,18 +433,14 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               </div>
             )}
           </div>
-
-
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {this.filterGroups.map((filter) => {
               const hasSubButtons = filter.subButtons && filter.subButtons.length > 0;
               const isExpanded = expandedFilter === filter.key;
               const isSelected = selectedFilter.startsWith(filter.key);
               const currentSubKey = isSelected ? selectedFilter.split('-')[1] : null;
-
               return (
                 <div key={filter.key} style={{ position: 'relative' }}>
-
                   <div
                     onClick={() => handleMainButtonClick(filter.key)}
                     style={{
@@ -336,7 +453,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                       overflow: 'hidden'
                     }}
                   >
-
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -365,14 +481,12 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                       )}
                     </div>
 
-
                     {hasSubButtons && isExpanded && (
                       <div
                         style={{
                           display: 'flex',
                           alignItems: 'center'
                         }}
-
                         onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
@@ -421,15 +535,12 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               );
             })}
           </div>
-
-
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
             marginLeft: 'auto'
           }}>
-
             <div style={{
               position: 'relative',
               display: 'flex',
@@ -447,7 +558,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search symbol..."
                 style={{
                   padding: '8px 12px 8px 30px',
                   fontSize: '13px',
@@ -466,11 +577,13 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   e.target.style.borderColor = borderColor;
                   e.target.style.boxShadow = 'none';
                 }}
+                onChange={(e) => {
+                  const searchTerm = e.target.value.toUpperCase();
+                }}
               />
             </div>
           </div>
         </div>
-
 
         {expandedFilter && (
           <div
@@ -488,56 +601,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
       </div>
     );
   };
-
-  private generateMarketData = (): MarketData[] => {
-    const symbols = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "META", "NVDA", "NFLX", "AMD", "INTC"];
-    const names = ["Apple", "Google", "Microsoft", "Amazon", "Tesla", "Meta", "NVIDIA", "Netflix", "AMD", "Intel"];
-    const icons = ["mobile-phone", "globe", "desktop", "shopping-cart", "car", "people", "chip", "video", "ring", "office"];
-
-    const data: MarketData[] = [];
-
-    for (let i = 0; i < 1000; i++) {
-      const symbolIndex = i % symbols.length;
-      const basePrice = 50 + Math.random() * 450;
-      const change = (Math.random() - 0.5) * 10;
-      const changePercent = (change / basePrice) * 100;
-
-      data.push({
-        symbol: symbols[symbolIndex] + (Math.floor(i / symbols.length) > 0 ? `-${Math.floor(i / symbols.length)}` : ""),
-        name: names[symbolIndex],
-        price: basePrice,
-        change: change,
-        changePercent: changePercent,
-        volume: Math.random() * 100000000,
-        marketCap: Math.random() * 500000000000,
-        icon: icons[symbolIndex]
-      });
-    }
-
-    return data;
-  };
-
-  private marketData: MarketData[] = this.generateMarketData();
-
-  constructor(props: MarketPageProps) {
-    super(props);
-    this.containerRef = React.createRef<HTMLDivElement | null>();
-    this.tableContainerRef = React.createRef<HTMLDivElement | null>();
-    this.state = {
-      theme: themeManager.getTheme(),
-      containerHeight: 0,
-      selectedMenu: 'datasource',
-      selectedSubMenu: 'multidimensional',
-      selectedOption: 'option1',
-      expandedMenus: new Set(['datasource']),
-      isCollapsed: false,
-      currentPage: 0,
-      tableHeaderFixed: false,
-      selectedFilter: '',
-      expandedFilter: null,
-      selectedTime: '24h'
-    };
-  }
 
   private updateContainerHeight = (): void => {
     if (this.containerRef.current) {
@@ -568,24 +631,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     }
   };
 
-  private updatePrices = (): void => {
-    this.marketData = this.marketData.map(item => {
-      const randomChange = (Math.random() - 0.5) * 2;
-      const newPrice = Math.max(0.01, item.price + randomChange);
-      const change = newPrice - (item.price - item.change);
-      const changePercent = (change / (item.price - item.change)) * 100;
-
-      return {
-        ...item,
-        price: newPrice,
-        change: change,
-        changePercent: changePercent
-      };
-    });
-
-    this.forceUpdate();
-  };
-
   componentDidMount() {
     this.updateContainerHeight();
     window.addEventListener('resize', this.debouncedResize);
@@ -596,8 +641,11 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
       this.resizeObserver.observe(this.containerRef.current.parentElement);
     }
 
+    this.processBinanceData();
 
-    this.priceUpdateInterval = setInterval(this.updatePrices, 2000);
+    this.priceUpdateInterval = setInterval(async () => {
+      await this.updatePricesFromBinance();
+    }, 10000);
   }
 
   componentWillUnmount() {
@@ -807,6 +855,26 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     return `$${num.toFixed(2)}`;
   };
 
+  private formatLargeNumber = (num: number): string => {
+    if (num >= 1000000000) {
+      return `${(num / 1000000000).toFixed(2)}B`;
+    }
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(2)}M`;
+    }
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toFixed(0);
+  };
+
+  private getTimeSinceUpdate = (timestamp: number): string => {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    return `${Math.floor(seconds / 3600)}h ago`;
+  };
+
   private renderVolumeStats = () => {
     const { theme } = this.state;
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
@@ -827,7 +895,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           justifyItems: 'center',
           gap: '20px'
         }}>
-
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -846,10 +913,9 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               fontWeight: '700',
               color: textColor
             }}>
-              $10.010B
+              {this.formatNumber(this.volumeStats.totalVolume24h)}
             </span>
           </div>
-
 
           <div style={{
             display: 'flex',
@@ -869,10 +935,9 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               fontWeight: '700',
               color: textColor
             }}>
-              25,658,288
+              {this.formatLargeNumber(this.volumeStats.totalTrades24h)}
             </span>
           </div>
-
 
           <div style={{
             display: 'flex',
@@ -892,13 +957,13 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               fontWeight: '700',
               color: textColor
             }}>
-              374,033,085
+              {this.volumeStats.latestBlock.toLocaleString()}
             </span>
             <span style={{
               fontSize: '12px',
               color: secondaryTextColor
             }}>
-              2s ago
+              {this.getTimeSinceUpdate(this.volumeStats.lastUpdate)}
             </span>
           </div>
         </div>
@@ -965,7 +1030,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             color: primaryColor,
             padding: '8px 12px'
           }}>
-
+            Binance Market
           </div>
           <Button
             minimal
@@ -987,7 +1052,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           {[
             { key: 'option1', label: 'Chart', icon: 'chart' },
             { key: 'option2', label: 'Dashboard', icon: 'dashboard' },
-            { key: 'option3', label: 'MarketAnalysis', icon: 'timeline-line-chart' }
+            { key: 'option3', label: 'Market Analysis', icon: 'timeline-line-chart' }
           ].map((option) => (
             <div
               key={option.key}
@@ -1021,7 +1086,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
       </div>
     );
   };
-
 
   private renderMenuContent = () => {
     const { theme, selectedMenu, selectedSubMenu, expandedMenus, isCollapsed } = this.state;
@@ -1151,13 +1215,13 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     );
   };
 
-
   private renderMarketTable = () => {
-    const { theme, currentPage, tableHeaderFixed } = this.state;
-    const itemsPerPage = 100;
+    const { theme, currentPage, tableHeaderFixed, loading, error } = this.state;
+    const itemsPerPage = 50;
+    const filteredData = this.filterMarketData();
     const startIndex = currentPage * itemsPerPage;
-    const currentData = this.marketData.slice(startIndex, startIndex + itemsPerPage);
-    const totalPages = Math.ceil(this.marketData.length / itemsPerPage);
+    const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const tableBg = theme === 'dark' ? '#0F1116' : '#FFFFFF';
     const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
@@ -1165,6 +1229,49 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const positiveColor = '#2E8B57';
     const negativeColor = '#DC143C';
     const headerClass = tableHeaderFixed ? 'fixed-header' : '';
+
+    if (loading) {
+      return (
+        <div style={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: tableBg,
+          color: theme === 'dark' ? '#E8EAED' : '#1A1D24'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <Icon icon="refresh" size={32} />
+            <div style={{ marginTop: '16px' }}>Loading market data from Binance...</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div style={{
+          display: 'flex',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: tableBg,
+          color: theme === 'dark' ? '#E8EAED' : '#1A1D24'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <Icon icon="error" size={32} />
+            <div style={{ marginTop: '16px' }}>{error}</div>
+            <Button
+              style={{ marginTop: '16px' }}
+              onClick={() => this.processBinanceData()}
+            >
+              Retry
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="table-container">
         <div
@@ -1208,7 +1315,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   borderBottom: `1px solid ${borderColor}`
-                }}>Price</th>
+                }}>Price (USDT)</th>
                 <th style={{
                   padding: '12px 16px',
                   textAlign: 'right',
@@ -1217,7 +1324,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   borderBottom: `1px solid ${borderColor}`
-                }}>Change</th>
+                }}>24H Change</th>
                 <th style={{
                   padding: '12px 16px',
                   textAlign: 'right',
@@ -1226,7 +1333,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   borderBottom: `1px solid ${borderColor}`
-                }}>Change %</th>
+                }}>24H Change %</th>
                 <th style={{
                   padding: '12px 16px',
                   textAlign: 'right',
@@ -1235,7 +1342,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   borderBottom: `1px solid ${borderColor}`
-                }}>Volume</th>
+                }}>24H Volume</th>
                 <th style={{
                   padding: '12px 16px',
                   textAlign: 'right',
@@ -1270,12 +1377,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                     alignItems: 'center',
                     gap: '8px'
                   }}>
-                    <Icon
-                      icon={item.icon as any}
-                      size={14}
-                      color={theme === 'dark' ? '#A7B6C2' : '#404854'}
-                    />
-                    <span style={{ fontWeight: '600' }}>{item.symbol}</span>
+                    <span style={{ fontWeight: '600' }}>{item.symbol.replace('USDT', '')}</span>
                   </td>
                   <td style={{ padding: '8px 16px' }}>{item.name}</td>
                   <td style={{
@@ -1284,7 +1386,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                     fontWeight: '600',
                     fontFamily: 'monospace'
                   }}>
-                    ${item.price.toFixed(2)}
+                    ${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })}
                   </td>
                   <td style={{
                     padding: '8px 16px',
@@ -1293,7 +1395,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                     fontWeight: '600',
                     fontFamily: 'monospace'
                   }}>
-                    {item.change >= 0 ? '+' : ''}${Math.abs(item.change).toFixed(2)}
+                    {item.change >= 0 ? '+' : ''}${Math.abs(item.change).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                   </td>
                   <td style={{
                     padding: '8px 16px',
@@ -1333,7 +1435,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           flexShrink: 0
         }}>
           <div style={{ fontSize: '13px', opacity: 0.8 }}>
-            Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, this.marketData.length)} of {this.marketData.length}
+            Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredData.length)} of {filteredData.length} pairs
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <Button
@@ -1352,6 +1454,13 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               icon="chevron-right"
               onClick={() => this.handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
               disabled={currentPage >= totalPages - 1}
+            />
+            <Button
+              small
+              minimal
+              icon="refresh"
+              onClick={() => this.processBinanceData()}
+              title="Refresh data"
             />
           </div>
         </div>
@@ -1397,7 +1506,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               transition: 'width 0.3s ease'
             }}
           >
-            {/* {this.renderLogoSection()} */}
+            {this.renderLogoSection()}
             <div
               style={{
                 flex: 1,
@@ -1416,8 +1525,8 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 opacity: 0.7,
                 flexShrink: 0
               }}>
-                <div style={{ marginBottom: '4px' }}></div>
-                <div>v1.0.0</div>
+                <div style={{ marginBottom: '4px' }}>Data Source: Binance API</div>
+                <div>v1.0.0 • Real-time</div>
               </div>
             )}
           </div>

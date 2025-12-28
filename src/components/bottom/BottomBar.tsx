@@ -11,204 +11,35 @@ interface BottomBarState {
     searchValue: string;
     activeSearchTab: string;
     networkSpeed: 'excellent' | 'good' | 'fair' | 'poor';
+    hotTokens: TokenInfo[];
+    latestTokens: TokenInfo[];
+    loading: boolean;
+    error: string | null;
 }
 
 interface TokenInfo {
     symbol: string;
-    color: string;
     name: string;
-    network: string;
-    website?: string;
-    twitter?: string;
-    telegram?: string;
     price?: string;
     change24h?: string;
+}
+
+interface BinanceTicker {
+    symbol: string;
+    priceChange: string;
+    priceChangePercent: string;
+    lastPrice: string;
+    volume: string;
+    quoteVolume: string;
 }
 
 class BottomBar extends React.Component<{}, BottomBarState> {
     private timer: NodeJS.Timeout | null = null;
     private unsubscribe: (() => void) | null = null;
     private networkTimer: NodeJS.Timeout | null = null;
+    private dataFetchTimer: NodeJS.Timeout | null = null;
     private searchInputRef: React.RefObject<HTMLInputElement | null> = React.createRef();
     private searchPopupRef: React.RefObject<HTMLDivElement | null> = React.createRef();
-
-    // Search suggestions data
-    private searchSuggestions = {
-        hotTokens: [
-            {
-                symbol: 'BTC/USDT',
-                color: '#F7931A',
-                name: 'Bitcoin',
-                network: 'Bitcoin',
-                website: 'https://bitcoin.org',
-                twitter: 'https://twitter.com/bitcoin',
-                price: '$43,250.67',
-                change24h: '+2.34%'
-            },
-            {
-                symbol: 'ETH/USDT',
-                color: '#627EEA',
-                name: 'Ethereum',
-                network: 'Ethereum',
-                website: 'https://ethereum.org',
-                twitter: 'https://twitter.com/ethereum',
-                telegram: 'https://t.me/ethereum',
-                price: '$2,345.89',
-                change24h: '+1.78%'
-            },
-            {
-                symbol: 'BNB/USDT',
-                color: '#F3BA2F',
-                name: 'Binance Coin',
-                network: 'BSC',
-                website: 'https://binance.org',
-                twitter: 'https://twitter.com/binance',
-                telegram: 'https://t.me/binanceexchange',
-                price: '$312.45',
-                change24h: '-0.56%'
-            },
-            {
-                symbol: 'XRP/USDT',
-                color: '#23292F',
-                name: 'Ripple',
-                network: 'XRP Ledger',
-                website: 'https://ripple.com',
-                twitter: 'https://twitter.com/Ripple',
-                price: '$0.6234',
-                change24h: '+3.21%'
-            },
-            {
-                symbol: 'ADA/USDT',
-                color: '#0033AD',
-                name: 'Cardano',
-                network: 'Cardano',
-                website: 'https://cardano.org',
-                twitter: 'https://twitter.com/Cardano',
-                telegram: 'https://t.me/CardanoAnnouncements',
-                price: '$0.4567',
-                change24h: '+5.12%'
-            },
-            {
-                symbol: 'SOL/USDT',
-                color: '#00FFA3',
-                name: 'Solana',
-                network: 'Solana',
-                website: 'https://solana.com',
-                twitter: 'https://twitter.com/solana',
-                telegram: 'https://t.me/solana',
-                price: '$98.76',
-                change24h: '+8.45%'
-            },
-            {
-                symbol: 'DOT/USDT',
-                color: '#E6007A',
-                name: 'Polkadot',
-                network: 'Polkadot',
-                website: 'https://polkadot.network',
-                twitter: 'https://twitter.com/Polkadot',
-                telegram: 'https://t.me/PolkadotOfficial',
-                price: '$7.234',
-                change24h: '+1.23%'
-            },
-            {
-                symbol: 'DOGE/USDT',
-                color: '#C2A633',
-                name: 'Dogecoin',
-                network: 'Dogecoin',
-                website: 'https://dogecoin.com',
-                twitter: 'https://twitter.com/dogecoin',
-                price: '$0.0891',
-                change24h: '-2.34%'
-            }
-        ],
-        latestTokens: [
-            {
-                symbol: 'APE/USDT',
-                color: '#0052FF',
-                name: 'ApeCoin',
-                network: 'Ethereum',
-                website: 'https://apecoin.com',
-                twitter: 'https://twitter.com/apecoin',
-                price: '$1.567',
-                change24h: '+12.34%'
-            },
-            {
-                symbol: 'SAND/USDT',
-                color: '#00ADEF',
-                name: 'The Sandbox',
-                network: 'Ethereum',
-                website: 'https://sandbox.game',
-                twitter: 'https://twitter.com/TheSandboxGame',
-                telegram: 'https://t.me/sandboxgame',
-                price: '$0.4567',
-                change24h: '+3.45%'
-            },
-            {
-                symbol: 'MANA/USDT',
-                color: '#FF2D55',
-                name: 'Decentraland',
-                network: 'Ethereum',
-                website: 'https://decentraland.org',
-                twitter: 'https://twitter.com/decentraland',
-                price: '$0.3789',
-                change24h: '+2.67%'
-            },
-            {
-                symbol: 'GALA/USDT',
-                color: '#00B1C9',
-                name: 'Gala',
-                network: 'Ethereum',
-                website: 'https://gala.com',
-                twitter: 'https://twitter.com/gogalagames',
-                telegram: 'https://t.me/GoGalaGames',
-                price: '$0.0234',
-                change24h: '+15.78%'
-            },
-            {
-                symbol: 'ENJ/USDT',
-                color: '#624DBF',
-                name: 'Enjin Coin',
-                network: 'Ethereum',
-                website: 'https://enjin.io',
-                twitter: 'https://twitter.com/enjin',
-                telegram: 'https://t.me/enjin_community',
-                price: '$0.3456',
-                change24h: '+4.56%'
-            },
-            {
-                symbol: 'AXS/USDT',
-                color: '#0055D5',
-                name: 'Axie Infinity',
-                network: 'Ethereum',
-                website: 'https://axieinfinity.com',
-                twitter: 'https://twitter.com/AxieInfinity',
-                telegram: 'https://t.me/axieinfinity',
-                price: '$7.890',
-                change24h: '-1.23%'
-            },
-            {
-                symbol: 'IMX/USDT',
-                color: '#16C784',
-                name: 'Immutable X',
-                network: 'Ethereum L2',
-                website: 'https://immutable.com',
-                twitter: 'https://twitter.com/Immutable',
-                telegram: 'https://t.me/immutablex',
-                price: '$1.234',
-                change24h: '+6.78%'
-            },
-            {
-                symbol: 'RNDR/USDT',
-                color: '#FF6B00',
-                name: 'Render Token',
-                network: 'Ethereum',
-                website: 'https://rendertoken.com',
-                twitter: 'https://twitter.com/rendertoken',
-                price: '$3.456',
-                change24h: '+9.12%'
-            }
-        ]
-    };
 
     private leftMenuItems = [
         {
@@ -291,20 +122,18 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         this.state = {
             theme: themeManager.getTheme(),
             currentTime: new Date().toLocaleTimeString(),
-            marqueeText: 'This is test new..............             This is test new..............',
+            marqueeText: '连接Binance实时数据...',
             windowWidth: window.innerWidth,
             isSearchFocused: false,
             searchValue: '',
             activeSearchTab: 'hot',
-            networkSpeed: 'good' 
+            networkSpeed: 'good',
+            hotTokens: [],
+            latestTokens: [],
+            loading: true,
+            error: null
         };
     }
-
-    private simulateNetworkChange = () => {
-        const speeds: ('excellent' | 'good' | 'fair' | 'poor')[] = ['excellent', 'good', 'fair', 'poor'];
-        const randomSpeed = speeds[Math.floor(Math.random() * speeds.length)];
-        this.setState({ networkSpeed: randomSpeed });
-    };
 
     componentDidMount() {
         window.addEventListener('resize', this.handleResize);
@@ -316,105 +145,93 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 currentTime: new Date().toLocaleTimeString()
             });
         }, 1000);
-
         this.networkTimer = setInterval(this.simulateNetworkChange, 5000);
-
+        this.dataFetchTimer = setInterval(this.fetchMarketData, 15000);
         document.addEventListener('mousedown', this.handleClickOutside);
+        this.fetchMarketData();
     }
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.handleResize);
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
-        if (this.timer) {
-            clearInterval(this.timer);
-        }
-        if (this.networkTimer) {
-            clearInterval(this.networkTimer);
-        }
+        if (this.unsubscribe) this.unsubscribe();
+        if (this.timer) clearInterval(this.timer);
+        if (this.networkTimer) clearInterval(this.networkTimer);
+        if (this.dataFetchTimer) clearInterval(this.dataFetchTimer);
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
+    fetchMarketData = async () => {
+        try {
+            const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+            if (!response.ok) {
+                throw new Error(`API请求失败: ${response.status}`);
+            }
+            const data: BinanceTicker[] = await response.json();
+            const hotTokens = data
+                .filter(ticker => {
+                    return ticker.symbol.endsWith('USDT') &&
+                        !ticker.symbol.includes('UP') &&
+                        !ticker.symbol.includes('DOWN');
+                })
+                .sort((a, b) => parseFloat(b.volume) - parseFloat(a.volume))
+                .slice(0, 16)
+                .map(ticker => this.convertToTokenInfo(ticker));
+            const latestTokens = data
+                .filter(ticker => {
+                    return ticker.symbol.endsWith('USDT') &&
+                        !ticker.symbol.includes('UP') &&
+                        !ticker.symbol.includes('DOWN');
+                })
+                .sort((a, b) => b.symbol.localeCompare(a.symbol))
+                .slice(0, 16)
+                .map(ticker => this.convertToTokenInfo(ticker));
+            const topGainers = data
+                .filter(ticker => ticker.symbol.endsWith('USDT'))
+                .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
+                .slice(0, 5);
+            const marqueeText = topGainers.map(ticker => {
+                const symbol = ticker.symbol.replace('USDT', '');
+                const change = parseFloat(ticker.priceChangePercent);
+                return `${symbol}: $${parseFloat(ticker.lastPrice).toFixed(2)} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)`;
+            }).join(' | ');
+            this.setState({
+                hotTokens,
+                latestTokens,
+                marqueeText: `热门代币: ${marqueeText}`,
+                loading: false,
+                error: null
+            });
+        } catch (error) {
+            console.error('获取Binance数据失败:', error);
+            this.setState({
+                error: '无法获取市场数据',
+                loading: false
+            });
+        }
+    };
+
+    convertToTokenInfo = (ticker: BinanceTicker): TokenInfo => {
+        const baseSymbol = ticker.symbol.replace('USDT', '');
+        const change = parseFloat(ticker.priceChangePercent);
+        return {
+            symbol: `${baseSymbol}/USDT`,
+            name: baseSymbol,
+            price: `$${parseFloat(ticker.lastPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 })}`,
+            change24h: `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`
+        };
+    };
+
+    private simulateNetworkChange = () => {
+        const speeds: ('excellent' | 'good' | 'fair' | 'poor')[] = ['excellent', 'good', 'fair', 'poor'];
+        const randomSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+        this.setState({ networkSpeed: randomSpeed });
+    };
+
     handleSettingsClick = () => {
-        alert('Settings clicked!');
     };
 
     handleResize = () => {
         this.setState({ windowWidth: window.innerWidth });
-    };
-
-    renderNetworkIndicator = () => {
-        const { theme, networkSpeed } = this.state;
-        const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
-        const activeColor = theme === 'dark' ? '#15B371' : '#0A6640';
-
-        let signalIcon;
-        switch (networkSpeed) {
-            case 'excellent':
-                signalIcon = '📶';
-                break;
-            case 'good':
-                signalIcon = '📶';
-                break;
-            case 'fair':
-                signalIcon = '📶';
-                break;
-            case 'poor':
-                signalIcon = '📶';
-                break;
-            default:
-                signalIcon = '📶';
-        }
-
-        return (
-            <div
-                style={{
-                    fontSize: '14px',
-                    cursor: 'default',
-                    color: networkSpeed === 'excellent' ? activeColor : iconColor,
-                    transition: 'color 0.3s ease',
-                    userSelect: 'none',
-                    display: 'flex',
-                    alignItems: 'center'
-                }}
-                title={`Network: ${networkSpeed}`}
-            >
-                {signalIcon}
-            </div>
-        );
-    };
-
-    renderSettingsIcon = () => {
-        const { theme } = this.state;
-        const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
-        const hoverColor = theme === 'dark' ? '#F5F8FA' : '#182026';
-
-        return (
-            <div
-                style={{
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    color: iconColor,
-                    transition: 'color 0.2s ease, transform 0.2s ease',
-                    userSelect: 'none',
-                    display: 'flex',
-                    alignItems: 'center'
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.color = hoverColor;
-                    e.currentTarget.style.transform = 'rotate(30deg)';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.color = iconColor;
-                    e.currentTarget.style.transform = 'rotate(0deg)';
-                }}
-                onClick={this.handleSettingsClick}
-                title="Settings"
-            >
-                ⚙️
-            </div>
-        );
     };
 
     handleClickOutside = (event: MouseEvent) => {
@@ -432,12 +249,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         return document.documentElement.classList.contains('bp4-dark') ? 'dark' : 'light';
     };
 
-    handleThemeChange = (event: any) => {
-        const newTheme = event.detail?.theme ||
-            (document.documentElement.classList.contains('bp4-dark') ? 'dark' : 'light');
-        this.setState({ theme: newTheme });
-    };
-
     getVisibleMenuItems = () => {
         const { windowWidth } = this.state;
         const middleWidth = windowWidth * 2 / 4;
@@ -453,7 +264,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         const backgroundColor = theme === 'dark' ? '#1C2127' : '#FFFFFF';
         const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
         const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
-
         return (
             <Menu
                 style={{
@@ -504,82 +314,80 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         console.log(`Selected token: ${token}`);
     };
 
-    // Render social links icons
-    renderSocialLinks = (token: TokenInfo) => {
-        const { theme } = this.state;
+    renderNetworkIndicator = () => {
+        const { theme, networkSpeed } = this.state;
         const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
-        const hoverColor = theme === 'dark' ? '#F5F8FA' : '#182026';
+        const activeColor = theme === 'dark' ? '#15B371' : '#0A6640';
+
+        let signalIcon;
+        switch (networkSpeed) {
+            case 'excellent':
+                signalIcon = '📶';
+                break;
+            case 'good':
+                signalIcon = '📶';
+                break;
+            case 'fair':
+                signalIcon = '📶';
+                break;
+            case 'poor':
+                signalIcon = '📶';
+                break;
+            default:
+                signalIcon = '📶';
+        }
 
         return (
-            <div style={{ display: 'flex', gap: '6px' }}>
-                {token.website && (
-                    <div
-                        style={{
-                            width: '14px',
-                            height: '14px',
-                            cursor: 'pointer',
-                            color: iconColor,
-                            transition: 'color 0.2s ease',
-                            userSelect: 'none'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = hoverColor}
-                        onMouseLeave={(e) => e.currentTarget.style.color = iconColor}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(token.website, '_blank');
-                        }}
-                        title="Website"
-                    >
-                        🌐
-                    </div>
-                )}
-                {token.twitter && (
-                    <div
-                        style={{
-                            width: '14px',
-                            height: '14px',
-                            cursor: 'pointer',
-                            color: iconColor,
-                            transition: 'color 0.2s ease',
-                            userSelect: 'none'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = hoverColor}
-                        onMouseLeave={(e) => e.currentTarget.style.color = iconColor}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(token.twitter, '_blank');
-                        }}
-                        title="Twitter"
-                    >
-                        🐦
-                    </div>
-                )}
-                {token.telegram && (
-                    <div
-                        style={{
-                            width: '14px',
-                            height: '14px',
-                            cursor: 'pointer',
-                            color: iconColor,
-                            transition: 'color 0.2s ease',
-                            userSelect: 'none'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = hoverColor}
-                        onMouseLeave={(e) => e.currentTarget.style.color = iconColor}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            window.open(token.telegram, '_blank');
-                        }}
-                        title="Telegram"
-                    >
-                        📢
-                    </div>
-                )}
+            <div
+                style={{
+                    fontSize: '14px',
+                    cursor: 'default',
+                    color: networkSpeed === 'excellent' ? activeColor : iconColor,
+                    transition: 'color 0.3s ease',
+                    userSelect: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                title={`Network: ${networkSpeed}`}
+            >
+                {signalIcon}
             </div>
         );
     };
 
-    renderTokenLogo = (color: string, symbol: string) => {
+    renderSettingsIcon = () => {
+        const { theme } = this.state;
+        const iconColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
+        const hoverColor = theme === 'dark' ? '#F5F8FA' : '#182026';
+        return (
+            <div
+                style={{
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    color: iconColor,
+                    transition: 'color 0.2s ease, transform 0.2s ease',
+                    userSelect: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.color = hoverColor;
+                    e.currentTarget.style.transform = 'rotate(30deg)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.color = iconColor;
+                    e.currentTarget.style.transform = 'rotate(0deg)';
+                }}
+                onClick={this.handleSettingsClick}
+                title="Settings"
+            >
+                ⚙️
+            </div>
+        );
+    };
+
+    renderTokenLogo = (symbol: string) => {
+        const color = '#394B59';
         return (
             <div
                 style={{
@@ -604,7 +412,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         );
     };
 
-    // Custom Tab component
     renderCustomTabs = () => {
         const { theme, activeSearchTab } = this.state;
         const activeBackgroundColor = theme === 'dark' ? '#394B59' : '#CED9E0';
@@ -612,7 +419,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         const inactiveBackgroundColor = 'transparent';
         const inactiveTextColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
         const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
-
         return (
             <div style={{
                 display: 'flex',
@@ -637,7 +443,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     }}
                     onClick={() => this.handleSearchTabChange('hot')}
                 >
-                    Hot Tokens
+                    热门代币
                 </div>
                 <div
                     style={{
@@ -654,14 +460,14 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     }}
                     onClick={() => this.handleSearchTabChange('latest')}
                 >
-                    Latest Tokens
+                    最新代币
                 </div>
             </div>
         );
     };
 
     renderSearchPopup = () => {
-        const { theme, activeSearchTab } = this.state;
+        const { theme, activeSearchTab, hotTokens, latestTokens, loading, error } = this.state;
         const backgroundColor = theme === 'dark' ? '#1C2127' : '#FFFFFF';
         const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
         const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
@@ -669,11 +475,73 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         const secondaryTextColor = theme === 'dark' ? '#8A9BA8' : '#5C7080';
         const positiveColor = '#15B371';
         const negativeColor = '#DB3737';
-
-        const currentTokens = activeSearchTab === 'hot'
-            ? this.searchSuggestions.hotTokens
-            : this.searchSuggestions.latestTokens;
-
+        const currentTokens = activeSearchTab === 'hot' ? hotTokens : latestTokens;
+        if (loading) {
+            return (
+                <div
+                    ref={this.searchPopupRef}
+                    style={{
+                        width: '420px',
+                        height: '400px',
+                        backgroundColor: backgroundColor,
+                        border: `1px solid ${borderColor}`,
+                        borderRadius: '6px',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        position: 'absolute',
+                        bottom: '30px',
+                        right: '0',
+                        zIndex: 1000,
+                        userSelect: 'none'
+                    }}
+                >
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        color: textColor
+                    }}>
+                        加载中...
+                    </div>
+                </div>
+            );
+        }
+        if (error) {
+            return (
+                <div
+                    ref={this.searchPopupRef}
+                    style={{
+                        width: '420px',
+                        height: '400px',
+                        backgroundColor: backgroundColor,
+                        border: `1px solid ${borderColor}`,
+                        borderRadius: '6px',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
+                        position: 'absolute',
+                        bottom: '30px',
+                        right: '0',
+                        zIndex: 1000,
+                        userSelect: 'none'
+                    }}
+                >
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        color: negativeColor
+                    }}>
+                        {error}
+                    </div>
+                </div>
+            );
+        }
         return (
             <div
                 ref={this.searchPopupRef}
@@ -696,7 +564,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                 className={theme === 'dark' ? Classes.DARK : ''}
             >
                 {this.renderCustomTabs()}
-
                 <div
                     style={{
                         flex: 1,
@@ -710,7 +577,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', userSelect: 'none' }}>
                         {currentTokens.map((token, index) => (
                             <div
-                                key={token.symbol}
+                                key={`${token.symbol}-${index}`}
                                 style={{
                                     padding: '10px 12px',
                                     color: textColor,
@@ -731,12 +598,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                                 }}
                                 onClick={() => this.handleTokenSelect(token.symbol)}
                             >
-                                {/* Logo area */}
-                                <div style={{ display: 'flex', alignItems: 'center', userSelect: 'none' }}>
-                                    {this.renderTokenLogo(token.color, token.symbol)}
-                                </div>
-
-                                {/* Main content area - horizontal layout */}
+                                {this.renderTokenLogo(token.symbol)}
                                 <div style={{
                                     flex: 1,
                                     display: 'flex',
@@ -745,7 +607,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                                     minWidth: 0,
                                     userSelect: 'none'
                                 }}>
-                                    {/* Left: Token basic info */}
                                     <div style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -775,23 +636,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                                                 {token.name}
                                             </div>
                                         </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '12px'
-                                        }}>
-                                            <div style={{
-                                                fontSize: '11px',
-                                                color: secondaryTextColor,
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                Network: {token.network}
-                                            </div>
-                                            {this.renderSocialLinks(token)}
-                                        </div>
                                     </div>
-
-                                    {/* Right: Price info */}
                                     <div style={{
                                         display: 'flex',
                                         flexDirection: 'column',
@@ -824,14 +669,13 @@ class BottomBar extends React.Component<{}, BottomBarState> {
     };
 
     render() {
-        const { theme, currentTime, marqueeText, isSearchFocused, searchValue } = this.state;
+        const { theme, currentTime, marqueeText, isSearchFocused, searchValue, loading, error } = this.state;
         const visibleMenuItems = this.getVisibleMenuItems();
         const backgroundColor = theme === 'dark' ? '#1C2127' : '#FFFFFF';
         const textColor = theme === 'dark' ? '#F5F8FA' : '#182026';
         const borderColor = theme === 'dark' ? '#394B59' : '#DCE0E5';
         const inputBackgroundColor = theme === 'dark' ? '#2F343C' : '#FFFFFF';
         const inputBorderColor = theme === 'dark' ? '#5C7080' : '#BFCCD6';
-
         return (
             <div
                 className={`bottom-bar ${theme === 'dark' ? 'bp4-dark' : 'bp4-light'}`}
@@ -848,7 +692,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     position: 'relative'
                 }}
             >
-                {/* Left menu area */}
                 <div
                     style={{
                         flex: 1,
@@ -897,7 +740,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                             </Popover>
                         </div>
                     ))}
-
                     {visibleMenuItems.length < this.leftMenuItems.length && (
                         <div style={{
                             position: 'relative',
@@ -943,8 +785,6 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                         </div>
                     )}
                 </div>
-
-                {/* Middle marquee area */}
                 <div
                     style={{
                         flex: 2,
@@ -964,11 +804,9 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                             color: textColor
                         }}
                     >
-                        {marqueeText}
+                        {loading ? '正在获取实时数据...' : error ? error : marqueeText}
                     </div>
                 </div>
-
-                {/* Right search and time area */}
                 <div
                     style={{
                         flex: 1,
@@ -986,7 +824,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                     <div style={{ position: 'relative', display: 'inline-block' }}>
                         <InputGroup
                             small
-                            placeholder="Search..."
+                            placeholder="搜索代币..."
                             value={searchValue}
                             onChange={this.handleSearchChange}
                             onFocus={this.handleSearchFocus}
@@ -1004,11 +842,8 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                         />
                         {isSearchFocused && this.renderSearchPopup()}
                     </div>
-
-                    {/* 添加网络信号和齿轮图标 */}
                     {this.renderNetworkIndicator()}
                     {this.renderSettingsIcon()}
-
                     <div
                         style={{
                             color: textColor,
@@ -1020,6 +855,14 @@ class BottomBar extends React.Component<{}, BottomBarState> {
                         {currentTime}
                     </div>
                 </div>
+                <style>
+                    {`
+                        @keyframes marquee {
+                            0% { transform: translateX(100%); }
+                            100% { transform: translateX(-100%); }
+                        }
+                    `}
+                </style>
             </div>
         );
     }
