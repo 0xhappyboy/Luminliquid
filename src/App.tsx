@@ -14,7 +14,6 @@ import LendPageIndex from './pages/LendPageIndex';
 import TradeStrategyPageIndex from './pages/TradeStrategyPageIndex';
 import ProfilePage from './pages/ProfilePageIndex';
 import SocialMonitorPageIndex from './pages/SocialMonitorPage';
-import ContractAnalysisPage from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
 import ContractAnalysisPageIndex from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
 import PredictionMarketPage from './pages/PredictionMarket';
 import OrderSplitPageIndex from './pages/OrderSplitPage/OrderSplitPageIndex';
@@ -42,6 +41,7 @@ class App extends React.Component {
               <Route path='/news' element={<NewsPage />} />
               <Route path='/ordersplit' element={<OrderSplitPageIndex />} />
               <Route path='/arbitrage' element={<ArbitragePageIndex />} />
+              <Route path='/trade/:exchange/:symbol' element={<TradePage />} />
               <Route path='/trade' element={<TradePage />} />
               <Route path='/lend' element={<LendPageIndex />} />
               <Route path='/tradestrategy' element={<TradeStrategyPageIndex />} />

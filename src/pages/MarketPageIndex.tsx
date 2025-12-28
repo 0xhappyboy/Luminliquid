@@ -4,9 +4,12 @@ import {
   Button
 } from "@blueprintjs/core";
 import { themeManager } from "../globals/theme/ThemeManager";
+import { withRouter } from "../WithRouter";
+import { CexType } from "../types";
 
 interface MarketPageProps {
   children?: React.ReactNode;
+  navigate?: (path: string, options?: any) => void;
 }
 
 interface MarketPageState {
@@ -1370,6 +1373,10 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = tableBg;
                   }}
+                  onClick={() => {
+                    const cexType = CexType.Binance;
+                    this.props.navigate(`/trade/${cexType}/${item.symbol}`);
+                  }}
                 >
                   <td style={{
                     padding: '8px 16px',
@@ -1561,4 +1568,4 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
   }
 }
 
-export default MarketPage;
+export default withRouter(MarketPage);

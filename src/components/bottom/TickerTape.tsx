@@ -1,5 +1,8 @@
 import React from "react";
 import { themeManager } from "../../globals/theme/ThemeManager";
+import { useNavigate } from "react-router-dom";
+import { withRouter } from "../../WithRouter";
+import { CexType } from "../../types";
 
 interface TickerTapeState {
     quotes: Array<{
@@ -25,12 +28,16 @@ interface BinanceTicker {
     quoteVolume: string;
 }
 
-class TickerTape extends React.Component<{}, TickerTapeState> {
+interface TickerTapeProps {
+    navigate: (path: string, options?: any) => void;
+}
+
+class TickerTape extends React.Component<TickerTapeProps, TickerTapeState> {
     private intervalId: NodeJS.Timeout | null = null;
     private unsubscribe: (() => void) | null = null;
     private dataFetchInterval: NodeJS.Timeout | null = null;
 
-    constructor(props: {}) {
+    constructor(props: TickerTapeProps) {
         super(props);
         this.state = {
             quotes: [],
@@ -92,17 +99,16 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
                 loading: false
             });
         } catch (error) {
-            console.error('获取Binance数据失败:', error);
             this.setState({
-                error: '无法获取市场数据',
+                error: 'Unable to obtain market data',
                 loading: false
             });
         }
     };
 
     handleQuoteClick = (quote: any) => {
-        console.log('Quote clicked:', quote);
-        alert(`${quote.name} (${quote.symbol})\n价格: $${quote.price.toFixed(2)}\n24小时变化: ${quote.change >= 0 ? '+' : ''}${quote.change.toFixed(2)}%`);
+        const cexType = CexType.Binance;
+        this.props.navigate(`/trade/${cexType}/${quote.symbol}`);
     };
 
     render() {
@@ -113,17 +119,14 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
             quotes[(currentIndex + 2) % quotes.length],
             quotes[(currentIndex + 3) % quotes.length],
         ] : [];
-
         const backgroundColor = theme === 'dark' ? '#0F1116' : '#FFFFFF';
         const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
         const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
         const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
         const quoteBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
         const quoteHoverBg = theme === 'dark' ? '#2D323D' : '#E1E5E9';
-
         const positiveColor = '#2E8B57';
         const negativeColor = '#DC143C';
-
         if (loading && quotes.length === 0) {
             return (
                 <div style={{
@@ -136,11 +139,10 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
                     color: textColor,
                     fontSize: '12px'
                 }}>
-                    正在加载市场数据...
+                    Loading.....
                 </div>
             );
         }
-
         if (error) {
             return (
                 <div style={{
@@ -157,7 +159,6 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
                 </div>
             );
         }
-
         return (
             <div
                 style={{
@@ -246,7 +247,6 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
                         ) : null)}
                     </div>
                 </div>
-
                 <div
                     style={{
                         width: '1px',
@@ -255,7 +255,6 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
                         margin: '0 16px'
                     }}
                 />
-
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -344,4 +343,4 @@ class TickerTape extends React.Component<{}, TickerTapeState> {
     }
 }
 
-export default TickerTape;
+export default withRouter(TickerTape);

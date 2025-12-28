@@ -11,7 +11,6 @@ class MainLayout extends React.Component {
             <>
                 <TopArea />
                 <MiddleArea >
-
                 </MiddleArea>
                 <BottomArea />
             </>

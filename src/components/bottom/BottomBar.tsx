@@ -1,6 +1,9 @@
 import React from 'react';
 import { InputGroup, Button, Popover, Menu, MenuItem, Classes } from '@blueprintjs/core';
 import { themeManager } from '../../globals/theme/ThemeManager';
+import { useNavigate } from 'react-router-dom';
+import { withRouter } from '../../WithRouter';
+import { CexType } from '../../types';
 
 interface BottomBarState {
     theme: 'dark' | 'light';
@@ -33,7 +36,11 @@ interface BinanceTicker {
     quoteVolume: string;
 }
 
-class BottomBar extends React.Component<{}, BottomBarState> {
+interface BottomBarProps {
+    navigate: (path: string, options?: any) => void;
+}
+
+class BottomBar extends React.Component<BottomBarProps, BottomBarState> {
     private timer: NodeJS.Timeout | null = null;
     private unsubscribe: (() => void) | null = null;
     private networkTimer: NodeJS.Timeout | null = null;
@@ -117,7 +124,7 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         }
     ];
 
-    constructor(props: {}) {
+    constructor(props: BottomBarProps) {
         super(props);
         this.state = {
             theme: themeManager.getTheme(),
@@ -309,9 +316,10 @@ class BottomBar extends React.Component<{}, BottomBarState> {
         this.setState({ activeSearchTab: tabId });
     };
 
-    handleTokenSelect = (token: string) => {
+    private handleTokenSelect = (token: string) => {
         this.setState({ searchValue: token });
-        console.log(`Selected token: ${token}`);
+        const cexType = CexType.Binance;
+        this.props.navigate(`/trade/${cexType}/${token}`);
     };
 
     renderNetworkIndicator = () => {
@@ -868,4 +876,4 @@ class BottomBar extends React.Component<{}, BottomBarState> {
     }
 }
 
-export default BottomBar;
+export default withRouter(BottomBar);

@@ -1,15 +1,19 @@
-// utils/withRouter.tsx
 import React from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
-export function withRouter<T>(Component: React.ComponentType<T & any>) {
-  return function WrappedComponent(props: T) {
+export function withRouter<P extends object>(
+  WrappedComponent: React.ComponentType<P & {
+    navigate: (to: string, options?: any) => void;
+    location?: ReturnType<typeof useLocation>;
+    params?: ReturnType<typeof useParams>;
+  }>
+) {
+  return function WithRouterWrapper(props: P) {
     const navigate = useNavigate();
     const location = useLocation();
     const params = useParams();
-    
     return (
-      <Component
+      <WrappedComponent
         {...props}
         navigate={navigate}
         location={location}
