@@ -1,6 +1,6 @@
 import React from "react"
 import TopMenuBar from "./TopMenu"
-import TradingPanel from "./TopFunctionBar"
+import TopFunctionBar from "./TopFunctionBar"
 
 
 class TopArea extends React.Component<{}, {}> {
@@ -8,7 +8,7 @@ class TopArea extends React.Component<{}, {}> {
         return (
             <div>
                 <TopMenuBar />
-                <TradingPanel />
+                <TopFunctionBar />
             </div>
         )
     }

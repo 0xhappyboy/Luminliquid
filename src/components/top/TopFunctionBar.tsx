@@ -113,6 +113,18 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
         themeManager.toggleTheme();
     };
 
+    handleBack = () => {
+        window.history.back();
+    };
+
+    handleForward = () => {
+        window.history.forward();
+    };
+
+    handleRefresh = () => {
+        window.location.reload();
+    };
+
     getVisibleGroups = () => {
         const { windowWidth } = this.state;
 
@@ -131,41 +143,49 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
 
     renderSingleRowButton = (button: any, index: number) => (
         <Button
-            onClick={() => this.toPage(button.page)}
+            onClick={() => button.page && this.toPage(button.page)}
             key={button.key}
             minimal
             icon={button.icon}
             text={button.label}
             style={{
                 fontSize: '11px',
-                padding: '2px 6px',
-                minHeight: 'auto',
-                minWidth: 'auto',
-                lineHeight: '16px',
+                padding: '4px 2px',
+                minHeight: '36px',
+                minWidth: '0',
+                lineHeight: '14px',
                 margin: '0 1px',
                 borderRadius: '2px',
-                marginRight: '5px',
                 height: '100%',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '2px',
+                gap: '4px',
                 color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026',
                 backgroundColor: this.state.theme === 'dark' ? '#2F343C' : '#F5F8FA',
                 border: this.state.theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
-                flex: '1'
+                flex: '1 1 0px',
+                display: 'flex',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
             }}
+            className="single-row-button"
         >
             <span className={`bp4-icon bp4-icon-${button.icon}`} style={{
-                fontSize: '12px',
+                fontSize: '14px',
                 margin: 0,
-                marginRight: '0px !important'
+                flexShrink: 0
             }} />
             <span style={{
                 fontSize: '10px',
-                lineHeight: '10px'
+                lineHeight: '12px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '100%'
             }}>
-                {/* {button.label} */}
+                {button.label}
             </span>
         </Button>
     );
@@ -176,7 +196,9 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
             style={{
                 position: 'relative',
                 zIndex: 1,
-                margin: '1px'
+                margin: '1px',
+                flex: '1 1 0px',
+                minWidth: '0'
             }}
         >
             <Button
@@ -184,27 +206,94 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 text={button.label}
                 style={{
                     fontSize: '10px',
-                    padding: '1px 3px',
-                    width: '55px',
+                    padding: '2px 4px',
+                    width: '100%',
                     height: '20px',
-                    minWidth: '45px',
+                    minWidth: '0',
                     minHeight: '20px',
                     lineHeight: '12px',
                     borderRadius: '1px',
-                    marginRight: '5px',
-
-                    paddingLeft: '10px',
                     color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026',
                     backgroundColor: this.state.theme === 'dark' ? '#2F343C' : '#F5F8FA',
                     border: this.state.theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
-                    flex: '0 0 auto',
+                    flex: '1',
                     position: 'relative',
-                    zIndex: 1
+                    zIndex: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                 }}
                 className="double-row-button"
             />
         </div>
     );
+
+    renderLeftButtonGroup = (group: any, groupIndex: number) => {
+        const { theme } = this.state;
+        return (
+            <div
+                key={`left-group-${groupIndex}`}
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexShrink: 0,
+                    width: '170px',
+                    minWidth: '0',
+                    height: '100%',
+                    padding: '4px',
+                    paddingRight: '4px',
+                    paddingLeft: '0px',
+                    borderRight: (theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5'),
+                    position: 'relative',
+                    zIndex: 0,
+                    gap: '2px'
+                }}
+            >
+                {group.buttons.map((button: any, index: number) => (
+                    <Button
+                        key={button.key}
+                        minimal
+                        icon={button.icon}
+                        onClick={() => {
+                            if (button.key === 'back') this.handleBack();
+                            else if (button.key === 'forward') this.handleForward();
+                            else if (button.key === 'refresh') this.handleRefresh();
+                        }}
+                        style={{
+                            fontSize: '15px',
+                            minHeight: '36px',
+                            minWidth: '0',
+                            lineHeight: '14px',
+                            margin: '0 1px',
+                            borderRadius: '2px',
+                            height: '100%',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: this.state.theme === 'dark' ? '#F5F8FA' : '#182026',
+                            backgroundColor: this.state.theme === 'dark' ? '#2F343C' : '#F5F8FA',
+                            border: this.state.theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5',
+                            flex: '1 1 0px',
+                            display: 'flex',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            padding: '4px 2px',
+                        }}
+                        title={
+                            button.key === 'back' ? '返回上一页' :
+                                button.key === 'forward' ? '前进下一页' :
+                                    '刷新页面'
+                        }
+                    >
+                    </Button>
+                ))}
+            </div>
+        );
+    };
 
     renderButtonGroup = (group: any, groupIndex: number) => {
         const { theme } = this.state;
@@ -218,13 +307,13 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                         flex: '1',
                         minWidth: '0',
                         height: '100%',
-                        padding: '5px 4px',
-                        paddingLeft: '10px',
+                        padding: '4px',
                         borderRight: groupIndex < this.buttonGroups.length - 1
                             ? (theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5')
                             : 'none',
                         position: 'relative',
-                        zIndex: 0
+                        zIndex: 0,
+                        gap: '2px'
                     }}
                 >
                     {group.buttons.map((button: any, index: number) => (
@@ -235,48 +324,51 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 </div>
             );
         } else if (group.type === 'double-row') {
-            const firstRow = group.buttons.slice(0, 6);
-            const secondRow = group.buttons.slice(6, 12);
-            return (
-                <div
-                    key={`group-${groupIndex}`}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flex: '1',
-                        minWidth: '0',
-                        padding: '2px 4px',
-                        borderRight: groupIndex < this.buttonGroups.length - 1
-                            ? (theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5')
-                            : 'none',
-                        position: 'relative',
-                        zIndex: 0
-                    }}
-                >
-                    <div style={{
-                        display: 'flex',
-                        flex: '1',
-                        marginBottom: '2px',
-                        position: 'relative',
-                        zIndex: 2
-                    }}>
-                        {firstRow.map((button: any, index: number) => (
-                            this.renderDoubleRowButton(button, index)
-                        ))}
-                    </div>
-                    <div style={{
-                        display: 'flex',
-                        flex: '1',
-                        marginTop: '2px',
-                        position: 'relative',
-                        zIndex: 2
-                    }}>
-                        {secondRow.map((button: any, index: number) => (
-                            this.renderDoubleRowButton(button, index)
-                        ))}
-                    </div>
-                </div>
-            );
+            // const firstRow = group.buttons.slice(0, 6);
+            // const secondRow = group.buttons.slice(6, 12);
+            // return (
+            //     <div
+            //         key={`group-${groupIndex}`}
+            //         style={{
+            //             display: 'flex',
+            //             flexDirection: 'column',
+            //             flex: '1',
+            //             minWidth: '0',
+            //             padding: '2px',
+            //             borderRight: groupIndex < this.buttonGroups.length - 1
+            //                 ? (theme === 'dark' ? '1px solid #394B59' : '1px solid #DCE0E5')
+            //                 : 'none',
+            //             position: 'relative',
+            //             zIndex: 0,
+            //             gap: '2px'
+            //         }}
+            //     >
+            //         <div style={{
+            //             display: 'flex',
+            //             flex: '1',
+            //             minHeight: '22px',
+            //             position: 'relative',
+            //             zIndex: 2,
+            //             gap: '2px'
+            //         }}>
+            //             {firstRow.map((button: any, index: number) => (
+            //                 this.renderDoubleRowButton(button, index)
+            //             ))}
+            //         </div>
+            //         <div style={{
+            //             display: 'flex',
+            //             flex: '1',
+            //             minHeight: '22px',
+            //             position: 'relative',
+            //             zIndex: 2,
+            //             gap: '2px'
+            //         }}>
+            //             {secondRow.map((button: any, index: number) => (
+            //                 this.renderDoubleRowButton(button, index)
+            //             ))}
+            //         </div>
+            //     </div>
+            // );
         }
         return null;
     };
@@ -284,7 +376,14 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
     render() {
         const { theme } = this.state;
         const visibleGroups = this.getVisibleGroups();
-
+        const leftButtonGroup = {
+            type: 'single-row' as const,
+            buttons: [
+                { key: 'back', label: '', icon: 'chevron-left' as const, page: null },
+                { key: 'forward', label: '', icon: 'chevron-right' as const, page: null },
+                { key: 'refresh', label: '', icon: 'refresh' as const, page: null }
+            ]
+        };
         return (
             <div
                 className={`button-row ${theme === 'dark' ? 'bp4-dark' : 'bp4-light'}`}
@@ -301,20 +400,21 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                     overflow: 'hidden'
                 }}
             >
+                {this.renderLeftButtonGroup(leftButtonGroup, -1)}
                 <div
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         flex: '1',
                         minWidth: '0',
-                        height: '100%'
+                        height: '100%',
+                        overflow: 'hidden'
                     }}
                 >
                     {visibleGroups.map((group, index) =>
                         this.renderButtonGroup(group, index)
                     )}
                 </div>
-
             </div>
         );
     }

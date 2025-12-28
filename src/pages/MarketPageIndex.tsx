@@ -46,41 +46,51 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
 
   private menuData = [
     {
-      key: 'watchlist',
+      key: 'datasource',
       icon: 'star',
-      label: 'WatchList',
+      label: 'Data Source',
       children: [
-        { key: 'multidimensional', label: 'Chart' },
-        { key: 'dashboard', label: 'Dashbord' },
-        { key: 'blockchain-rank', label: 'BlockchainRank' },
-        { key: 'dex-rank', label: 'DEX Rank' },
-        { key: 'new-pools', label: 'New Pools' }
+        { key: 'binance', label: 'Binance' },
+        { key: 'bybit', label: 'Bybit' },
+        { key: 'bitget', label: 'Bitget' },
       ]
     },
-    {
-      key: 'categories',
-      icon: 'grouped-bar-chart',
-      label: 'Class',
-      children: [
-        { key: 'ai-agents', label: 'AI' }
-      ]
-    },
-    {
-      key: 'chains',
-      icon: 'graph',
-      label: 'Chains',
-      children: [
-        { key: 'kasplex', label: 'Kasplex' },
-        { key: 'gate-layer', label: 'Gate Layer' },
-        { key: 'bnb-chain', label: 'BNB Chain' },
-        { key: 'solana', label: 'Solana' },
-        { key: 'ethereum', label: 'Ethereum' },
-        { key: 'base', label: 'Base' },
-        { key: 'arbitrum', label: 'Arbitrum' },
-        { key: 'sul-network', label: 'Sul Network' },
-        { key: 'hyperliquid', label: 'Hyperliquid' }
-      ]
-    }
+    // {
+    //   key: 'watchlist',
+    //   icon: 'star',
+    //   label: 'WatchList',
+    //   children: [
+    //     { key: 'multidimensional', label: 'Chart' },
+    //     { key: 'dashboard', label: 'Dashbord' },
+    //     { key: 'blockchain-rank', label: 'BlockchainRank' },
+    //     { key: 'dex-rank', label: 'DEX Rank' },
+    //     { key: 'new-pools', label: 'New Pools' }
+    //   ]
+    // },
+    // {
+    //   key: 'categories',
+    //   icon: 'grouped-bar-chart',
+    //   label: 'Class',
+    //   children: [
+    //     { key: 'ai-agents', label: 'AI' }
+    //   ]
+    // },
+    // {
+    //   key: 'chains',
+    //   icon: 'graph',
+    //   label: 'Chains',
+    //   children: [
+    //     { key: 'kasplex', label: 'Kasplex' },
+    //     { key: 'gate-layer', label: 'Gate Layer' },
+    //     { key: 'bnb-chain', label: 'BNB Chain' },
+    //     { key: 'solana', label: 'Solana' },
+    //     { key: 'ethereum', label: 'Ethereum' },
+    //     { key: 'base', label: 'Base' },
+    //     { key: 'arbitrum', label: 'Arbitrum' },
+    //     { key: 'sul-network', label: 'Sul Network' },
+    //     { key: 'hyperliquid', label: 'Hyperliquid' }
+    //   ]
+    // }
   ];
 
   private filterGroups = [
@@ -516,10 +526,10 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     this.state = {
       theme: themeManager.getTheme(),
       containerHeight: 0,
-      selectedMenu: 'watchlist',
+      selectedMenu: 'datasource',
       selectedSubMenu: 'multidimensional',
       selectedOption: 'option1',
-      expandedMenus: new Set(['watchlist']),
+      expandedMenus: new Set(['datasource']),
       isCollapsed: false,
       currentPage: 0,
       tableHeaderFixed: false,
@@ -1017,7 +1027,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const { theme, selectedMenu, selectedSubMenu, expandedMenus, isCollapsed } = this.state;
     const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
     const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
-
     if (isCollapsed) {
       return (
         <div style={{ padding: '8px 0' }}>
@@ -1149,16 +1158,13 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const startIndex = currentPage * itemsPerPage;
     const currentData = this.marketData.slice(startIndex, startIndex + itemsPerPage);
     const totalPages = Math.ceil(this.marketData.length / itemsPerPage);
-
     const tableBg = theme === 'dark' ? '#0F1116' : '#FFFFFF';
     const headerBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
     const rowHoverBg = theme === 'dark' ? '#2D323D' : '#F8F9FA';
     const positiveColor = '#2E8B57';
     const negativeColor = '#DC143C';
-
     const headerClass = tableHeaderFixed ? 'fixed-header' : '';
-
     return (
       <div className="table-container">
         <div
@@ -1317,8 +1323,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             </tbody>
           </table>
         </div>
-
-
         <div style={{
           padding: '5px 25px',
           borderTop: `1px solid ${borderColor}`,
@@ -1361,7 +1365,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const sidebarBg = theme === 'dark' ? '#1A1D24' : '#F8F9FA';
     const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
-
     return (
       <div
         ref={this.containerRef}
@@ -1375,7 +1378,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         }}
       >
         <style>{this.applyGlobalTheme()}</style>
-
         <div style={{
           display: 'flex',
           flex: 1,
@@ -1395,7 +1397,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               transition: 'width 0.3s ease'
             }}
           >
-            {this.renderLogoSection()}
+            {/* {this.renderLogoSection()} */}
             <div
               style={{
                 flex: 1,
@@ -1419,8 +1421,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               </div>
             )}
           </div>
-
-
           <div style={{
             flex: 1,
             display: 'flex',
@@ -1430,17 +1430,12 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             overflow: 'hidden',
             minWidth: 0
           }}>
-
             <div style={{ flexShrink: 0 }}>
               {this.renderVolumeStats()}
             </div>
-
-
             <div style={{ flexShrink: 0 }}>
               {this.renderFilterButtons()}
             </div>
-
-
             <div style={{
               flex: 1,
               display: 'flex',
