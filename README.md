@@ -10,3 +10,7 @@ A comprehensive financial terminal that runs on multiple platforms.
 <p align="center">
 <a href="./README_zh-CN.md">简体中文</a> | <a href="./README.md">English</a>
 </p>
+
+# Demo
+
+<img src="./assets/demo_1.gif" width="100%">
