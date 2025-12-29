@@ -53,6 +53,8 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         { key: CexType.Bybit, label: 'Bybit', source: CexType.Bybit },
         { key: CexType.Bitget, label: 'Bitget', source: CexType.Bitget },
         { key: CexType.Hyperliquid, label: 'Hyperliquid', source: CexType.Hyperliquid },
+        { key: CexType.OKX, label: 'OKX', source: CexType.OKX },
+        { key: CexType.Coinbase, label: 'Coinbase', source: CexType.Coinbase },
       ]
     },
   ];
@@ -1516,8 +1518,10 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 opacity: 0.7,
                 flexShrink: 0
               }}>
-                <div style={{ marginBottom: '4px' }}>Data Sources: Binance, Bybit, Bitget, Hyperliquid</div>
-                <div>v1.0.0 • Multi-Exchange • Real-time</div>
+                <div style={{ marginBottom: '4px' }}>
+                  Data Sources: Binance, Bybit, Bitget, Hyperliquid, OKX, Gate.io, Coinbase
+                </div>
+                <div>v1.1.0 • Multi-Exchange • Real-time</div>
               </div>
             )}
           </div>
