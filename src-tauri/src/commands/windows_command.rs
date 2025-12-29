@@ -75,6 +75,7 @@ pub async fn multi_panel_window(app: tauri::AppHandle) -> Result<(), String> {
     let label = format!("multi_panel_{}", chrono::Utc::now().timestamp_millis());
     let _window = WebviewWindowBuilder::new(&app, label, WebviewUrl::App("/multi_panel".into()))
         .inner_size(1200.0, 800.0)
+        .title("Luminliquid - Multi Panel Trading")
         .min_inner_size(800.0, 600.0)
         .resizable(true)
         .decorations(false)

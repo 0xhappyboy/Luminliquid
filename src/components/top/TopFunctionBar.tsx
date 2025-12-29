@@ -25,8 +25,8 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 { key: pages.market.name, label: pages.market.name, icon: 'predictive-analysis' as const, page: pages.market.path },
                 { key: pages.ordersplit.name, label: pages.ordersplit.name, icon: 'globe-network' as const, page: pages.ordersplit.path },
                 { key: pages.arbitrage.name, label: pages.arbitrage.name, icon: 'exchange' as const, page: pages.arbitrage.path },
-                { key: pages.trade.name, label: pages.trade.name, icon: 'pulse' as const, page: pages.trade.path },
-                { key: pages.wallet.name, label: pages.wallet.name, icon: 'flash' as const, page: pages.wallet.path }
+              
+                      { key: 'multi_panel_window', label: 'MultiPanelWindow', icon: 'font' as const },
             ]
         },
         {
@@ -62,8 +62,6 @@ class TopFunctionBar extends React.Component<TopFunctionBarProps, TopFunctionBar
                 { key: pages.contractanalysis.name, label: pages.contractanalysis.name, icon: 'circle' as const, page: pages.contractanalysis.path },
                 { key: pages.predictionmarket.name, label: pages.predictionmarket.name, icon: 'refresh' as const, page: pages.predictionmarket.path },
                 { key: pages.networkstatus.name, label: pages.networkstatus.name, icon: 'document' as const, page: pages.networkstatus.path },
-                { key: 'multi_panel_window', label: 'MultiPanelWindow', icon: 'font' as const },
-                { key: 'test', label: 'test', icon: 'more' as const }
             ]
         },
         {

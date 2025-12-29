@@ -29,7 +29,7 @@ interface BinanceTicker {
 }
 
 interface TickerTapeProps {
-    navigate: (path: string, options?: any) => void;
+    navigate?: (path: string, options?: any) => void;
 }
 
 class TickerTape extends React.Component<TickerTapeProps, TickerTapeState> {

@@ -37,7 +37,7 @@ interface BinanceTicker {
 }
 
 interface BottomBarProps {
-    navigate: (path: string, options?: any) => void;
+    navigate?: (path: string, options?: any) => void;
 }
 
 class BottomBar extends React.Component<BottomBarProps, BottomBarState> {
