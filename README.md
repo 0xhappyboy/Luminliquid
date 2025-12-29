@@ -18,3 +18,4 @@ A comprehensive financial terminal that runs on multiple platforms.
 # Demo
 
 <img src="./assets/demo_1.gif" width="100%">
+<img src="./assets/demo_2.gif" width="100%">

@@ -18,3 +18,4 @@
 # 演示
 
 <img src="./assets/demo_1.gif" width="100%">
+<img src="./assets/demo_2.gif" width="100%">
