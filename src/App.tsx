@@ -5,22 +5,22 @@ import TopArea from './components/top/TopArea';
 import MiddleArea from './components/center/MiddleArea';
 import BottomArea from './components/bottom/BottomArea';
 import { BrowserRouter as Router, Route, BrowserRouter, Routes } from 'react-router-dom';
-import FinanceToolsPageIndex from './pages/FinanceToolsPage/ToolPageIndex';
-import MarketPage from './pages/MarketPage/MarketPageIndex';
+import FinanceToolsPageIndex from './pages/FinanceToolsPage';
+import MarketPage from './pages/MarketPage';
 import NewsPage from './pages/NewsPageIndex';
-import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
-import TradePage from './pages/TradePage/TradePageIndex';
+import ArbitragePageIndex from './pages/ArbitragePage';
+import TradePage from './pages/TradePage';
 import LendPageIndex from './pages/LendPageIndex';
 import TradeStrategyPageIndex from './pages/TradeStrategyPageIndex';
 import ProfilePage from './pages/ProfilePageIndex';
 import SocialMonitorPageIndex from './pages/SocialMonitorPage';
-import ContractAnalysisPageIndex from './pages/ContractAnalysisPage/ContractAnalysisPageIndex';
+import ContractAnalysisPageIndex from './pages/ContractAnalysisPage';
 import PredictionMarketPage from './pages/PredictionMarket';
-import OrderSplitPageIndex from './pages/OrderSplitPage/OrderSplitPageIndex';
+import OrderSplitPageIndex from './pages/OrderSplitPage';
 import NetworkStatusPageIndex from './pages/NetworkStatusPageIndex';
 
 import SettingPageIndex from './pages/SettingPageIndex';
-import MultiPanelPage from './pages/MultiPanelPage';
+import MultiPanelPage from './pages/MultiPanelTradePage';
 
 // blueprintjs
 require('normalize.css');

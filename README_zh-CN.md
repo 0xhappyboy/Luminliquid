@@ -11,6 +11,10 @@
 <a href="./README_zh-CN.md">简体中文</a> | <a href="./README.md">English</a>
 </p>
 
+# 图表引擎
+
+<a href="https://github.com/0xhappyboy/candleview">CandleView</a>
+
 # 演示
 
 <img src="./assets/demo_1.gif" width="100%">

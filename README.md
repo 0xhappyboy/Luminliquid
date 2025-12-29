@@ -11,6 +11,10 @@ A comprehensive financial terminal that runs on multiple platforms.
 <a href="./README_zh-CN.md">简体中文</a> | <a href="./README.md">English</a>
 </p>
 
+# Chart Engine
+
+<a href="https://github.com/0xhappyboy/candleview">CandleView</a>
+
 # Demo
 
 <img src="./assets/demo_1.gif" width="100%">

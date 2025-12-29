@@ -1,8 +1,8 @@
 import React from 'react';
 import CandleView from 'candleview';
-import { themeManager } from '../globals/theme/ThemeManager';
-import { overflowManager } from '../globals/theme/OverflowTypeManager';
-import { TEST_CANDLEVIEW_DATA8 } from './TradePage/TestData/TestData_3';
+import { themeManager } from '../../globals/theme/ThemeManager';
+import { overflowManager } from '../../globals/theme/OverflowTypeManager';
+import { TEST_CANDLEVIEW_DATA8 } from '../TradePage/TestData/TestData_3';
 
 interface MultiPanelPageProps {
     children?: React.ReactNode;
@@ -107,7 +107,7 @@ class MultiPanelPage extends React.Component<MultiPanelPageProps, MultiPanelPage
                     data={TEST_CANDLEVIEW_DATA8}
                     title={`Panel ${panelId}`}
                     theme={theme}
-                    i18n={'zh-cn'}
+                    i18n={'en'}
                     leftpanel={true}
                     toppanel={true}
                     // terminal={true}
