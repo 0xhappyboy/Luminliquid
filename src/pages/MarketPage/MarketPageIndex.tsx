@@ -3,9 +3,13 @@ import {
   Icon,
   Button
 } from "@blueprintjs/core";
-import { themeManager } from "../globals/theme/ThemeManager";
-import { withRouter } from "../WithRouter";
-import { CexType } from "../types";
+import { themeManager } from "../../globals/theme/ThemeManager";
+import { withRouter } from "../../WithRouter";
+import { CexType } from "../../types";
+import {
+  MarketDataAggregator,
+  MarketData
+} from "./MarketDataSource";
 
 interface MarketPageProps {
   children?: React.ReactNode;
@@ -15,6 +19,7 @@ interface MarketPageProps {
 interface MarketPageState {
   theme: 'dark' | 'light';
   containerHeight: number;
+  selectedDataSource: CexType | 'all';
   selectedMenu: string;
   selectedSubMenu: string;
   selectedOption: string;
@@ -29,33 +34,25 @@ interface MarketPageState {
   error: string | null;
 }
 
-interface MarketData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  marketCap: number;
-  quoteVolume?: number;
-}
-
 class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
   private unsubscribe: (() => void) | null = null;
   private containerRef: React.RefObject<HTMLDivElement | null>;
   private tableContainerRef: React.RefObject<HTMLDivElement | null>;
   private resizeObserver: ResizeObserver | null = null;
   private priceUpdateInterval: NodeJS.Timeout | null = null;
+  private dataAggregator: MarketDataAggregator;
 
   private menuData = [
     {
       key: 'datasource',
-      icon: 'star',
+      icon: 'database',
       label: 'Data Source',
       children: [
-        { key: 'binance', label: 'Binance' },
-        { key: 'bybit', label: 'Bybit' },
-        { key: 'bitget', label: 'Bitget' },
+        { key: 'all', label: 'All Exchanges', source: 'all' as CexType | 'all' },
+        { key: CexType.Binance, label: 'Binance', source: CexType.Binance },
+        { key: CexType.Bybit, label: 'Bybit', source: CexType.Bybit },
+        { key: CexType.Bitget, label: 'Bitget', source: CexType.Bitget },
+        { key: CexType.Hyperliquid, label: 'Hyperliquid', source: CexType.Hyperliquid },
       ]
     },
   ];
@@ -124,7 +121,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
   ];
 
   private marketData: MarketData[] = [];
-  private binanceDataCache: Map<string, any> = new Map();
   private volumeStats = {
     totalVolume24h: 0,
     totalTrades24h: 0,
@@ -136,11 +132,14 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     super(props);
     this.containerRef = React.createRef<HTMLDivElement | null>();
     this.tableContainerRef = React.createRef<HTMLDivElement | null>();
+    this.dataAggregator = new MarketDataAggregator();
+
     this.state = {
       theme: themeManager.getTheme(),
       containerHeight: 0,
+      selectedDataSource: 'all',
       selectedMenu: 'datasource',
-      selectedSubMenu: 'multidimensional',
+      selectedSubMenu: 'all',
       selectedOption: 'option1',
       expandedMenus: new Set(['datasource']),
       isCollapsed: false,
@@ -154,84 +153,16 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     };
   }
 
-  private fetchBinanceTickerData = async (): Promise<any[]> => {
-    try {
-      const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching Binance data:', error);
-      throw error;
-    }
-  };
-
-  private fetchBinanceExchangeInfo = async (): Promise<any> => {
-    try {
-      const response = await fetch('https://api.binance.com/api/v3/exchangeInfo');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching exchange info:', error);
-      throw error;
-    }
-  };
-
-
-  private processBinanceData = async (): Promise<void> => {
+  private fetchAllMarketData = async (): Promise<void> => {
     try {
       this.setState({ loading: true, error: null });
-      const [tickerData, exchangeInfo] = await Promise.all([
-        this.fetchBinanceTickerData(),
-        this.fetchBinanceExchangeInfo()
-      ]);
-      const symbolMap = new Map();
-      exchangeInfo.symbols.forEach((sym: any) => {
-        symbolMap.set(sym.symbol, {
-          name: sym.baseAsset,
-          status: sym.status
-        });
-      });
-      const usdtPairs = tickerData.filter((item: any) =>
-        item.symbol.endsWith('USDT') &&
-        parseFloat(item.quoteVolume) > 100000 &&
-        symbolMap.get(item.symbol)?.status === 'TRADING'
-      );
-      const marketData: MarketData[] = usdtPairs.map((item: any) => {
-        const price = parseFloat(item.lastPrice);
-        const prevPrice = parseFloat(item.prevClosePrice);
-        const change = price - prevPrice;
-        const changePercent = prevPrice > 0 ? (change / prevPrice) * 100 : 0;
-        const volume = parseFloat(item.volume);
-        const quoteVolume = parseFloat(item.quoteVolume);
-        return {
-          symbol: item.symbol,
-          name: symbolMap.get(item.symbol)?.name || item.symbol.replace('USDT', ''),
-          price: price,
-          change: change,
-          changePercent: changePercent,
-          volume: volume,
-          marketCap: quoteVolume * 10,
-          quoteVolume: quoteVolume,
-        };
-      });
-      this.marketData = marketData.sort((a, b) => (b.quoteVolume || 0) - (a.quoteVolume || 0));
-      this.volumeStats = {
-        totalVolume24h: this.marketData.reduce((sum, item) => sum + (item.quoteVolume || 0), 0),
-        totalTrades24h: Math.floor(Math.random() * 50000000) + 10000000,
-        latestBlock: Math.floor(Math.random() * 1000000) + 370000000,
-        lastUpdate: Date.now()
-      };
-      this.binanceDataCache.clear();
-      this.marketData.forEach(item => {
-        this.binanceDataCache.set(item.symbol, item);
-      });
+
+      await this.dataAggregator.fetchAllData();
+      this.updateMarketData();
+
       this.setState({ loading: false });
     } catch (error) {
-      console.error('Error processing Binance data:', error);
+      console.error('Error fetching all market data:', error);
       this.setState({
         loading: false,
         error: 'Failed to load market data. Please try again later.'
@@ -239,45 +170,62 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     }
   };
 
-  private updatePricesFromBinance = async (): Promise<void> => {
+  private fetchDataSource = async (source: CexType | 'all'): Promise<void> => {
     try {
-      const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
-      const tickerData = await response.json();
-      const updatedData = this.marketData.map(item => {
-        const newData = tickerData.find((t: any) => t.symbol === item.symbol);
-        if (newData) {
-          const price = parseFloat(newData.lastPrice);
-          const prevPrice = item.price - item.change;
-          const change = price - prevPrice;
-          const changePercent = prevPrice > 0 ? (change / prevPrice) * 100 : 0;
-          const volume = parseFloat(newData.volume);
-          const quoteVolume = parseFloat(newData.quoteVolume);
-          return {
-            ...item,
-            price: price,
-            change: change,
-            changePercent: changePercent,
-            volume: volume,
-            marketCap: quoteVolume * 10,
-            quoteVolume: quoteVolume
-          };
-        }
-        return item;
+      this.setState({ loading: true, error: null });
+
+      if (source === 'all') {
+        await this.dataAggregator.fetchAllData();
+      } else {
+        await this.dataAggregator.fetchDataSource(source);
+      }
+
+      this.updateMarketData();
+      this.setState({ loading: false });
+    } catch (error) {
+      console.error(`Error fetching data for ${source}:`, error);
+      this.setState({
+        loading: false,
+        error: `Failed to load ${source === 'all' ? 'all exchanges' : source} data.`
       });
-      this.marketData = updatedData;
-      this.volumeStats.totalVolume24h = this.marketData.reduce(
-        (sum, item) => sum + (item.quoteVolume || 0), 0
-      );
-      this.volumeStats.lastUpdate = Date.now();
+    }
+  };
+
+  private updateMarketData = (): void => {
+    const { selectedDataSource } = this.state;
+
+    if (selectedDataSource === 'all') {
+      this.marketData = this.dataAggregator.getMarketDataBySource();
+    } else {
+      this.marketData = this.dataAggregator.getMarketDataBySource(selectedDataSource);
+    }
+
+    this.calculateVolumeStats();
+  };
+
+  private calculateVolumeStats = (): void => {
+    this.volumeStats = {
+      totalVolume24h: this.marketData.reduce((sum, item) => sum + (item.quoteVolume || 0), 0),
+      totalTrades24h: Math.floor(Math.random() * 50000000) + 10000000,
+      latestBlock: Math.floor(Math.random() * 1000000) + 370000000,
+      lastUpdate: Date.now()
+    };
+  };
+
+  private updatePricesFromSources = async (): Promise<void> => {
+    try {
+      await this.dataAggregator.updatePrices();
+      this.updateMarketData();
       this.forceUpdate();
     } catch (error) {
-      console.error('Error updating prices from Binance:', error);
+      console.error('Error updating prices:', error);
     }
   };
 
   private filterMarketData = (): MarketData[] => {
     const { selectedFilter, selectedTime } = this.state;
     let filteredData = [...this.marketData];
+
     if (selectedFilter) {
       const [filterType, timePeriod] = selectedFilter.split('-');
       switch (filterType) {
@@ -292,11 +240,27 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           break;
       }
     }
+
+    const { selectedDataSource } = this.state;
+    if (selectedDataSource !== 'all') {
+      filteredData = filteredData.filter(item => item.source === selectedDataSource);
+    }
+
     return filteredData;
   };
 
+  private handleDataSourceSelect = (source: CexType | 'all'): void => {
+    this.setState({
+      selectedDataSource: source,
+      selectedSubMenu: source === 'all' ? 'all' : source,
+      currentPage: 0
+    }, () => {
+      this.updateMarketData();
+    });
+  };
+
   private renderFilterButtons = () => {
-    const { theme, selectedFilter, expandedFilter, selectedTime } = this.state;
+    const { theme, selectedFilter, expandedFilter, selectedTime, selectedDataSource } = this.state;
     const borderColor = theme === 'dark' ? '#2D323D' : '#E1E5E9';
     const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
     const activeBgColor = theme === 'dark' ? '#3C4858' : '#E1E5E9';
@@ -328,6 +292,11 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const handleOutsideClick = () => {
       this.setState({ expandedFilter: null });
     };
+
+    const currentSourceName = selectedDataSource === 'all'
+      ? 'All Exchanges'
+      : this.dataAggregator.getSourceName(selectedDataSource);
+
     return (
       <div style={{
         padding: '5px 10px',
@@ -342,7 +311,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           flexWrap: 'wrap'
         }}>
           <div
-            onClick={handleResetAll}
+            onClick={() => this.fetchDataSource(selectedDataSource)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -357,8 +326,23 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             }}
           >
             <Icon icon="refresh" size={12} />
-            <span>Reset</span>
+            <span>Refresh {currentSourceName}</span>
           </div>
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 12px',
+            fontSize: '13px',
+            border: `1px solid ${borderColor}`,
+            backgroundColor: theme === 'dark' ? '#1A1D24' : '#FFFFFF',
+            color: theme === 'dark' ? '#E8EAED' : '#1A1D24'
+          }}>
+            <Icon icon="database" size={12} />
+            <span>Source: {currentSourceName}</span>
+          </div>
+
           <div style={{ position: 'relative' }}>
             <div
               onClick={() => {
@@ -587,7 +571,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             </div>
           </div>
         </div>
-
         {expandedFilter && (
           <div
             style={{
@@ -644,10 +627,10 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
       this.resizeObserver.observe(this.containerRef.current.parentElement);
     }
 
-    this.processBinanceData();
+    this.fetchAllMarketData();
 
     this.priceUpdateInterval = setInterval(async () => {
-      await this.updatePricesFromBinance();
+      await this.updatePricesFromSources();
     }, 10000);
   }
 
@@ -671,7 +654,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const focusShadow = theme === 'dark'
       ? '0 0 0 2px rgba(143, 153, 168, 0.3)'
       : '0 0 0 2px rgba(95, 107, 124, 0.2)';
-
     return `
       .no-select {
         -webkit-user-select: none;
@@ -1033,7 +1015,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             color: primaryColor,
             padding: '8px 12px'
           }}>
-            Binance Market
+            Multi-Exchange Market
           </div>
           <Button
             minimal
@@ -1091,7 +1073,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
   };
 
   private renderMenuContent = () => {
-    const { theme, selectedMenu, selectedSubMenu, expandedMenus, isCollapsed } = this.state;
+    const { theme, selectedDataSource, expandedMenus, isCollapsed } = this.state;
     const primaryColor = theme === 'dark' ? '#A7B6C2' : '#404854';
     const textColor = theme === 'dark' ? '#E8EAED' : '#1A1D24';
     if (isCollapsed) {
@@ -1100,8 +1082,8 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           {this.menuData.map((menu) => (
             <div
               key={menu.key}
-              onClick={() => this.handleMenuSelect(menu.key)}
-              className={`menu-item menu-item-hover ${selectedMenu === menu.key ? 'menu-item-selected' : ''} collapsed-menu-item`}
+              onClick={() => this.handleMenuToggle(menu.key)}
+              className={`menu-item menu-item-hover collapsed-menu-item`}
               tabIndex={0}
               style={{
                 display: 'flex',
@@ -1110,11 +1092,9 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 fontSize: '14px',
                 fontWeight: '500',
                 cursor: 'pointer',
-                backgroundColor: selectedMenu === menu.key ?
-                  (theme === 'dark' ? '#3C4858' : '#E1E5E9') : 'transparent',
-                borderRight: selectedMenu === menu.key ? `3px solid ${primaryColor}` : '3px solid transparent',
-                color: selectedMenu === menu.key ?
-                  (theme === 'dark' ? '#FFFFFF' : '#182026') : textColor,
+                backgroundColor: 'transparent',
+                borderRight: '3px solid transparent',
+                color: textColor,
                 transition: 'all 0.2s ease',
                 outline: 'none',
                 marginBottom: '4px',
@@ -1125,7 +1105,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 icon={menu.icon as any}
                 size={16}
                 className="menu-icon"
-                color={selectedMenu === menu.key ? primaryColor : undefined}
               />
             </div>
           ))}
@@ -1142,8 +1121,8 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
           return (
             <div key={menu.key} style={{ marginBottom: '4px' }}>
               <div
-                onClick={() => this.handleMenuSelect(menu.key)}
-                className={`menu-item menu-item-hover ${selectedMenu === menu.key ? 'menu-item-selected' : ''}`}
+                onClick={() => this.handleMenuToggle(menu.key)}
+                className={`menu-item menu-item-hover`}
                 tabIndex={0}
                 style={{
                   display: 'flex',
@@ -1154,11 +1133,9 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
-                  backgroundColor: selectedMenu === menu.key ?
-                    (theme === 'dark' ? '#3C4858' : '#E1E5E9') : 'transparent',
-                  borderRight: selectedMenu === menu.key ? `3px solid ${primaryColor}` : '3px solid transparent',
-                  color: selectedMenu === menu.key ?
-                    (theme === 'dark' ? '#FFFFFF' : '#182026') : textColor,
+                  backgroundColor: 'transparent',
+                  borderRight: '3px solid transparent',
+                  color: textColor,
                   transition: 'all 0.2s ease',
                   outline: 'none',
                 }}
@@ -1167,7 +1144,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   <Icon
                     icon={menu.icon as any}
                     size={14}
-                    color={selectedMenu === menu.key ? primaryColor : undefined}
                   />
                   <span style={{ fontSize: '14px' }}>{menu.label}</span>
                 </div>
@@ -1175,7 +1151,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   <Icon
                     icon={isExpanded ? "chevron-down" : "chevron-right"}
                     size={12}
-                    color={selectedMenu === menu.key ? primaryColor : textColor}
+                    color={textColor}
                     style={{
                       transition: 'transform 0.2s ease',
                       opacity: 0.7
@@ -1186,29 +1162,32 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
 
               {hasChildren && isExpanded && (
                 <div style={{ marginTop: '2px' }}>
-                  {menu.children.map((child) => (
-                    <div
-                      key={child.key}
-                      onClick={() => this.handleMenuSelect(menu.key, child.key)}
-                      className={`menu-item menu-item-hover ${selectedSubMenu === child.key ? 'menu-item-selected' : ''}`}
-                      tabIndex={0}
-                      style={{
-                        padding: '8px 16px 8px 36px',
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        backgroundColor: selectedSubMenu === child.key ?
-                          (theme === 'dark' ? '#3C4858' : '#E1E5E9') : 'transparent',
-                        color: selectedSubMenu === child.key ?
-                          (theme === 'dark' ? '#FFFFFF' : '#182026') : textColor,
-                        borderRight: selectedSubMenu === child.key ? `3px solid ${primaryColor}` : '3px solid transparent',
-                        transition: 'all 0.2s ease',
-                        margin: '1px 0',
-                        outline: 'none',
-                      }}
-                    >
-                      {child.label}
-                    </div>
-                  ))}
+                  {menu.children.map((child) => {
+                    const isSelected = selectedDataSource === child.source;
+                    return (
+                      <div
+                        key={child.key}
+                        onClick={() => this.handleDataSourceSelect(child.source)}
+                        className={`menu-item menu-item-hover ${isSelected ? 'menu-item-selected' : ''}`}
+                        tabIndex={0}
+                        style={{
+                          padding: '8px 16px 8px 36px',
+                          fontSize: '13px',
+                          cursor: 'pointer',
+                          backgroundColor: isSelected ?
+                            (theme === 'dark' ? '#3C4858' : '#E1E5E9') : 'transparent',
+                          color: isSelected ?
+                            (theme === 'dark' ? '#FFFFFF' : '#182026') : textColor,
+                          borderRight: isSelected ? `3px solid ${primaryColor}` : '3px solid transparent',
+                          transition: 'all 0.2s ease',
+                          margin: '1px 0',
+                          outline: 'none',
+                        }}
+                      >
+                        {child.label}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -1219,7 +1198,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
   };
 
   private renderMarketTable = () => {
-    const { theme, currentPage, tableHeaderFixed, loading, error } = this.state;
+    const { theme, currentPage, tableHeaderFixed, loading, error, selectedDataSource } = this.state;
     const itemsPerPage = 50;
     const filteredData = this.filterMarketData();
     const startIndex = currentPage * itemsPerPage;
@@ -1232,8 +1211,10 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
     const positiveColor = '#2E8B57';
     const negativeColor = '#DC143C';
     const headerClass = tableHeaderFixed ? 'fixed-header' : '';
-
     if (loading) {
+      const loadingText = selectedDataSource === 'all'
+        ? 'Loading market data from all exchanges...'
+        : `Loading ${this.dataAggregator.getSourceName(selectedDataSource)} data...`;
       return (
         <div style={{
           display: 'flex',
@@ -1245,12 +1226,11 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         }}>
           <div style={{ textAlign: 'center' }}>
             <Icon icon="refresh" size={32} />
-            <div style={{ marginTop: '16px' }}>Loading market data from Binance...</div>
+            <div style={{ marginTop: '16px' }}>{loadingText}</div>
           </div>
         </div>
       );
     }
-
     if (error) {
       return (
         <div style={{
@@ -1266,7 +1246,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             <div style={{ marginTop: '16px' }}>{error}</div>
             <Button
               style={{ marginTop: '16px' }}
-              onClick={() => this.processBinanceData()}
+              onClick={() => this.fetchDataSource(selectedDataSource)}
             >
               Retry
             </Button>
@@ -1274,7 +1254,6 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
         </div>
       );
     }
-
     return (
       <div className="table-container">
         <div
@@ -1309,7 +1288,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   borderBottom: `1px solid ${borderColor}`
-                }}>Name</th>
+                }}>Exchange</th>
                 <th style={{
                   padding: '12px 16px',
                   textAlign: 'right',
@@ -1360,7 +1339,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
             <tbody>
               {currentData.map((item, index) => (
                 <tr
-                  key={startIndex + index}
+                  key={`${item.source}-${item.symbol}-${index}`}
                   style={{
                     borderBottom: `1px solid ${borderColor}`,
                     height: '42px',
@@ -1374,8 +1353,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                     e.currentTarget.style.backgroundColor = tableBg;
                   }}
                   onClick={() => {
-                    const cexType = CexType.Binance;
-                    this.props.navigate(`/trade/${cexType}/${item.symbol}`);
+                    this.props.navigate?.(`/trade/${item.source}/${item.sourceSymbol}`);
                   }}
                 >
                   <td style={{
@@ -1384,9 +1362,15 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                     alignItems: 'center',
                     gap: '8px'
                   }}>
-                    <span style={{ fontWeight: '600' }}>{item.symbol.replace('USDT', '')}</span>
+                    <span style={{ fontWeight: '600' }}>{item.symbol}</span>
                   </td>
-                  <td style={{ padding: '8px 16px' }}>{item.name}</td>
+                  <td style={{
+                    padding: '8px 16px',
+                    fontSize: '12px',
+                    opacity: 0.8
+                  }}>
+                    {this.dataAggregator.getSourceName(item.source)}
+                  </td>
                   <td style={{
                     padding: '8px 16px',
                     textAlign: 'right',
@@ -1466,7 +1450,7 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
               small
               minimal
               icon="refresh"
-              onClick={() => this.processBinanceData()}
+              onClick={() => this.fetchDataSource(this.state.selectedDataSource)}
               title="Refresh data"
             />
           </div>
@@ -1532,8 +1516,8 @@ class MarketPage extends React.Component<MarketPageProps, MarketPageState> {
                 opacity: 0.7,
                 flexShrink: 0
               }}>
-                <div style={{ marginBottom: '4px' }}>Data Source: Binance API</div>
-                <div>v1.0.0 • Real-time</div>
+                <div style={{ marginBottom: '4px' }}>Data Sources: Binance, Bybit, Bitget, Hyperliquid</div>
+                <div>v1.0.0 • Multi-Exchange • Real-time</div>
               </div>
             )}
           </div>

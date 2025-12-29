@@ -6,7 +6,7 @@ import MiddleArea from './components/center/MiddleArea';
 import BottomArea from './components/bottom/BottomArea';
 import { BrowserRouter as Router, Route, BrowserRouter, Routes } from 'react-router-dom';
 import FinanceToolsPageIndex from './pages/FinanceToolsPage/ToolPageIndex';
-import MarketPage from './pages/MarketPageIndex';
+import MarketPage from './pages/MarketPage/MarketPageIndex';
 import NewsPage from './pages/NewsPageIndex';
 import ArbitragePageIndex from './pages/ArbitragePage/ArbitragePageIndex';
 import TradePage from './pages/TradePage/TradePageIndex';
