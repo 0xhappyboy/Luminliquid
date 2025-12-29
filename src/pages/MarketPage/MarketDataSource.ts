@@ -185,7 +185,17 @@ export class HyperliquidDataSource implements IMarketDataSource {
     name = "Hyperliquid";
     async fetchTickerData(): Promise<any[]> {
         try {
-            const response = await fetch('https://api.hyperliquid.xyz/info');
+            const requestBody = {
+                type: 'metaAndAssetCtxs'
+            };
+            const response = await fetch('https://api.hyperliquid.xyz/info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -196,19 +206,33 @@ export class HyperliquidDataSource implements IMarketDataSource {
         }
     }
 
-    processData(rawData: any): MarketData[] {
-        if (!rawData || !rawData.meta) return [];
-        return rawData.meta.universe.map((item: any) => {
-            const stats = rawData.meta.perpStats?.[item.name] || {};
-            const price = stats.markPrice || 0;
-            const prevPrice = stats.prevDayPrice || price;
+    processData(rawData: any[]): MarketData[] {
+        if (!Array.isArray(rawData) || rawData.length < 2) {
+            return [];
+        }
+        const universe = rawData[0]?.universe || [];
+        const marketDataList = rawData[1] || [];
+        if (!Array.isArray(universe) || !Array.isArray(marketDataList)) {
+            return [];
+        }
+        if (universe.length === 0 || universe.length !== marketDataList.length) {
+            return [];
+        }
+        const processedData = universe.map((symbolItem: any, index: number) => {
+            const marketData = marketDataList[index];
+            const symbolName = symbolItem.name || symbolItem.symbol || `UNKNOWN_${index}`;
+            const price = parseFloat(marketData.markPx) ||
+                parseFloat(marketData.midPx) ||
+                parseFloat(marketData.prevDayPx) || 0;
+            const prevPrice = parseFloat(marketData.prevDayPx) || price;
             const change = price - prevPrice;
             const changePercent = prevPrice > 0 ? (change / prevPrice) * 100 : 0;
-            const volume = stats.volume24h || 0;
-            const quoteVolume = volume * price;
+            const quoteVolume = parseFloat(marketData.dayNtlVlm) || 0;
+            const volume = quoteVolume / price || 0;
+
             return {
-                symbol: item.name,
-                name: item.name,
+                symbol: symbolName,
+                name: symbolName,
                 price: price,
                 change: change,
                 changePercent: changePercent,
@@ -216,9 +240,10 @@ export class HyperliquidDataSource implements IMarketDataSource {
                 marketCap: quoteVolume * 10,
                 quoteVolume: quoteVolume,
                 source: this.type,
-                sourceSymbol: item.name
+                sourceSymbol: symbolName
             };
         }).filter((item: MarketData) => item.quoteVolume > 100000);
+        return processedData;
     }
 }
 
